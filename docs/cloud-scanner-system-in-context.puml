@@ -1,0 +1,20 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+
+
+LAYOUT_WITH_LEGEND()
+
+Person(ana, "Ana", "Manage resources in an AWS account")
+
+
+System(cloudscanner, "Cloud scanner", "Combines resource usage and impacts")
+
+System_Ext(aws, "AWS standard APIs", "Returns resource usage")
+System_Ext(boaviztaapi, "Boavizta API", "Returns impact data")
+
+Rel(ana, cloudscanner, "Get cloud usage impacts data using")
+Rel(cloudscanner, aws, "List resources and usage detail using")
+Rel(cloudscanner, boaviztaapi, "Get impacts of the scanned resources using")
+
+@enduml

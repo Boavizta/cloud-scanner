@@ -1,0 +1,248 @@
+{
+  "instances": [
+    {
+      "instance_id": "123",
+      "instance_type": "a1.4xlarge",
+      "impacts": {
+        "impacts": {
+          "gwp": {
+            "manufacture": 565,
+            "use": 0.00560505
+          },
+          "pe": {
+            "manufacture": 7720,
+            "use": "Not Implemented"
+          },
+          "adp": {
+            "manufacture": 0.102,
+            "use": "Not Implemented"
+          }
+        },
+        "verbose": {
+          "CPU-1": {
+            "unit": 1,
+            "hash": "9249748bf565cc80f784a4024f3ff0b12f3a71865abadd9701dbc0876ee81e7a",
+            "core_units": {
+              "input_value": null,
+              "used_value": 24,
+              "status": "SET"
+            },
+            "die_size_per_core": {
+              "input_value": null,
+              "used_value": 0.245,
+              "status": "SET"
+            },
+            "process": {
+              "input_value": null,
+              "used_value": 16,
+              "status": "SET"
+            },
+            "manufacturer": {
+              "input_value": null,
+              "used_value": "Annapurna Labs",
+              "status": "SET"
+            },
+            "manufacture_date": {
+              "input_value": null,
+              "used_value": "2018",
+              "status": "SET"
+            },
+            "family": {
+              "input_value": null,
+              "used_value": "Graviton",
+              "status": "SET"
+            },
+            "impacts": {
+              "gwp": 22,
+              "pe": 325,
+              "adp": 0.02
+            }
+          },
+          "RAM-1": {
+            "unit": 2,
+            "hash": "6f524d576e2243d3647948dc0e06e9a9b5da3067dcd16f1b06ecafd7eb07cfd5",
+            "capacity": {
+              "input_value": null,
+              "used_value": 16,
+              "status": "SET"
+            },
+            "density": {
+              "input_value": null,
+              "used_value": 0.625,
+              "status": "SET"
+            },
+            "impacts": {
+              "gwp": 124,
+              "pe": 1546,
+              "adp": 0.006
+            }
+          },
+          "POWER_SUPPLY-1": {
+            "unit": 2,
+            "hash": "be84aabaaac41126e1bd93ec3c10b355c6c7534cf9e3d7337cef9d6d0bb116c6",
+            "unit_weight": {
+              "input_value": null,
+              "used_value": 2.99,
+              "status": "SET"
+            },
+            "impacts": {
+              "gwp": 146,
+              "pe": 2104,
+              "adp": 0.05
+            }
+          },
+          "CASE-1": {
+            "unit": 1,
+            "hash": "083dcd17f9997756af73de7c61f0cf2986b25075ad00bbf7c07e08cc80a2183f",
+            "case_type": {
+              "input_value": null,
+              "used_value": "rack",
+              "status": "SET"
+            },
+            "impacts": {
+              "gwp": 150,
+              "pe": 2200,
+              "adp": 0.02
+            }
+          },
+          "MOTHERBOARD-1": {
+            "unit": 1,
+            "hash": "3a31a8fbd4b871719831ef11af93eefbb1c2afc0f62d850a31fb5475aac9336e",
+            "impacts": {
+              "gwp": 66,
+              "pe": 836,
+              "adp": 0.004
+            }
+          },
+          "ASSEMBLY-1": {
+            "unit": 1,
+            "hash": "8bfe70a2b59691c050865455cc9cf1b561ec702e7cf930c1026a490964bbd364",
+            "impacts": {
+              "gwp": 7,
+              "pe": 69,
+              "adp": 0
+            }
+          },
+          "SSD-1": {
+            "unit": 1,
+            "hash": "cb269039943b145f924c394acd2f665c10b23bddf954428af81bd8eccaff3d6a",
+            "capacity": {
+              "input_value": null,
+              "used_value": 1000,
+              "status": "SET"
+            },
+            "density": {
+              "input_value": null,
+              "used_value": 48.5,
+              "status": "SET"
+            },
+            "impacts": {
+              "gwp": 52,
+              "pe": 640,
+              "adp": 0.002
+            }
+          },
+          "USAGE-1": {
+            "unit": 1,
+            "hash": 0,
+            "hours_use_time": {
+              "input_value": 2,
+              "used_value": 2,
+              "status": "UNCHANGED"
+            },
+            "hours_electrical_consumption": {
+              "input_value": null,
+              "used_value": 0.050955,
+              "status": "SET"
+            },
+            "usage_location": {
+              "input_value": "FRA",
+              "used_value": "FRA",
+              "status": "UNCHANGED"
+            },
+            "gwp_factor": {
+              "input_value": null,
+              "used_value": 0.055,
+              "status": "SET"
+            },
+            "pe_factor": {
+              "input_value": null,
+              "used_value": 0,
+              "status": "SET"
+            },
+            "adp_factor": {
+              "input_value": null,
+              "used_value": 0,
+              "status": "SET"
+            },
+            "max_power": {
+              "input_value": null,
+              "used_value": 67.94,
+              "status": "SET"
+            },
+            "workload": {
+              "10": {
+                "power": {
+                  "input_value": null,
+                  "used_value": 0.45,
+                  "status": "SET"
+                },
+                "time": {
+                  "input_value": 0,
+                  "used_value": 0,
+                  "status": "UNCHANGED"
+                }
+              },
+              "50": {
+                "power": {
+                  "input_value": null,
+                  "used_value": 0.75,
+                  "status": "SET"
+                },
+                "time": {
+                  "input_value": 1,
+                  "used_value": 1,
+                  "status": "UNCHANGED"
+                }
+              },
+              "100": {
+                "power": {
+                  "input_value": null,
+                  "used_value": 1,
+                  "status": "SET"
+                },
+                "time": {
+                  "input_value": 0,
+                  "used_value": 0,
+                  "status": "UNCHANGED"
+                }
+              },
+              "idle": {
+                "power": {
+                  "input_value": null,
+                  "used_value": 0.28,
+                  "status": "SET"
+                },
+                "time": {
+                  "input_value": 0,
+                  "used_value": 0,
+                  "status": "UNCHANGED"
+                }
+              }
+            },
+            "instance_per_server": {
+              "input_value": null,
+              "used_value": 1,
+              "status": "SET"
+            },
+            "impacts": {
+              "gwp": 0,
+              "pe": 0,
+              "adp": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}
