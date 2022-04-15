@@ -6,6 +6,12 @@ Collect cloud usage data, so that it can be combined with impact data of Boavizt
 
 ## Usage
 
-## Scanner output format
+### Passing credentials
 
-Cloud scanner returns results in a format that can be directly used to query Boavizta API
+### Filtering resources
+
+## Output format
+
+Cloud scanner returns an array of instances with their impacts in json format.
+
+See [docs/sample_result.json](docs/sample_result.json)
