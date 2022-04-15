@@ -8,16 +8,13 @@ LAYOUT_WITH_LEGEND()
 Person(ana, "Ana", "Manage resources in an AWS account")
 
 
-System(cloudscanner, "Cloud scanner", "Collects resource usage data in a format usable to query Boavizta API", "a")
+System(cloudscanner, "Cloud scanner", "Combines resource usage and impacts")
 
+System_Ext(aws, "AWS standard APIs", "Returns resource usage")
 System_Ext(boaviztaapi, "Boavizta API", "Returns impact data")
-System_Ext(aws, "aws standard apis", "Returns resource usage")
 
-
-Rel(ana, cloudscanner, "Get cloud usage data using")
-Rel(ana, boaviztaapi, "Get impacts of the scanned resources using")
-Rel(cloudscanner,aws, "List resources and usage detail using")
-
-
+Rel(ana, cloudscanner, "Get cloud usage impacts data using")
+Rel(cloudscanner, aws, "List resources and usage detail using")
+Rel(cloudscanner, boaviztaapi, "Get impacts of the scanned resources using")
 
 @enduml

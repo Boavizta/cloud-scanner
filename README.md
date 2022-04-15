@@ -2,7 +2,7 @@
 
 Collect cloud usage data, so that it can be combined with impact data of Boavizta API.
 
-![Get a scan o](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
+![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
 ## Usage
 
