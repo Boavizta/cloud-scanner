@@ -1,12 +1,15 @@
 [package]
+authors = ["Olivier de Meringo <demeringo@gmail.com>"]
+edition = "2021"
 name = "cloud-scanner-cli"
 version = "0.0.1"
-edition = "2021"
-authors = ["Olivier de Meringo <demeringo@gmail.com>"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 aws-config = "0.10.1"
+aws-sdk-ec2 = "0.10.1"
+structopt =  "0.3"
+
+[dependencies.tokio]
+features = ["full"]
+version = "1"
 aws-sdk-ec2 = "0.10.1"
 tokio = { version = "1", features = ["full"] }
