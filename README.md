@@ -20,18 +20,22 @@ export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 ### Filtering resources
 
-TODO
+Not yet implemented
 
 ### Run
 
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 cd cloud-scanner-cli
-cargo run
+cargo run -- --text
 ```
 
 ## Output format
 
-Cloud scanner returns an array of instances with their impacts in json format.
+Cloud scanner prints some instance metadata (instanceid, tags and type) on stdout.
 
-See [docs/sample_result.json](docs/sample_result.json)
+Will soon return
+
+- an array of instances (json)
+- an array of instances with their usage/workload (json)
+- return an array of instances with their impact as json (Boavizta output, see [docs/sample_result.json](docs/sample_result.json))
