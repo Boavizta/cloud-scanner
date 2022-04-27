@@ -6,6 +6,8 @@ version = "0.0.1"
 [dependencies]
 aws-config = "0.10.1"
 aws-sdk-ec2 = "0.10.1"
+aws-sdk-cloudwatch = "0.10.1"
+
 structopt =  "0.3"
 
 [dependencies.tokio]

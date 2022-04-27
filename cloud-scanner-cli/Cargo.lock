@@ -93,6 +93,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "aws-sdk-cloudwatch"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "671b4c09faa5303725d253320478589f2fef1f5d83cf86340f6a549b9400fbca"
+dependencies = [
+ "aws-endpoint",
+ "aws-http",
+ "aws-sig-auth",
+ "aws-smithy-async",
+ "aws-smithy-client",
+ "aws-smithy-http",
+ "aws-smithy-http-tower",
+ "aws-smithy-query",
+ "aws-smithy-types",
+ "aws-smithy-xml",
+ "aws-types",
+ "bytes",
+ "http",
+ "tokio-stream",
+ "tower",
+]
+
+[[package]]
 name = "aws-sdk-ec2"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -387,6 +410,7 @@ name = "cloud-scanner-cli"
 version = "0.0.1"
 dependencies = [
  "aws-config",
+ "aws-sdk-cloudwatch",
  "aws-sdk-ec2",
  "structopt",
  "tokio",
