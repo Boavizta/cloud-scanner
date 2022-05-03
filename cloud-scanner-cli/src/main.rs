@@ -2,10 +2,7 @@ use aws_sdk_cloudwatch::Error;
 use structopt::clap::crate_version;
 use structopt::StructOpt;
 mod aws_api;
-
-use boavizta_api_sdk::apis::cloud_api::server_get_all_archetype_name_v1_cloud_aws_all_instances_get;
-
-use boavizta_api_sdk::apis::configuration::Configuration;
+mod boavizta_api;
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "cloud-scanner-cli", version = crate_version!(), about = "AWS account scanner to list instances.")]
@@ -38,12 +35,4 @@ async fn main() -> Result<(), Error> {
     }
 
     Ok(())
-}
-
-#[tokio::test]
-async fn calling_api_through_sdk_works() {
-    let mut config = boavizta_api_sdk::apis::configuration::Configuration::new();
-    config.base_path = String::from("https://api.boavizta.org");
-    let res = boavizta_api_sdk::apis::cloud_api::server_get_all_archetype_name_v1_cloud_aws_all_instances_get(&config).await;
-    println!("{:?}", res);
 }

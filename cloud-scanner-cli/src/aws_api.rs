@@ -1,8 +1,8 @@
 //use aws_sdk_cloudwatch::;
 //use aws_config::meta::region::RegionProviderChain;
+use aws_sdk_cloudwatch::Client as CW_client;
 use aws_sdk_ec2::model::Instance;
 use aws_sdk_ec2::{Client, Error /*Region*/};
-use aws_sdk_cloudwatch::{Client as CW_client};
 // struct InstanceUsage {
 //     instance: aws_sdk_ec2::model::Instance,
 //     timestamp: f64,
@@ -48,10 +48,6 @@ fn print_instances(instances: Vec<Instance>) {
         println!();
     }
 }
-
-// async fn get_default_impact(instance: Instance){
-//  // Call boavizta API, passing an instance type, returns a sandard imapact of Boavizata API
-// }
 
 // async fn show_regions(client: &Client) -> Result<(), Error> {
 //     let rsp = client.describe_regions().send().await?;

@@ -424,6 +424,9 @@ dependencies = [
  "aws-sdk-cloudwatch",
  "aws-sdk-ec2",
  "boavizta_api_sdk",
+ "serde",
+ "serde_derive",
+ "serde_json",
  "structopt",
  "tokio",
 ]
