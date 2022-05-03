@@ -1,12 +1,10 @@
-# ValidationError
+# MotherBoard
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**loc** | [**Vec<crate::models::AnyOfstringinteger>**](anyOf<string,integer>.md) |  | 
-**msg** | **String** |  | 
-**_type** | **String** |  | 
+**units** | Option<**i32**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

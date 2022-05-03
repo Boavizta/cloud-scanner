@@ -49,3 +49,9 @@ Will soon return
 - an array of instances (json)
 - an array of instances with their usage/workload (json)
 - return an array of instances with their impact as json (Boavizta output, see [docs/sample_result.json](docs/sample_result.json))
+
+## Generate / update Boavizta API sdk
+
+```sh
+docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://api.boavizta.org/openapi.json   -g rust  -o /local/boavizta-api-sdk --package-name boavizta_api_sdk
+```
