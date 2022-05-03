@@ -8,9 +8,27 @@ At the moment it just list instances of your default region, without any usage n
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
+## Getting started
+
+### List AWS instances of the account
+
+Using default account region.
+
+```sh
+export AWS_PROFILE='<YOUR_PROFILE_NAME>'
+cd cloud-scanner-cli
+cargo run -- --text
+```
+
+### Get impact of your instances for a given period
+
+- pass period parameter (start date / end date)
+- TODO: define a sampling rate for cloudwatch metrics  retrieval?
+
+
 ## Usage
 
-### Passing credentials
+### Passing AWS credentials
 
 Easiest way is use an environment variable to use a specific aws profile.
 
@@ -21,14 +39,6 @@ export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 ### Filtering resources
 
 Not yet implemented
-
-### Run
-
-```sh
-export AWS_PROFILE='<YOUR_PROFILE_NAME>'
-cd cloud-scanner-cli
-cargo run -- --text
-```
 
 ## Output format
 

@@ -10,6 +10,9 @@ aws-sdk-cloudwatch = "0.10.1"
 
 structopt =  "0.3"
 
+boavizta_api_sdk = { path = "../boavizta-api-sdk" }
+
+
 [dependencies.tokio]
 features = ["full"]
 version = "1"

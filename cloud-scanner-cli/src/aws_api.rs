@@ -2,7 +2,7 @@
 //use aws_config::meta::region::RegionProviderChain;
 use aws_sdk_ec2::model::Instance;
 use aws_sdk_ec2::{Client, Error /*Region*/};
-
+use aws_sdk_cloudwatch::{Client as CW_client};
 // struct InstanceUsage {
 //     instance: aws_sdk_ec2::model::Instance,
 //     timestamp: f64,
@@ -75,9 +75,10 @@ pub async fn display_instances_as_text(tags: Vec<String>) {
 
 // List metrics.
 // snippet-start:[cloudwatch.rust.list-metrics]
-pub async fn show_metrics(
-    client: &aws_sdk_cloudwatch::Client,
-) -> Result<(), aws_sdk_cloudwatch::Error> {
+pub async fn list_metrics() -> Result<(), aws_sdk_cloudwatch::Error> {
+    let shared_config = aws_config::from_env().load().await;
+    let client = CW_client::new(&shared_config);
+
     let rsp = client.list_metrics().send().await?;
     let metrics = rsp.metrics().unwrap_or_default();
 
@@ -103,4 +104,3 @@ pub async fn show_metrics(
 
     Ok(())
 }
-
