@@ -77,6 +77,7 @@ Class | Method | HTTP request | Description
  - [UsageCloud](docs/UsageCloud.md)
  - [UsageServer](docs/UsageServer.md)
  - [ValidationError](docs/ValidationError.md)
+ - [ValidationErrorLocInner](docs/ValidationErrorLocInner.md)
 
 
 To get access to the crate's generated documentation, use:

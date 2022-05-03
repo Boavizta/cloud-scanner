@@ -24,3 +24,5 @@ pub mod usage_server;
 pub use self::usage_server::UsageServer;
 pub mod validation_error;
 pub use self::validation_error::ValidationError;
+pub mod validation_error_loc_inner;
+pub use self::validation_error_loc_inner::ValidationErrorLocInner;

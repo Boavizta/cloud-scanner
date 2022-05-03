@@ -12,21 +12,12 @@
 
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct ValidationError {
-    #[serde(rename = "loc")]
-    pub loc: Vec<crate::models::ValidationErrorLocInner>,
-    #[serde(rename = "msg")]
-    pub msg: String,
-    #[serde(rename = "type")]
-    pub _type: String,
+pub struct ValidationErrorLocInner {
 }
 
-impl ValidationError {
-    pub fn new(loc: Vec<crate::models::ValidationErrorLocInner>, msg: String, _type: String) -> ValidationError {
-        ValidationError {
-            loc,
-            msg,
-            _type,
+impl ValidationErrorLocInner {
+    pub fn new() -> ValidationErrorLocInner {
+        ValidationErrorLocInner {
         }
     }
 }
