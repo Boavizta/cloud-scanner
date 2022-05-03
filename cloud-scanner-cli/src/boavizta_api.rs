@@ -37,23 +37,31 @@ async fn get_all_impacts(tags:Vec<String> ){
 /// Returns the default impacts of an instance from Boavizta API
 /// without considering usage pattern (default is 100% usage)
 ///
+/// Returns empty json of impact if any error
 async fn get_default_impacts(instance_type: String) -> serde_json::Value {
     // Call boavizta API, passing an instance type, returns a standard impact
     let mut configuration = configuration::Configuration::new();
     configuration.base_path = String::from("https://api.boavizta.org");
-    let instance_type = Some(instance_type.as_str());
+    let opt_instance_type = Some(instance_type.as_str());
 
     let verbose = Some(false);
     let usage_cloud: Option<UsageCloud> = Some(UsageCloud::new());
 
-    cloud_api::instance_cloud_impact_v1_cloud_aws_post(
+    let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
         &configuration,
-        instance_type,
+        opt_instance_type,
         verbose,
         usage_cloud,
     )
-    .await
-    .unwrap()
+    .await;
+    match res {
+        Ok(res) => res,
+        Err(e) => {
+            eprintln!("Cannot get impact from api for instance type {}: {}",instance_type,e);
+            serde_json::from_str("{}").unwrap() 
+        }
+    }
+    
 }
 
 /// Returns the default impacts of an instance from Boavizta API
