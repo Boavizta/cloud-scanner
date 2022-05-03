@@ -19,8 +19,14 @@ use aws_sdk_ec2::{Client, Error /*Region*/};
 /// List all instances of the current account
 ///
 /// Filtering instance on tags is not yet implemented.
-async fn list_instances(client: &Client, tags: Vec<String>) -> Result<Vec<Instance>, Error> {
+pub async fn list_instances(tags: Vec<String>) -> Result<Vec<Instance>, Error> {
     println!("Skipping tag filer {:?}", tags);
+
+    let shared_config = aws_config::from_env()
+    //.region(Region::new("eu-west-1"))
+    .load()
+    .await;
+    let client = Client::new(&shared_config);
 
     let mut instances: Vec<Instance> = Vec::new();
 
@@ -38,6 +44,7 @@ async fn list_instances(client: &Client, tags: Vec<String>) -> Result<Vec<Instan
     }
     Ok(instances)
 }
+
 
 /// Prints some instance details
 fn print_instances(instances: Vec<Instance>) {
@@ -60,12 +67,7 @@ fn print_instances(instances: Vec<Instance>) {
 
 /// Query account for instances and display as text
 pub async fn display_instances_as_text(tags: Vec<String>) {
-    let shared_config = aws_config::from_env()
-        //.region(Region::new("eu-west-1"))
-        .load()
-        .await;
-    let client = Client::new(&shared_config);
-    let instances = list_instances(&client, tags).await;
+    let instances = list_instances(tags).await;
     print_instances(instances.unwrap());
 }
 

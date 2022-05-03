@@ -5,6 +5,35 @@ use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::UsageCloud;
 use serde_json::{Result, Value};
 
+
+/// Describes an instance with it's impacts
+#[derive(Debug)]
+pub struct AwsInstanceWithImpacts {
+    instance_id: String,
+    instance_type: String,
+    impacts_json: String,
+}
+
+/// Returns minimal AWS instance metadata with its impacts
+pub async fn get_instance_with_impacts(instance: &aws_sdk_ec2::model::Instance) -> AwsInstanceWithImpacts {
+
+    let instance_id = String::from(instance.instance_id.as_ref().unwrap());
+    let instance_type = get_instance_type_as_string(instance);
+    let res : serde_json::Value = get_default_impacts_from_instance(instance).await;
+
+    AwsInstanceWithImpacts {
+        instance_id: instance_id,
+        instance_type: instance_type,
+        impacts_json: res.to_string(),
+    }
+
+}
+
+
+async fn get_all_impacts(tags:Vec<String> ){
+
+}
+
 /// Returns the default impacts of an instance from Boavizta API
 /// without considering usage pattern (default is 100% usage)
 ///
@@ -31,14 +60,14 @@ async fn get_default_impacts(instance_type: String) -> serde_json::Value {
 /// without considering usage pattern (default is 100% usage)
 ///
 async fn get_default_impacts_from_instance(
-    instance: aws_sdk_ec2::model::Instance,
+    instance: &aws_sdk_ec2::model::Instance,
 ) -> serde_json::Value {
     // Call boavizta API, passing an instance type, returns a standard impact
     let instance_type = get_instance_type_as_string(instance);
     get_default_impacts(instance_type).await
 }
 /// Returns the instance type (extracted from instance) as a new String
-fn get_instance_type_as_string(instance: aws_sdk_ec2::model::Instance) -> String {
+fn get_instance_type_as_string(instance: &aws_sdk_ec2::model::Instance) -> String {
     instance.instance_type().unwrap().as_str().to_owned()
 }
 
@@ -103,3 +132,4 @@ async fn get_default_impact() {
 
     assert_eq!(expected, impacts);
 }
+

@@ -1,4 +1,5 @@
 use aws_sdk_cloudwatch::Error;
+use boavizta_api::AwsInstanceWithImpacts;
 use structopt::clap::crate_version;
 use structopt::StructOpt;
 mod aws_api;
@@ -20,6 +21,20 @@ struct Opt {
     list_metrics: bool,
 }
 
+async fn print_all_impacts_as_json(tags: Vec<String>) {
+    let instances = aws_api::list_instances(tags).await.unwrap();
+
+    let mut instances_with_impacts: Vec<boavizta_api::AwsInstanceWithImpacts> = Vec::new();
+
+    for instance in &instances {
+        let value = boavizta_api::get_instance_with_impacts(instance).await;
+        instances_with_impacts.push(value);
+    }
+    for instance_with_impact in instances_with_impacts {
+        println!("{:?}", instance_with_impact);
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let opt = Opt::from_args();
@@ -32,6 +47,7 @@ async fn main() -> Result<(), Error> {
         aws_api::display_instances_as_text(opt.filter_tags).await;
     } else {
         println!("json output coming soon");
+        print_all_impacts_as_json(opt.filter_tags).await;
     }
 
     Ok(())
