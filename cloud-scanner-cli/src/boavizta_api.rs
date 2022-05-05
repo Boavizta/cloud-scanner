@@ -5,7 +5,6 @@ use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::UsageCloud;
 use serde_json::{Result, Value};
 
-
 /// Describes an instance with it's impacts
 #[derive(Debug)]
 pub struct AwsInstanceWithImpacts {
@@ -105,9 +104,9 @@ async fn retrieve_instance_impact_through_sdk_works() {
         verbose,
         usage_cloud,
     )
-    .await
-    .unwrap();
-    println!("{:?}", res);
+    .await;
+    assert!(res.is_ok());
+    println!("{:?}", res.unwrap());
 }
 
 #[tokio::test]
@@ -141,3 +140,23 @@ async fn get_default_impact() {
     assert_eq!(expected, impacts);
 }
 
+#[tokio::test]
+async fn verify_api_fails_for_some_instance_types(){
+    let mut configuration = configuration::Configuration::new();
+    configuration.base_path = String::from("https://api.boavizta.org");
+    
+    let instance_type = Some("t2.xlarge");
+    // t2.xlarge t2.micro t2.small g3.4xlarge
+    let verbose = Some(false);
+    let usage_cloud: Option<UsageCloud> = Some(UsageCloud::new());
+
+    let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
+        &configuration,
+        instance_type,
+        verbose,
+        usage_cloud,
+    )
+    .await;
+
+    assert!(res.is_err());
+}
