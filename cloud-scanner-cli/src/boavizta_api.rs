@@ -1,36 +1,33 @@
-use aws_sdk_ec2;
+//use aws_sdk_ec2;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::UsageCloud;
-use serde_json::{Result, Value};
+//use serde_json::{Result, Value};
+//use serde::{Deserialize, Serialize};
+use serde_derive::{Deserialize, Serialize};
 
 /// Describes an instance with it's impacts
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AwsInstanceWithImpacts {
     instance_id: String,
     instance_type: String,
-    impacts_json: String,
+    impacts: serde_json::Value,
 }
 
 /// Returns minimal AWS instance metadata with its impacts
-pub async fn get_instance_with_impacts(instance: &aws_sdk_ec2::model::Instance) -> AwsInstanceWithImpacts {
-
+pub async fn get_instance_with_impacts(
+    instance: &aws_sdk_ec2::model::Instance,
+) -> AwsInstanceWithImpacts {
     let instance_id = String::from(instance.instance_id.as_ref().unwrap());
     let instance_type = get_instance_type_as_string(instance);
-    let res : serde_json::Value = get_default_impacts_from_instance(instance).await;
+    let res: serde_json::Value = get_default_impacts_from_instance(instance).await;
 
     AwsInstanceWithImpacts {
-        instance_id: instance_id,
-        instance_type: instance_type,
-        impacts_json: res.to_string(),
+        instance_id,
+        instance_type,
+        impacts: res,
     }
-
-}
-
-
-async fn get_all_impacts(tags:Vec<String> ){
-
 }
 
 /// Returns the default impacts of an instance from Boavizta API
@@ -56,11 +53,13 @@ async fn get_default_impacts(instance_type: String) -> serde_json::Value {
     match res {
         Ok(res) => res,
         Err(e) => {
-            eprintln!("Cannot get impact from api for instance type {}: {}",instance_type,e);
-            serde_json::from_str("{}").unwrap() 
+            eprintln!(
+                "Warning: Cannot get impacts from API for instance type {}: {}",
+                instance_type, e
+            );
+            serde_json::from_str("{}").unwrap()
         }
     }
-    
 }
 
 /// Returns the default impacts of an instance from Boavizta API
@@ -91,7 +90,7 @@ async fn retrieve_instance_types_through_sdk_works() {
 }
 
 #[tokio::test]
-async fn retrieve_instance_impact_through_sdk_works() {
+async fn get_instance_default_impacts_through_sdk_works() {
     let mut configuration = configuration::Configuration::new();
     configuration.base_path = String::from("https://api.boavizta.org");
     let instance_type = Some("m6g.xlarge");
@@ -106,7 +105,9 @@ async fn retrieve_instance_impact_through_sdk_works() {
     )
     .await;
     assert!(res.is_ok());
-    println!("{:?}", res.unwrap());
+    let json = res.unwrap();
+    println!("{:?}", json);
+    println!("{}", json);
 }
 
 #[tokio::test]
@@ -132,7 +133,7 @@ async fn get_default_impact() {
     "#;
 
     // Parse the string of data into serde_json::Value.
-    let expected: Value = serde_json::from_str(data).unwrap();
+    let expected: serde_json::Value = serde_json::from_str(data).unwrap();
 
     let instance_type = String::from("m6g.xlarge");
     let impacts = get_default_impacts(instance_type).await;
@@ -141,22 +142,25 @@ async fn get_default_impact() {
 }
 
 #[tokio::test]
-async fn verify_api_fails_for_some_instance_types(){
+async fn get_instance_default_impacts_through_sdk_fails_for_some_instance_types() {
     let mut configuration = configuration::Configuration::new();
     configuration.base_path = String::from("https://api.boavizta.org");
-    
-    let instance_type = Some("t2.xlarge");
-    // t2.xlarge t2.micro t2.small g3.4xlarge
-    let verbose = Some(false);
-    let usage_cloud: Option<UsageCloud> = Some(UsageCloud::new());
 
-    let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
-        &configuration,
-        instance_type,
-        verbose,
-        usage_cloud,
-    )
-    .await;
+    let known_failing_types = vec!["t2.xlarge", "t2.micro", "t2.small", "g3.4xlarge"];
 
-    assert!(res.is_err());
+    for failing_type in known_failing_types {
+        let instance_type = Some(failing_type);
+        let verbose = Some(false);
+        let usage_cloud: Option<UsageCloud> = Some(UsageCloud::new());
+
+        let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
+            &configuration,
+            instance_type,
+            verbose,
+            usage_cloud,
+        )
+        .await;
+
+        assert!(res.is_err());
+    }
 }

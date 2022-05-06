@@ -1,5 +1,5 @@
 use aws_sdk_cloudwatch::Error;
-use boavizta_api::AwsInstanceWithImpacts;
+//use boavizta_api::AwsInstanceWithImpacts;
 use structopt::clap::crate_version;
 use structopt::StructOpt;
 mod aws_api;
@@ -21,7 +21,7 @@ struct Opt {
     list_metrics: bool,
 }
 
-async fn print_all_impacts_as_json(tags: Vec<String>) {
+async fn print_all_impacts_as_json(tags: Vec<String>) -> serde_json::Result<()> {
     let instances = aws_api::list_instances(tags).await.unwrap();
 
     let mut instances_with_impacts: Vec<boavizta_api::AwsInstanceWithImpacts> = Vec::new();
@@ -30,9 +30,14 @@ async fn print_all_impacts_as_json(tags: Vec<String>) {
         let value = boavizta_api::get_instance_with_impacts(instance).await;
         instances_with_impacts.push(value);
     }
-    for instance_with_impact in instances_with_impacts {
-        println!("{:?}", instance_with_impact);
-    }
+    // for instance_with_impact in instances_with_impacts {
+    //     let j = serde_json::to_string(&instance_with_impact)?;
+    //     println!("{}", j);
+    // }
+
+    let j = serde_json::to_string(&instances_with_impacts)?;
+    println!("{}", j);
+    Ok(())
 }
 
 #[tokio::main]
@@ -46,8 +51,9 @@ async fn main() -> Result<(), Error> {
     if opt.text {
         aws_api::display_instances_as_text(opt.filter_tags).await;
     } else {
-        println!("json output coming soon");
-        print_all_impacts_as_json(opt.filter_tags).await;
+        print_all_impacts_as_json(opt.filter_tags)
+            .await
+            .expect("Unable to get impacts");
     }
 
     Ok(())

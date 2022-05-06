@@ -20,12 +20,12 @@ use aws_sdk_ec2::{Client, Error /*Region*/};
 ///
 /// Filtering instance on tags is not yet implemented.
 pub async fn list_instances(tags: Vec<String>) -> Result<Vec<Instance>, Error> {
-    println!("Skipping tag filer {:?}", tags);
+    eprintln!("Warning: skipping tag filer {:?}", tags);
 
     let shared_config = aws_config::from_env()
-    //.region(Region::new("eu-west-1"))
-    .load()
-    .await;
+        //.region(Region::new("eu-west-1"))
+        .load()
+        .await;
     let client = Client::new(&shared_config);
 
     let mut instances: Vec<Instance> = Vec::new();
@@ -44,7 +44,6 @@ pub async fn list_instances(tags: Vec<String>) -> Result<Vec<Instance>, Error> {
     }
     Ok(instances)
 }
-
 
 /// Prints some instance details
 fn print_instances(instances: Vec<Instance>) {
