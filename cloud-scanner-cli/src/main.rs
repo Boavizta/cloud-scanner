@@ -45,7 +45,7 @@ async fn main() -> Result<(), Error> {
     let opt = Opt::from_args();
 
     if opt.list_metrics {
-        aws_api::list_metrics().await?;
+        aws_api::list_instance_metrics().await?;
     }
 
     if opt.text {

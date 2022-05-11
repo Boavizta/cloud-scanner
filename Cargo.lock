@@ -51,7 +51,7 @@ dependencies = [
  "aws-smithy-http",
  "aws-smithy-http-tower",
  "aws-smithy-json",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "aws-types",
  "bytes",
  "hex",
@@ -84,7 +84,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "43b0c6a0938ee38f5f7659d8b175d151f75cf64f856bbde2f1aabb4d3d6f79be"
 dependencies = [
  "aws-smithy-http",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "aws-types",
  "http",
  "lazy_static",
@@ -106,7 +106,7 @@ dependencies = [
  "aws-smithy-http",
  "aws-smithy-http-tower",
  "aws-smithy-query",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "aws-smithy-xml",
  "aws-types",
  "bytes",
@@ -129,7 +129,7 @@ dependencies = [
  "aws-smithy-http",
  "aws-smithy-http-tower",
  "aws-smithy-query",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "aws-smithy-xml",
  "aws-types",
  "bytes",
@@ -153,7 +153,7 @@ dependencies = [
  "aws-smithy-http",
  "aws-smithy-http-tower",
  "aws-smithy-json",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "aws-types",
  "bytes",
  "http",
@@ -175,7 +175,7 @@ dependencies = [
  "aws-smithy-http",
  "aws-smithy-http-tower",
  "aws-smithy-query",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "aws-smithy-xml",
  "aws-types",
  "bytes",
@@ -211,7 +211,7 @@ dependencies = [
  "percent-encoding",
  "regex",
  "ring",
- "time",
+ "time 0.3.9",
  "tracing",
 ]
 
@@ -236,7 +236,7 @@ dependencies = [
  "aws-smithy-async",
  "aws-smithy-http",
  "aws-smithy-http-tower",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "bytes",
  "fastrand",
  "http",
@@ -257,7 +257,7 @@ version = "0.40.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a06512ad2d8e80dcddb67859ed482ff433e2a2769228b980c1403d2cb069e365"
 dependencies = [
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "bytes",
  "bytes-utils",
  "futures-core",
@@ -293,7 +293,7 @@ version = "0.40.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfb575dc48946d75a55a28137fce1ae2b94fd75b82ddad7d67760b0613a08068"
 dependencies = [
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
 ]
 
 [[package]]
@@ -302,7 +302,7 @@ version = "0.40.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d1f71d4f1c9f2cb0aded4d27c9dc5d55f5398372e0e19a9d489b80ab0bcdb80"
 dependencies = [
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "urlencoding",
 ]
 
@@ -315,7 +315,29 @@ dependencies = [
  "itoa",
  "num-integer",
  "ryu",
- "time",
+ "time 0.3.9",
+]
+
+[[package]]
+name = "aws-smithy-types"
+version = "0.41.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c7f957a2250cc0fa4ccf155e00aeac9a81f600df7cd4ecc910c75030e6534f5"
+dependencies = [
+ "itoa",
+ "num-integer",
+ "ryu",
+ "time 0.3.9",
+]
+
+[[package]]
+name = "aws-smithy-types-convert"
+version = "0.41.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59e553ac559f076df8ffd81386f5a47310f8822522afa283c611e96a61d3c988"
+dependencies = [
+ "aws-smithy-types 0.41.0",
+ "chrono",
 ]
 
 [[package]]
@@ -337,7 +359,7 @@ dependencies = [
  "aws-smithy-async",
  "aws-smithy-client",
  "aws-smithy-http",
- "aws-smithy-types",
+ "aws-smithy-types 0.40.2",
  "http",
  "rustc_version",
  "tracing",
@@ -402,6 +424,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "chrono"
+version = "0.4.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "670ad68c9088c2a963aaa298cb369688cf3f9465ce5e2d4ca10e6e0098a1ce73"
+dependencies = [
+ "libc",
+ "num-integer",
+ "num-traits",
+ "time 0.1.44",
+ "winapi",
+]
+
+[[package]]
 name = "clap"
 version = "2.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -423,7 +458,9 @@ dependencies = [
  "aws-config",
  "aws-sdk-cloudwatch",
  "aws-sdk-ec2",
+ "aws-smithy-types-convert",
  "boavizta_api_sdk",
+ "chrono",
  "serde",
  "serde_derive",
  "serde_json",
@@ -820,7 +857,7 @@ dependencies = [
  "log",
  "miow",
  "ntapi",
- "wasi",
+ "wasi 0.11.0+wasi-snapshot-preview1",
  "winapi",
 ]
 
@@ -1403,6 +1440,17 @@ dependencies = [
 
 [[package]]
 name = "time"
+version = "0.1.44"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6db9e6914ab8b1ae1c260a4ae7a49b6c5611b40328a735b21862567685e73255"
+dependencies = [
+ "libc",
+ "wasi 0.10.0+wasi-snapshot-preview1",
+ "winapi",
+]
+
+[[package]]
+name = "time"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2702e08a7a860f005826c6815dcac101b19b5eb330c27fe4a5928fec1d20ddd"
@@ -1677,6 +1725,12 @@ dependencies = [
  "log",
  "try-lock",
 ]
+
+[[package]]
+name = "wasi"
+version = "0.10.0+wasi-snapshot-preview1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1a143597ca7c7793eff794def352d41792a93c481eb1042423ff7ff72ba2c31f"
 
 [[package]]
 name = "wasi"

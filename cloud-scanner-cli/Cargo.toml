@@ -14,8 +14,8 @@ boavizta_api_sdk = { path = "../boavizta-api-sdk" }
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
-
-
+chrono ="^0.4"
+aws-smithy-types-convert = { version ="0.41", features = ["convert-chrono"] }
 [dependencies.tokio]
 features = ["full"]
 version = "1"
