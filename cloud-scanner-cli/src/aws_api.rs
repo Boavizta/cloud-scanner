@@ -193,14 +193,13 @@ async fn get_instance_usage(
 
     let cpu_metric_name = String::from("CPUUtilization");
     let ec2_namespace = "AWS/EC2";
-    
-    println!("{}",instance_id);
+
+    println!("{}", instance_id);
     let dimensions = vec![Dimension::builder()
         .name("InstanceId")
-       // .value("i-03e0b3b1246001382")
+        // .value("i-03e0b3b1246001382")
         .value(instance_id)
         .build()];
-
 
     println!(
         "{:?} {:?} {:?} {:?}",
@@ -239,7 +238,16 @@ async fn test_get_instance_usage_metrics() {
 
     let res = get_instance_usage(instance_id).await.unwrap();
 
-    println!("{:?}", res);
-    //let expected: i32 = 1;
-    //assert_eq!(1,metric.la);
+    let datapoints = res.datapoints.unwrap();
+    assert_eq!(2, datapoints.len());
+}
+
+#[tokio::test]
+async fn test_get_instance_usage_metrics_of_shutdown_instance() {
+    let instance_id = String::from("i-03e0b3b1246001382");
+
+    let res = get_instance_usage(instance_id).await.unwrap();
+
+    let datapoints = res.datapoints.unwrap();
+    assert_eq!(0, datapoints.len());
 }
