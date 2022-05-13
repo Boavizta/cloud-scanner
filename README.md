@@ -10,7 +10,7 @@ At the moment it just returns impacts of your aws instances.  It does not use me
 
 ## Getting started
 
-### List AWS instances of the account
+### Just list AWS instances of the account
 
 Using default account region.
 
@@ -25,7 +25,7 @@ Using default account region.
 
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
-cargo run
+cargo run | jq
 ```
 
 ### Get impact of your instances for a given period
@@ -43,15 +43,15 @@ cargo run
 cargo run -- --help
 
 cloud-scanner-cli 0.0.1
-AWS account scanner to list instances.
+List AWS instances and their impacts.
 
 USAGE:
     cloud-scanner-cli [FLAGS] [OPTIONS]
 
 FLAGS:
     -h, --help            Prints help information
-    -l, --list-metrics    Display available metrics
     -t, --text            Display results as text (instead of json)
+    -u, --use-cpu-load    Take the CPU load of instances into consideration to estimate the impacts
     -V, --version         Prints version information
 
 OPTIONS:

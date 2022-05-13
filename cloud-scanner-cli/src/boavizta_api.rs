@@ -1,10 +1,7 @@
-//use aws_sdk_ec2;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::UsageCloud;
-//use serde_json::{Result, Value};
-//use serde::{Deserialize, Serialize};
 use serde_derive::{Deserialize, Serialize};
 
 /// Describes an instance with it's impacts
@@ -16,7 +13,7 @@ pub struct AwsInstanceWithImpacts {
 }
 
 /// Returns minimal AWS instance metadata with its impacts
-pub async fn get_instance_with_impacts(
+pub async fn get_instance_with_default_impacts(
     instance: &aws_sdk_ec2::model::Instance,
 ) -> AwsInstanceWithImpacts {
     let instance_id = String::from(instance.instance_id.as_ref().unwrap());
