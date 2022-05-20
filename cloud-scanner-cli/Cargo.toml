@@ -7,9 +7,8 @@ version = "0.0.1"
 aws-config = "0.10.1"
 aws-sdk-ec2 = "0.10.1"
 aws-sdk-cloudwatch = "0.10.1"
-
+isocountry = "^0.3"
 structopt =  "0.3"
-
 boavizta_api_sdk = { path = "../boavizta-api-sdk" }
 serde = "^1.0"
 serde_derive = "^1.0"

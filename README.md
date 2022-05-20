@@ -4,20 +4,11 @@ Collect aws cloud usage data, so that it can be combined with impact data of Boa
 
 ⚠ Very early Work in progress !
 
-At the moment it just returns impacts of your aws instances.  It does not use metrics of instance usage to calculate the impacts, but rather returns the _default_ impact data provided by API for each instance types.
+At the moment it just returns impacts of your aws instances. It does not use metrics of instance usage to calculate the impacts, but rather returns the _default_ impact data provided by API for each instance type.
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
 ## Getting started
-
-### Just list AWS instances of the account
-
-Using default account region.
-
-```sh
-export AWS_PROFILE='<YOUR_PROFILE_NAME>'
-cargo run -- --text
-```
 
 ### List impacts of AWS instances of the account
 
@@ -25,15 +16,10 @@ Using default account region.
 
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
-cargo run | jq
+
+# Estimate impact for 10 hours of use (-h 10)
+cargo run -- --h 10 | jq
 ```
-
-### Get impact of your instances for a given period
-
-⚠ TODO
-
-- pass period parameter (start date / end date)
-- define a sampling rate for cloudwatch metrics retrieval?
 
 ## Usage
 
@@ -46,37 +32,43 @@ cloud-scanner-cli 0.0.1
 List AWS instances and their impacts.
 
 USAGE:
-    cloud-scanner-cli [FLAGS] [OPTIONS]
+    cloud-scanner-cli [FLAGS] [OPTIONS] --hours-use-time <hours-use-time>
 
 FLAGS:
-    -h, --help            Prints help information
-    -t, --text            Display results as text (instead of json)
+        --help            Prints help information
+        --text            Display results as text (instead of json)
     -u, --use-cpu-load    Take the CPU load of instances into consideration to estimate the impacts
     -V, --version         Prints version information
 
 OPTIONS:
-    -f, --filter-tags <filter-tags>...    Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
+    -f, --filter-tags <filter-tags>...       Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
+    -h, --hours-use-time <hours-use-time>    The number of hours of usage for which we want to estimate the impacts
 ```
+
+### Get impact of your instances for a given period
+
+⚠ TODO
+
+- pass period parameter (start date / end date)
+- define a sampling rate for cloudwatch metrics retrieval?
 
 ### Passing AWS credentials
 
-Easiest way is use an environment variable to use a specific aws profile.
+Easiest way to pass aws credential is use an environment variable to use a specific aws profile.
 
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 ```
 
-### Filtering resources
-
-Not yet implemented
-
 ## Output format
 
-Cloud scanner returns json array of instances metadata (instanceid, tags and type and default usage impacts) on stdout.
+Cloud scanner returns json array of instances metadata (instance_id, tags, type and usage impacts) on stdout.
 
-Will soon return
+## Current limitations
 
-- an array of instances with impacts tuned with usage/workload (json)
+- Query only the default region of you AWS profile
+- Instance workload (i.e. CPU load) is not - yet - used to assess impacts.
+- Filtering instances by tag is not yet supported.
 
 ## Generate / update Boavizta API sdk
 

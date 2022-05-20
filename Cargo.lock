@@ -461,6 +461,7 @@ dependencies = [
  "aws-smithy-types-convert",
  "boavizta_api_sdk",
  "chrono",
+ "isocountry",
  "serde",
  "serde_derive",
  "serde_json",
@@ -772,6 +773,16 @@ name = "ipnet"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "879d54834c8c76457ef4293a689b2a8c59b076067ad77b15efafbb05f92a592b"
+
+[[package]]
+name = "isocountry"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1ea1dc4bf0fb4904ba83ffdb98af3d9c325274e92e6e295e4151e86c96363e04"
+dependencies = [
+ "serde",
+ "thiserror",
+]
 
 [[package]]
 name = "itoa"

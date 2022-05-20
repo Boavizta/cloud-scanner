@@ -4,24 +4,31 @@ use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 // use aws_sdk_cloudwatch::output::ListMetricsOutput;
 use aws_sdk_cloudwatch::Client as CW_client;
 use aws_sdk_ec2::model::Instance;
-use aws_sdk_ec2::{Client, Error /*Region*/};
+use aws_sdk_ec2::{Client, Error, Region};
 use chrono::Duration;
+use isocountry::CountryCode;
 
 //use aws_smithy_types_convert::date_time::DateTimeExt;
 use chrono::Utc;
 
-// struct InstanceUsage {
-//     instance: aws_sdk_ec2::model::Instance,
-//     timestamp: f64,
-//     duration: f64,
-//     usage: Vec<Usage>,
-// }
+/// Returns 3 letters ISO code for the country corresponding to the aws region we are logged into
+pub async fn get_current_iso_country() -> &'static str {
+    let aws_region = get_current_aws_region().await;
+    let cc = get_country_from_aws_region(aws_region.as_str());
+    cc.alpha3()
+}
 
-// struct Usage {
-//     percentile: u8,
-//     cpu_usage: u8,
-//     mem_consumption: u8,
-// }
+/// Converts aws region into country
+fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
+    let cc: CountryCode = match aws_region {
+        "eu-west-1" => CountryCode::IRL,
+        "eu-west-3" => CountryCode::FRA,
+        "eu-east-1" => CountryCode::IRL,
+        "eu-west-2" => CountryCode::GBR,
+        _ => CountryCode::FRA,
+    };
+    cc
+}
 
 /// List all instances of the current account
 ///
@@ -63,6 +70,14 @@ fn print_instances(instances: Vec<Instance>) {
         println!("Tags:  {:?}", instance.tags().unwrap());
         println!();
     }
+}
+
+/// Returns the AWS region we are connected to
+async fn get_current_aws_region() -> String {
+    let shared_config = aws_config::from_env().load().await;
+    let awr: &Region = shared_config.region().unwrap();
+
+    String::from(awr.as_ref())
 }
 
 // async fn show_regions(client: &Client) -> Result<(), Error> {
@@ -243,4 +258,23 @@ async fn test_average_cpu_load_24hrs_of_shutdown_instance() {
     let instance_id = "i-03e0b3b1246001382";
     let res = get_average_cpu_load_24hrs(instance_id).await;
     assert_eq!(0 as f64, res);
+}
+
+#[tokio::test]
+async fn test_get_current_region() {
+    let reg: String = get_current_aws_region().await;
+    assert_eq!("eu-west-1", reg);
+}
+
+#[tokio::test]
+async fn test_get_country_code_from_region() {
+    let region = "eu-west-3";
+    let cc = get_country_from_aws_region(region);
+    assert_eq!("FRA", cc.alpha3());
+}
+
+#[tokio::test]
+async fn test_get_current_iso_region() {
+    let country_code = get_current_iso_country().await;
+    assert_eq!("IRL", country_code);
 }
