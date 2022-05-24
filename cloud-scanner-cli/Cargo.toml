@@ -3,6 +3,7 @@ authors = ["Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
 version = "0.0.1"
+
 [dependencies]
 aws-config = "0.10.1"
 aws-sdk-ec2 = "0.10.1"
