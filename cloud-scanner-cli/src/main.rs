@@ -1,38 +1,46 @@
-use structopt::clap::crate_version;
-use structopt::StructOpt;
+use clap::{Parser, Subcommand};
 
-#[derive(StructOpt, Debug)]
-#[structopt(name = "cloud-scanner-cli", version = crate_version!(), about = "List AWS instances and their impacts.")]
-struct Opt {
-    /// The number of hours of usage for which we want to estimate the impacts
-    #[structopt(short, long)]
-    hours_use_time: f32,
-
-    /// Take the CPU load of instances into consideration to estimate the impacts
-    #[structopt(short, long)]
-    use_cpu_load: bool,
-
-    /// Just list instance as text
-    #[structopt(long)]
-    instances: bool,
-
+#[derive(Parser, Debug)]
+#[clap(author, version, about)]
+/// List aws instances and their environmental impact (from Boavizta API
+struct Arguments {
+    #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
-    #[structopt(short, long)]
     filter_tags: Vec<String>,
+    #[clap(subcommand)]
+    cmd: SubCommand,
+    #[clap(short, long, default_value_t = String::from(""))]
+    /// AWS region (default profile region is assumed if not provided)
+    aws_region: String,
+}
+
+#[derive(Subcommand, Debug)]
+enum SubCommand {
+    /// get Average (standard) impacts for a given usage duration
+    Standard {
+        #[clap(short = 'u', long)]
+        /// The number of hours of use for which we want to estimate the impacts
+        hours_use_time: f32,
+    },
+    ///get impacts related to measured instance usage: depending on usage rate (use instance workload),
+    Measured {},
+    ///just list instances and their metadata (without impacts)
+    ListInstances {},
 }
 
 #[tokio::main]
 async fn main() {
-    let opt = Opt::from_args();
+    let args = Arguments::parse();
 
-    if opt.use_cpu_load {
-        cloud_scanner_cli::print_cpu_load_impacts_as_json(&opt.filter_tags).await;
-    } else {
-        cloud_scanner_cli::print_default_impacts_as_json(&opt.hours_use_time, &opt.filter_tags)
-            .await;
-    }
-    if opt.instances {
-        cloud_scanner_cli::show_instances(&opt.filter_tags).await;
+    match args.cmd {
+        SubCommand::Standard{ hours_use_time } => {
+            cloud_scanner_cli::print_default_impacts_as_json(&hours_use_time, &args.filter_tags)
+                .await
+        }
+        SubCommand::Measured {} => {
+            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags).await
+        }
+        SubCommand::ListInstances {} => cloud_scanner_cli::show_instances(&args.filter_tags).await,
     }
     ()
 }
