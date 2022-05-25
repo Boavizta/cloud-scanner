@@ -1,0 +1,27 @@
+service: boavizta-cloud-scanner
+provider:
+  name: aws
+  runtime: rust
+  memorySize: 128
+  stage: dev
+  region: eu-west-1
+
+package:
+  individually: true
+
+custom:
+  rust:
+    dockerless: true
+
+plugins:
+  - serverless-rust
+
+functions:
+
+  hello:
+    handler: "cloud-scanner-lambda"
+    events:
+      - http:
+          path: /scan
+          method: GET
+  

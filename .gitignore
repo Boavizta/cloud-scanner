@@ -1,2 +1,4 @@
 cloud-scanner-cli/target/
 target/
+node_modules
+.serverless
