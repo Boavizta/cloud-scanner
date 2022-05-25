@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
-/// List aws instances and their environmental impact (from Boavizta API
+/// List aws instances and their environmental impact (from Boavizta API)
 struct Arguments {
     #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)

@@ -10,15 +10,15 @@ At the moment it just returns impacts of your aws instances. It does not use met
 
 ## Getting started
 
-### List impacts of AWS instances of the account
+### List standard impacts of AWS instances of the account
 
 Using default account region.
 
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
-# Estimate impact for 10 hours of use (-h 10)
-cargo run -- --h 10 | jq
+# Estimate impact for 10 hours of use 
+cargo run standard --hours-use-time 10| jq
 ```
 
 ## Usage
@@ -29,23 +29,30 @@ cargo run -- --h 10 | jq
 cargo run -- --help
 
 cloud-scanner-cli 0.0.1
-List AWS instances and their impacts.
+List aws instances and their environmental impact (from Boavizta API)
 
 USAGE:
-    cloud-scanner-cli [FLAGS] [OPTIONS] --hours-use-time <hours-use-time>
-
-FLAGS:
-        --help            Prints help information
-        --text            Display results as text (instead of json)
-    -u, --use-cpu-load    Take the CPU load of instances into consideration to estimate the impacts
-    -V, --version         Prints version information
+    cloud-scanner-cli [OPTIONS] <SUBCOMMAND>
 
 OPTIONS:
-    -f, --filter-tags <filter-tags>...       Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
-    -h, --hours-use-time <hours-use-time>    The number of hours of usage for which we want to estimate the impacts
+    -a, --aws-region <AWS_REGION>      AWS region (default profile region is assumed if not
+                                       provided) [default: ]
+    -h, --help                         Print help information
+    -t, --filter-tags <FILTER_TAGS>    Filter instances on tags (like tag-key-1=val_1
+                                       tag-key_2=val2)
+    -V, --version                      Print version information
+
+SUBCOMMANDS:
+    help              Print this message or the help of the given subcommand(s)
+    list-instances    just list instances and their metadata (without impacts)
+    measured          get impacts related to measured instance usage: depending on usage rate
+                          (use instance workload),
+    standard          get Average (standard) impacts for a given usage duration
 ```
 
-### Get impact of your instances for a given period
+### Get measured imapcts of your instances for a given period
+
+This uses the workload measured on instances to provide more realistic impacts.
 
 ⚠ TODO
 
