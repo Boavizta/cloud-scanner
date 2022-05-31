@@ -1,4 +1,3 @@
-use aws_sdk_cloudwatch;
 use aws_sdk_cloudwatch::model::{Dimension, Metric, StandardUnit, Statistic};
 use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 // use aws_sdk_cloudwatch::output::ListMetricsOutput;
@@ -176,7 +175,7 @@ async fn get_instance_usage(
     Ok(resp)
 }
 
-/// Returns the average CPU load of an instance over the last 24 hours or 0 if getting value fails
+/// Returns average CPU load of an instance over the last 24 hours or 0 if cannot retrieve the value.
 ///
 pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> f64 {
     let res = get_instance_usage(instance_id).await;
@@ -197,7 +196,7 @@ pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> f64 {
             "Warning: No load data for instance {}, returning 0 as load",
             instance_id
         );
-        return 0 as f64;
+        0 as f64
     } else {
         let first_point = &datapoints[0];
         first_point.average.unwrap()

@@ -1,4 +1,3 @@
-use aws_sdk_cloudwatch::Error;
 use boavizta_api_sdk::models::UsageCloud;
 
 mod aws_api;
