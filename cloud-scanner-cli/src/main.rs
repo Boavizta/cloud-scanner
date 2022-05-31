@@ -12,7 +12,7 @@ struct Arguments {
     /// AWS region (default profile region is assumed if not provided)
     aws_region: Option<String>,
     #[clap(short, long)]
-    /// Boavizta API URL
+    /// Optional Boavizta API URL (if you want to use your own instance)
     boavizta_api_url: Option<String>,
     #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
