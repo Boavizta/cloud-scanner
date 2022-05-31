@@ -2,15 +2,15 @@
 
 Collect aws cloud usage data, so that it can be combined with impact data of Boavizta API.
 
-⚠ Very early Work in progress !
+⚠ Early Work in progress !
 
-At the moment it just returns impacts of your aws instances. It does not use metrics of instance usage to calculate the impacts, but rather returns the _default_ impact data provided by API for each instance type.
+At the moment it just returns _standard_ impacts of aws instances in the default region of your account. It does not use metrics of instance usage to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
 ## Getting started
 
-### List standard impacts of AWS instances of the account
+### List standard impacts of AWS instances for 10 hours of use
 
 Using default account region.
 
@@ -18,7 +18,7 @@ Using default account region.
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 # Estimate impact for 10 hours of use 
-cargo run standard --hours-use-time 10| jq
+cargo run standard --hours-use-time 10 | jq
 ```
 
 ## Usage
@@ -28,19 +28,32 @@ cargo run standard --hours-use-time 10| jq
 ```sh
 cargo run -- --help
 
-cloud-scanner-cli 0.0.1
 List aws instances and their environmental impact (from Boavizta API)
 
 USAGE:
     cloud-scanner-cli [OPTIONS] <SUBCOMMAND>
 
 OPTIONS:
-    -a, --aws-region <AWS_REGION>      AWS region (default profile region is assumed if not
-                                       provided) [default: ]
-    -h, --help                         Print help information
-    -t, --filter-tags <FILTER_TAGS>    Filter instances on tags (like tag-key-1=val_1
-                                       tag-key_2=val2)
-    -V, --version                      Print version information
+    -a, --aws-region <AWS_REGION>
+            AWS region (default profile region is assumed if not provided)
+
+    -b, --boavizta-api-url <BOAVIZTA_API_URL>
+            Boavizta API URL
+
+    -h, --help
+            Print help information
+
+    -o, --out-file <OUT_FILE>
+            Save results to a file (instead of printing json to stdout)
+
+    -t, --filter-tags <FILTER_TAGS>
+            Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
+
+    -v, --verbosity
+            Enable logging, use multiple `v`s to increase verbosity
+
+    -V, --version
+            Print version information
 
 SUBCOMMANDS:
     help              Print this message or the help of the given subcommand(s)
@@ -50,7 +63,7 @@ SUBCOMMANDS:
     standard          get Average (standard) impacts for a given usage duration
 ```
 
-### Get measured imapcts of your instances for a given period
+### Get measured impacts of instances for a given period
 
 This uses the workload measured on instances to provide more realistic impacts.
 
@@ -69,15 +82,76 @@ export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 ## Output format
 
-Cloud scanner returns json array of instances metadata (instance_id, tags, type and usage impacts) on stdout.
+Cloud scanner returns a json array of instances metadata (instance_id, type usage_data and and usage impacts) on _stdout_.
 
-## Current limitations
+⚠ Returns _empty_ impacts when the _instance type_ is not known in Boavizta database
 
-- Query only the default region of you AWS profile
-- Instance workload (i.e. CPU load) is not - yet - used to assess impacts.
+```json
+[
+  {
+    "instance_id": "i-001dc0ebbf9cb25c0",
+    "instance_type": "t2.micro",
+    "usage_data": {
+      "hours_use_time": 5,
+      "usage_location": "IRL"
+    },
+    "impacts": {}
+  },
+  {
+    "instance_id": "i-004599844f7c24814",
+    "instance_type": "t2.small",
+    "usage_data": {
+      "hours_use_time": 5,
+      "usage_location": "IRL"
+    },
+    "impacts": {}
+  },
+  {
+    "instance_id": "i-075444d7293d8bd76",
+    "instance_type": "t2.micro",
+    "usage_data": {
+      "hours_use_time": 5,
+      "usage_location": "IRL"
+    },
+    "impacts": {}
+  },
+  {
+    "instance_id": "i-033df52f12f30ca66",
+    "instance_type": "m6g.xlarge",
+    "usage_data": {
+      "hours_use_time": 5,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0084,
+        "unit": "kgSbeq",
+        "use": 1.7e-09
+      },
+      "gwp": {
+        "manufacture": 87,
+        "unit": "kgCO2eq",
+        "use": 0.029
+      },
+      "pe": {
+        "manufacture": 1100,
+        "unit": "MJ",
+        "use": 0.82
+      }
+    }
+  }
+]
+
+```
+
+## ⚠ Current limitations
+
+- Return empty impacts when the instance _type_ is not listed in Boavizta database.
+- Query only the _default region_ of you AWS profile (`--aws-region` flag is not yet implemented).
+- Always returns _standard_ impacts: using instance workload to assess impact is not yet implemented (i.e. using CPU load through the `measured` command has no effect).
 - Filtering instances by tag is not yet supported.
 
-## Generate / update Boavizta API sdk
+### Generate / update Boavizta API sdk
 
 ```sh
 docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://api.boavizta.org/openapi.json   -g rust  -o /local/boavizta-api-sdk --package-name boavizta_api_sdk

@@ -1,17 +1,28 @@
+use std::path::PathBuf;
+
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
 /// List aws instances and their environmental impact (from Boavizta API)
 struct Arguments {
+    #[clap(subcommand)]
+    cmd: SubCommand,
+    #[clap(short, long)]
+    /// AWS region (default profile region is assumed if not provided)
+    aws_region: Option<String>,
+    #[clap(short, long)]
+    /// Boavizta API URL
+    boavizta_api_url: Option<String>,
     #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
     filter_tags: Vec<String>,
-    #[clap(subcommand)]
-    cmd: SubCommand,
-    #[clap(short, long, default_value_t = String::from(""))]
-    /// AWS region (default profile region is assumed if not provided)
-    aws_region: String,
+    /// Save results to a file (instead of printing json to stdout)
+    #[clap(short, long, parse(from_os_str))]
+    out_file: Option<PathBuf>,
+    /// Enable logging, use multiple `v`s to increase verbosity
+    #[clap(short, long, parse(from_occurrences))]
+    verbosity: usize,
 }
 
 #[derive(Subcommand, Debug)]
@@ -33,7 +44,7 @@ async fn main() {
     let args = Arguments::parse();
 
     match args.cmd {
-        SubCommand::Standard{ hours_use_time } => {
+        SubCommand::Standard { hours_use_time } => {
             cloud_scanner_cli::print_default_impacts_as_json(&hours_use_time, &args.filter_tags)
                 .await
         }
@@ -42,5 +53,4 @@ async fn main() {
         }
         SubCommand::ListInstances {} => cloud_scanner_cli::show_instances(&args.filter_tags).await,
     }
-    ()
 }
