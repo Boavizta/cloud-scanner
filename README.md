@@ -23,13 +23,22 @@ cargo run standard --hours-use-time 10 | jq
 
 ## Usage
 
-### Run local docker image
+### Build and run as docker image
 
 ```sh
+# Local build of docker image
 docker build . --tag cloud-scanner-cli
-# Test 
-docker run cloud-scanner-cli
+# Test listing instances
+# Note 
+# - we map local credentials on the container (-v)
+# - we force a using 'myprofile' profile by setting the AWS_PROFILE environment variable with -e flag
+# - the -it flag is optional, only purpose is to get colored output if any
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' cloud-scanner-cli list-instance
+# Test getting impacts
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' cloud-scanner-cli standard --hours-use-time 10
 ```
+
+⚠ This method of passing credentials is not secure nor very practical. In a production setup you should rather rely on the role of the instance hosting the container to manage authentication.
 
 ### Building local executable
 
