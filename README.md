@@ -23,6 +23,20 @@ cargo run standard --hours-use-time 10 | jq
 
 ## Usage
 
+### Run local docker image
+
+```sh
+docker build . --tag cloud-scanner-cli
+# Test 
+docker run cloud-scanner-cli
+```
+
+### Building local executable
+
+```sh
+cargo build --release
+```
+
 ### Cli options
 
 ```sh
