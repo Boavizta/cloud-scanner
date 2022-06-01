@@ -5,10 +5,10 @@ name = "cloud-scanner-cli"
 version = "0.0.2"
 
 [dependencies]
-aws-config = "0.10.1"
-aws-sdk-cloudwatch = "0.10.1"
-aws-sdk-ec2 = "0.10.1"
-aws-smithy-types-convert = { version = "0.41", features = ["convert-chrono"] }
+aws-config =  { version = "0.12.0", features = ["rustls"]}
+aws-sdk-cloudwatch = { version = "0.12.0", features = ["rustls"]}
+aws-sdk-ec2 = { version = "0.12.0", features = ["rustls"]}
+aws-smithy-types-convert = { version = "0.42", features = ["convert-chrono"] }
 boavizta_api_sdk = { path = "../boavizta-api-sdk" }
 chrono = "^0.4"
 clap = { version = "3.1.6", features = ["derive"] }
@@ -16,9 +16,7 @@ isocountry = "^0.3"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
-
-[dependencies.tokio]
-aws-sdk-ec2 = "0.10.1"
-features = ["full"]
 tokio = { version = "1", features = ["full"] }
-version = "1"
+
+
+
