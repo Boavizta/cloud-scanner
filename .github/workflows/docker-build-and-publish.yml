@@ -26,10 +26,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Build Docker image
-        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli:latest
+        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:latest
       
       - name : Tag Docker image
-        run: docker tag ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli:latest ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli:$(date +%s)
+        run: docker tag ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:latest ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:$(date +%s)
 
       - name: Push image
-        run: docker push -a ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli
+        run: docker push -a ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli
