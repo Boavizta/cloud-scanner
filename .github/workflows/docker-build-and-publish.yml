@@ -1,0 +1,35 @@
+name: Build and Publish docker image
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push-docker-image:
+    name: Build Docker image and push to github docker repository
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build Docker image
+        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli:latest
+      
+      - name : Tag Docker image
+        run: docker tag ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli:latest ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli:$(date +%s)
+
+      - name: Push image
+        run: docker push -a ${{ env.REGISTRY }}/Boavizta/cloud-scanner-cli
