@@ -129,7 +129,7 @@ async fn get_impacts(instance_type: String, usage_cloud: UsageCloud) -> serde_js
     match res {
         Ok(res) => res,
         Err(e) => {
-            eprintln!(
+            warn!(
                 "Warning: Cannot get impacts from API for instance type {}: {}",
                 instance_type, e
             );

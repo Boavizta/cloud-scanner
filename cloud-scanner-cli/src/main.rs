@@ -2,6 +2,9 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 
+extern crate log;
+extern crate loggerv;
+
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
 /// List aws instances and their environmental impact (from Boavizta API)
@@ -22,7 +25,7 @@ struct Arguments {
     out_file: Option<PathBuf>,
     /// Enable logging, use multiple `v`s to increase verbosity
     #[clap(short, long, parse(from_occurrences))]
-    verbosity: usize,
+    verbosity: u64,
 }
 
 #[derive(Subcommand, Debug)]
@@ -42,6 +45,8 @@ enum SubCommand {
 #[tokio::main]
 async fn main() {
     let args = Arguments::parse();
+
+    loggerv::init_with_verbosity(args.verbosity).unwrap();
 
     match args.cmd {
         SubCommand::Standard { hours_use_time } => {
