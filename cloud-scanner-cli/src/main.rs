@@ -1,38 +1,56 @@
-use structopt::clap::crate_version;
-use structopt::StructOpt;
+use std::path::PathBuf;
 
-#[derive(StructOpt, Debug)]
-#[structopt(name = "cloud-scanner-cli", version = crate_version!(), about = "List AWS instances and their impacts.")]
-struct Opt {
-    /// The number of hours of usage for which we want to estimate the impacts
-    #[structopt(short, long)]
-    hours_use_time: f32,
+use clap::{Parser, Subcommand};
 
-    /// Take the CPU load of instances into consideration to estimate the impacts
-    #[structopt(short, long)]
-    use_cpu_load: bool,
-
-    /// Just list instance as text
-    #[structopt(long)]
-    instances: bool,
-
+#[derive(Parser, Debug)]
+#[clap(author, version, about)]
+/// List aws instances and their environmental impact (from Boavizta API)
+struct Arguments {
+    #[clap(subcommand)]
+    cmd: SubCommand,
+    #[clap(short, long)]
+    /// AWS region (default profile region is assumed if not provided)
+    aws_region: Option<String>,
+    #[clap(short, long)]
+    /// Optional Boavizta API URL (if you want to use your own instance)
+    boavizta_api_url: Option<String>,
+    #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
-    #[structopt(short, long)]
     filter_tags: Vec<String>,
+    /// Save results to a file (instead of printing json to stdout)
+    #[clap(short, long, parse(from_os_str))]
+    out_file: Option<PathBuf>,
+    /// Enable logging, use multiple `v`s to increase verbosity
+    #[clap(short, long, parse(from_occurrences))]
+    verbosity: usize,
+}
+
+#[derive(Subcommand, Debug)]
+enum SubCommand {
+    /// get Average (standard) impacts for a given usage duration
+    Standard {
+        #[clap(short = 'u', long)]
+        /// The number of hours of use for which we want to estimate the impacts
+        hours_use_time: f32,
+    },
+    ///get impacts related to measured instance usage: depending on usage rate (use instance workload),
+    Measured {},
+    ///just list instances and their metadata (without impacts)
+    ListInstances {},
 }
 
 #[tokio::main]
 async fn main() {
-    let opt = Opt::from_args();
+    let args = Arguments::parse();
 
-    if opt.use_cpu_load {
-        cloud_scanner_cli::print_cpu_load_impacts_as_json(&opt.filter_tags).await;
-    } else {
-        cloud_scanner_cli::print_default_impacts_as_json(&opt.hours_use_time, &opt.filter_tags)
-            .await;
+    match args.cmd {
+        SubCommand::Standard { hours_use_time } => {
+            cloud_scanner_cli::print_default_impacts_as_json(&hours_use_time, &args.filter_tags)
+                .await
+        }
+        SubCommand::Measured {} => {
+            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags).await
+        }
+        SubCommand::ListInstances {} => cloud_scanner_cli::show_instances(&args.filter_tags).await,
     }
-    if opt.instances {
-        cloud_scanner_cli::show_instances(&opt.filter_tags).await;
-    }
-    ()
 }
