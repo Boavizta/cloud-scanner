@@ -1,5 +1,6 @@
 use boavizta_api_sdk::models::UsageCloud;
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 mod aws_api;
 mod boavizta_api;
 

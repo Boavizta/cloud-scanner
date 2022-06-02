@@ -1,4 +1,4 @@
-use aws_sdk_cloudwatch::model::{Dimension, Metric, StandardUnit, Statistic};
+use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
 use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 // use aws_sdk_cloudwatch::output::ListMetricsOutput;
 use aws_sdk_cloudwatch::Client as CW_client;
