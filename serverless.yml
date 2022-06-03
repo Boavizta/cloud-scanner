@@ -12,14 +12,18 @@ package:
 custom:
   rust:
     dockerless: true
+  # # when using local builds (dockerless), optionally provide a different target and linker for the compiler
+  #   # for example, allow local running on ARM macs
+    target: x86_64-unknown-linux-musl
+  #   linker: clang
 
 plugins:
   - serverless-rust
 
 functions:
 
-  hello:
-    handler: "cloud-scanner-lambda"
+  scan:
+    handler: "cloud-scanner-lambda.bootstrap"
     events:
       - http:
           path: /scan

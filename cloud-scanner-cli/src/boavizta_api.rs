@@ -13,27 +13,6 @@ pub struct AwsInstanceWithImpacts {
     impacts: serde_json::Value,
 }
 
-/// Returns instance information aggregated with Boavizta default impacts for this type of instance.
-///
-/// ⚠ Usage / workload of the instance is **not** considered
-/// Uses the standard AWS instance object as an input and use it to query Boavizta API.
-pub async fn get_instance_with_default_impacts(
-    instance: &aws_sdk_ec2::model::Instance,
-) -> AwsInstanceWithImpacts {
-    let instance_id = String::from(instance.instance_id.as_ref().unwrap());
-    let instance_type = get_instance_type_as_string(instance);
-    let impacts: serde_json::Value = get_default_impacts_from_instance(instance).await;
-
-    let usage_data: UsageCloud = UsageCloud::new();
-
-    AwsInstanceWithImpacts {
-        instance_id,
-        instance_type,
-        impacts,
-        usage_data,
-    }
-}
-
 /// Returns instance information aggregated with Boavizta impacts for this type of instance.
 ///
 /// Uses the standard AWS instance object and associated workload as an input to query Boavizta API.
@@ -54,18 +33,6 @@ pub async fn get_instance_impacts(
 }
 
 /// Returns the default impacts of an instance from Boavizta API
-/// without considering usage pattern (default is 100% usage)
-///
-async fn get_default_impacts_from_instance(
-    instance: &aws_sdk_ec2::model::Instance,
-) -> serde_json::Value {
-    // Call boavizta API, passing an instance type, returns a standard impact
-    let instance_type = get_instance_type_as_string(instance);
-    get_default_impacts(instance_type).await
-}
-
-// Returns the default impacts of an instance from Boavizta API
-/// without considering usage pattern (default is 100% usage)
 ///
 async fn get_impacts_from_instance(
     instance: &aws_sdk_ec2::model::Instance,
@@ -74,38 +41,6 @@ async fn get_impacts_from_instance(
     // Call boavizta API, passing an instance type, returns a standard impact
     let instance_type = get_instance_type_as_string(instance);
     get_impacts(instance_type, usage_data).await
-}
-
-/// Returns the default impacts of an instance from Boavizta API
-/// without considering usage pattern (default is 100% usage)
-///
-/// Returns empty json of impact if any error
-async fn get_default_impacts(instance_type: String) -> serde_json::Value {
-    // Call boavizta API, passing an instance type, returns a standard impact
-    let mut configuration = configuration::Configuration::new();
-    configuration.base_path = String::from("https://api.boavizta.org");
-    let opt_instance_type = Some(instance_type.as_str());
-
-    let verbose = Some(false);
-    let usage_cloud: Option<UsageCloud> = Some(UsageCloud::new());
-
-    let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
-        &configuration,
-        opt_instance_type,
-        verbose,
-        usage_cloud,
-    )
-    .await;
-    match res {
-        Ok(res) => res,
-        Err(e) => {
-            eprintln!(
-                "Warning: Cannot get impacts from API for instance type {}: {}",
-                instance_type, e
-            );
-            serde_json::from_str("{}").unwrap()
-        }
-    }
 }
 
 /// Returns the  impacts of an instance from Boavizta API
@@ -129,7 +64,7 @@ async fn get_impacts(instance_type: String, usage_cloud: UsageCloud) -> serde_js
     match res {
         Ok(res) => res,
         Err(e) => {
-            eprintln!(
+            warn!(
                 "Warning: Cannot get impacts from API for instance type {}: {}",
                 instance_type, e
             );
@@ -202,7 +137,8 @@ async fn get_default_impact() {
     let expected: serde_json::Value = serde_json::from_str(data).unwrap();
 
     let instance_type = String::from("m6g.xlarge");
-    let impacts = get_default_impacts(instance_type).await;
+    let usage_cloud: UsageCloud = UsageCloud::new();
+    let impacts = get_impacts(instance_type, usage_cloud).await;
 
     assert_eq!(expected, impacts);
 }

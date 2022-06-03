@@ -1,5 +1,6 @@
 use boavizta_api_sdk::models::UsageCloud;
-
+#[macro_use]
+extern crate log;
 mod aws_api;
 mod boavizta_api;
 
@@ -25,7 +26,7 @@ pub async fn print_default_impacts_as_json(hours_use_time: &f32, tags: &Vec<Stri
 
 /// Prints impacts considering the instance workload / CPU load
 pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>) {
-    eprintln!("Warning: getting impacts for specific CPU load is not yet implemented, will just display instances and average load");
+    warn!("Warning: getting impacts for specific CPU load is not yet implemented, will just display instances and average load");
     let instances = aws_api::list_instances(tags).await.unwrap();
 
     for instance in &instances {

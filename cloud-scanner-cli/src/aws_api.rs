@@ -1,4 +1,4 @@
-use aws_sdk_cloudwatch::model::{Dimension, Metric, StandardUnit, Statistic};
+use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
 use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 // use aws_sdk_cloudwatch::output::ListMetricsOutput;
 use aws_sdk_cloudwatch::Client as CW_client;
@@ -33,7 +33,7 @@ fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
 ///
 /// Filtering instance on tags is not yet implemented.
 pub async fn list_instances(tags: &Vec<String>) -> Result<Vec<Instance>, Error> {
-    eprintln!("Warning: skipping tag filer {:?}", tags);
+    warn!("Warning: skipping tag filer {:?}", tags);
 
     let shared_config = aws_config::from_env()
         //.region(Region::new("eu-west-1"))
@@ -182,7 +182,7 @@ pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> f64 {
     let res = match res {
         Ok(res) => res,
         Err(e) => {
-            eprintln!(
+            warn!(
                 "Cannot get cpu usage, returning 0 load. Application error: {}",
                 e
             );
@@ -192,7 +192,7 @@ pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> f64 {
 
     let datapoints = res.datapoints.unwrap();
     if datapoints.is_empty() {
-        eprintln!(
+        warn!(
             "Warning: No load data for instance {}, returning 0 as load",
             instance_id
         );
