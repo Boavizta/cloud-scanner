@@ -5,6 +5,18 @@ provider:
   memorySize: 128
   stage: dev
   region: eu-west-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 'ec2:DescribeInstances'
+          Resource: '*'
+        - Effect: Allow
+          Action: 'cloudwatch:GetMetricStatistics'
+          Resource: '*'
+        - Effect: Allow
+          Action: 'cloudwatch:DescribeAlarm'
+          Resource: '*'
 
 package:
   individually: true
