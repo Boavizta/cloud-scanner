@@ -15,13 +15,12 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
     // creating an application/json response
     println!("Scan account invoked with event : {:?}", event);
 
+    // warn!("Using 1 hour");
     let hours_use_time = 1 as f32;
     let filter_tags: Vec<String> = Vec::new();
-    cloud_scanner_cli::print_default_impacts_as_json(&hours_use_time, &filter_tags).await;
-    Ok(response(
-        StatusCode::OK,
-        json!({"message": "Scan done"}).to_string(),
-    ))
+    let impacts: String =
+        cloud_scanner_cli::get_default_impacts(&hours_use_time, &filter_tags).await;
+    Ok(response(StatusCode::OK, impacts))
 }
 
 /// HTTP Response with a JSON payload
@@ -51,6 +50,4 @@ mod tests {
             .into_response();
         assert_eq!(response.body(), expected.body())
     }
-
-   
 }
