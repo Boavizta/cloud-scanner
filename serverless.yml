@@ -9,14 +9,14 @@ provider:
     role:
       statements:
         - Effect: Allow
-          Action: 'ec2:DescribeInstances'
-          Resource: '*'
+          Action: "ec2:DescribeInstances"
+          Resource: "*"
         - Effect: Allow
-          Action: 'cloudwatch:GetMetricStatistics'
-          Resource: '*'
+          Action: "cloudwatch:GetMetricStatistics"
+          Resource: "*"
         - Effect: Allow
-          Action: 'cloudwatch:DescribeAlarm'
-          Resource: '*'
+          Action: "cloudwatch:DescribeAlarm"
+          Resource: "*"
 
 package:
   individually: true
@@ -24,20 +24,20 @@ package:
 custom:
   rust:
     dockerless: true
-  # # when using local builds (dockerless), optionally provide a different target and linker for the compiler
-  #   # for example, allow local running on ARM macs
+    # # when using local builds (dockerless), optionally provide a different target and linker for the compiler
+    # # for example, allow local running on ARM macs
     target: x86_64-unknown-linux-musl
-  #   linker: clang
+    # linker: clang
 
 plugins:
   - serverless-rust
 
 functions:
-
   scan:
     handler: "cloud-scanner-lambda.bootstrap"
+    environment:
+      BOAVIZTA_API_URL: www.api.example.com
     events:
       - http:
           path: /scan
           method: GET
-  

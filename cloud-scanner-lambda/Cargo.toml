@@ -1,17 +1,26 @@
 [package]
+edition = "2021"
 name = "cloud-scanner-lambda"
 version = "0.0.1"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-cloud-scanner-cli = { path = "../cloud-scanner-cli" }
-tokio = { version = "1.17.0", features = ["macros"] }
-serde_json = "1.0"
-lambda_runtime = { version = "0.5.1" }
-lambda_http = { version = "0.5" }
-
 [[bin]]
 name = "bootstrap"
 path = "src/main.rs"
+
+[dependencies]
+envy = "*"
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[dependencies.cloud-scanner-cli]
+path = "../cloud-scanner-cli"
+
+[dependencies.lambda_http]
+version = "0.5"
+
+[dependencies.lambda_runtime]
+version = "0.5.1"
+
+[dependencies.tokio]
+features = ["macros"]
+version = "1.17.0"

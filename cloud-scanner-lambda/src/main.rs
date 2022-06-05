@@ -1,8 +1,18 @@
 use lambda_http::{http::StatusCode, IntoResponse, Request, RequestExt, Response};
 use lambda_runtime::{service_fn, Error, LambdaEvent};
 use serde_json::{json, Value};
+use std::env;
+#[macro_use]
+extern crate log;
 
 type E = Box<dyn std::error::Error + Sync + Send + 'static>;
+
+use serde::Deserialize;
+
+#[derive(Deserialize, Debug)]
+struct Config {
+    boavizta_api_url: String,
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -13,7 +23,13 @@ async fn main() -> Result<(), Error> {
 async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
     // `serde_json::Values` impl `IntoResponse` by default
     // creating an application/json response
+    match envy::from_env::<Config>() {
+        Ok(config) => println!("{:#?}", config),
+        Err(error) => panic!("{:#?}", error),
+    }
+
     println!("Scan account invoked with event : {:?}", event);
+    warn!("Using hardcoded use time of 1 hour");
 
     // warn!("Using 1 hour");
     let hours_use_time = 1 as f32;

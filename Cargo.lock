@@ -541,8 +541,11 @@ name = "cloud-scanner-lambda"
 version = "0.0.1"
 dependencies = [
  "cloud-scanner-cli",
+ "envy",
  "lambda_http",
  "lambda_runtime",
+ "log",
+ "serde",
  "serde_json",
  "tokio",
 ]
@@ -614,6 +617,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9852635589dc9f9ea1b6fe9f05b50ef208c85c834a562f0c6abb1c475736ec2b"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "envy"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f47e0157f2cb54f5ae1bd371b30a2ae4311e1c028f575cd4e81de7353215965"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
