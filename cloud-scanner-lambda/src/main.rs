@@ -1,5 +1,6 @@
 use lambda_http::{http::StatusCode, IntoResponse, Request, RequestExt, Response};
 use lambda_runtime::{service_fn, Error, LambdaEvent};
+use pkg_version::*;
 use serde_json::{json, Value};
 use std::env;
 #[macro_use]
@@ -28,15 +29,27 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         Err(error) => panic!("{:#?}", error),
     }
 
+    println!(
+        "Cloud scanner {}, using scanner lib {}",
+        get_version(),
+        cloud_scanner_cli::get_version()
+    );
     println!("Scan account invoked with event : {:?}", event);
     warn!("Using hardcoded use time of 1 hour");
 
-    // warn!("Using 1 hour");
     let hours_use_time = 1 as f32;
     let filter_tags: Vec<String> = Vec::new();
     let impacts: String =
         cloud_scanner_cli::get_default_impacts(&hours_use_time, &filter_tags).await;
     Ok(response(StatusCode::OK, impacts))
+}
+
+/// Return current version of cloud-scanner-lambda
+fn get_version() -> String {
+    const MAJOR: u32 = pkg_version_major!();
+    const MINOR: u32 = pkg_version_minor!();
+    const PATCH: u32 = pkg_version_patch!();
+    format!("{}.{}.{}", MAJOR, MINOR, PATCH)
 }
 
 /// HTTP Response with a JSON payload
