@@ -4,8 +4,8 @@ extern crate log;
 mod aws_api;
 mod boavizta_api;
 
-/// Prints impacts without using use time and default Boavizta impacts
-pub async fn print_default_impacts_as_json(hours_use_time: &f32, tags: &Vec<String>) {
+/// Returns default impacts as json
+pub async fn get_default_impacts(hours_use_time: &f32, tags: &Vec<String>) -> String {
     let instances = aws_api::list_instances(tags).await.unwrap();
     let country_code = aws_api::get_current_iso_country().await;
 
@@ -19,8 +19,12 @@ pub async fn print_default_impacts_as_json(hours_use_time: &f32, tags: &Vec<Stri
         let value = boavizta_api::get_instance_impacts(instance, usage_cloud).await;
         instances_with_impacts.push(value);
     }
+    serde_json::to_string(&instances_with_impacts).unwrap()
+}
 
-    let j = serde_json::to_string(&instances_with_impacts).unwrap();
+/// Prints impacts without using use time and default Boavizta impacts
+pub async fn print_default_impacts_as_json(hours_use_time: &f32, tags: &Vec<String>) {
+    let j = get_default_impacts(&hours_use_time, tags).await;
     println!("{}", j);
 }
 

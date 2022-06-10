@@ -3,4 +3,5 @@
 members = [
     "boavizta-api-sdk",
     "cloud-scanner-cli",
+    "cloud-scanner-lambda",
 ]
