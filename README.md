@@ -2,7 +2,7 @@
 
 Collect aws cloud usage data, so that it can be combined with impact data of Boavizta API.
 
-⚠ Early Work in progress !
+⚠ Early Work in progress ! See the [changelog](CHANGELOG.md).
 
 At the moment it just returns _standard_ impacts of aws instances in the default region of your account. It does not use metrics of instance usage to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
 
@@ -28,12 +28,14 @@ cargo run standard --hours-use-time 10 | jq
 ```sh
 # Local build of docker image
 docker build . --tag cloud-scanner-cli
+# Test run
+docker run -it cloud-scanner-cli --help
 # Test listing instances
 # Note 
 # - we map local credentials on the container (-v)
 # - we force a using 'myprofile' profile by setting the AWS_PROFILE environment variable with -e flag
 # - the -it flag is optional, only purpose is to get colored output if any
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' cloud-scanner-cli list-instance
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' cloud-scanner-cli list-instances
 # Test getting impacts
 docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' cloud-scanner-cli standard --hours-use-time 10
 ```
