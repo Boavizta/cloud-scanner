@@ -1,35 +1,23 @@
-FROM rust:1.61 as planner
-WORKDIR app
-
+FROM rust:1.61 as chef
+RUN rustup target add x86_64-unknown-linux-musl
+RUN apt update && apt install -y musl-tools musl-dev
+RUN update-ca-certificates
 RUN cargo install cargo-chef
+WORKDIR /app
+
+FROM chef AS planner
 COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Analyze dependencies
-RUN cargo chef prepare  --recipe-path recipe.json
-
-FROM rust:1.61 as cacher
-WORKDIR app
-RUN cargo install cargo-chef
+FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
-
-# Cache dependencies
-RUN cargo chef cook --release --recipe-path recipe.json
-
-FROM rust:1.61 as builder
-WORKDIR app
+# Notice that we are specifying the --target flag!
+RUN cargo chef cook --release --target x86_64-unknown-linux-musl --recipe-path recipe.json
 COPY . .
+RUN cargo build --release --target x86_64-unknown-linux-musl --bin cloud-scanner-cli
 
-# Copy over the cached dependencies
-COPY --from=cacher /app/target target
-COPY --from=cacher $CARGO_HOME $CARGO_HOME
-RUN cargo build --release
-
-FROM ubuntu:22.04 as runtime
-WORKDIR app
-
-RUN apt-get update \
-    && DEBIAN_FRONTEND="noninteractive" apt-get install -y ca-certificates tzdata \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=builder /app/target/release/cloud-scanner-cli /usr/local/bin
+FROM alpine AS runtime
+#RUN addgroup -S myuser && adduser -S myuser -G myuser
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/cloud-scanner-cli /usr/local/bin/
+#USER myuser
 ENTRYPOINT ["/usr/local/bin/cloud-scanner-cli"]
