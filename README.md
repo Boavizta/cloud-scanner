@@ -10,7 +10,7 @@ At the moment it just returns _standard_ impacts of aws instances in the default
 
 ## Getting started
 
-### List standard impacts of AWS instances for 10 hours of use
+### List standard impacts of AWS instances (for 10 hours of use)
 
 Using default account region.
 
@@ -18,29 +18,39 @@ Using default account region.
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 # Estimate impact for 10 hours of use 
-cargo run standard --hours-use-time 10 | jq
+cargo run --bin cloud-scanner-cli standard --hours-use-time 10 | jq
 ```
 
 ## Usage
 
-### Build and run as docker image
+### Run public docker image
+
+```sh
+docker pull ghcr.io/boavizta/cloud-scanner-cli:latest
+docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
+
+# Note 
+# - we map local credentials on the container (-v)
+# - we force a using 'myprofile' profile by setting the AWS_PROFILE environment variable with -e flag
+# - the -it flag is optional, only purpose is to get colored output if any
+
+# Just list instances
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest list-instances
+
+# List instances and standard impacts (for 10 hours of use)
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest standard --hours-use-time 10
+```
+
+⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
+
+### Build a local docker image
 
 ```sh
 # Local build of docker image
 docker build . --tag cloud-scanner-cli
 # Test run
 docker run -it cloud-scanner-cli --help
-# Test listing instances
-# Note 
-# - we map local credentials on the container (-v)
-# - we force a using 'myprofile' profile by setting the AWS_PROFILE environment variable with -e flag
-# - the -it flag is optional, only purpose is to get colored output if any
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' cloud-scanner-cli list-instances
-# Test getting impacts
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' cloud-scanner-cli standard --hours-use-time 10
 ```
-
-⚠ This method of passing credentials is not secure nor very practical. In a production setup you should rather rely on the role of the instance hosting the container to manage authentication.
 
 ### Building local executable
 
@@ -51,7 +61,7 @@ cargo build --release
 ### Cli options
 
 ```sh
-cargo run -- --help
+cargo run --bin cloud-scanner-cli -- --help
 
 List aws instances and their environmental impact (from Boavizta API)
 
@@ -173,7 +183,7 @@ Cloud scanner returns a json array of instances metadata (instance_id, type usag
 
 - Return empty impacts when the instance _type_ is not listed in Boavizta database.
 - Query only the _default region_ of you AWS profile (`--aws-region` flag is not yet implemented).
-- Always returns _standard_ impacts: using instance workload to assess impact is not yet implemented (i.e. using CPU load through the `measured` command has no effect).
+- Always returns _standard_ impacts: using instance workload to assess impact is not yet implemented (i.e. using CPU load through the `measured` command has no effect yet).
 - Filtering instances by tag is not yet supported.
 
 ### Generate / update Boavizta API sdk
