@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reduce size of docker image (use Alpine (5MB) instead of Ubuntu (80MB))
 - Fix github workflow to publish image only on merge to main branch
+- Serverless scanner: display version of library in log
 
 ## [0.0.2] - 2022-06-10
 
