@@ -1,6 +1,7 @@
 use boavizta_api_sdk::models::UsageCloud;
 #[macro_use]
 extern crate log;
+use pkg_version::*;
 mod aws_api;
 mod boavizta_api;
 
@@ -51,4 +52,12 @@ pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>) {
 /// List instances as text
 pub async fn show_instances(tags: &Vec<String>) {
     aws_api::display_instances_as_text(tags).await;
+}
+
+/// Return current version of the cloud-scanner-cli crate
+pub fn get_version() -> String {
+    const MAJOR: u32 = pkg_version_major!();
+    const MINOR: u32 = pkg_version_minor!();
+    const PATCH: u32 = pkg_version_patch!();
+    format!("{}.{}.{}", MAJOR, MINOR, PATCH)
 }

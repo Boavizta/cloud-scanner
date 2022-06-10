@@ -9,7 +9,7 @@ path = "src/main.rs"
 [dependencies]
 envy = "*"
 log = "0.4"
-serde = { version = "1.0", features = ["derive"] }
+pkg-version = "*"
 serde_json = "1.0"
 
 [dependencies.cloud-scanner-cli]
@@ -20,6 +20,10 @@ version = "0.5"
 
 [dependencies.lambda_runtime]
 version = "0.5.1"
+
+[dependencies.serde]
+features = ["derive"]
+version = "1.0"
 
 [dependencies.tokio]
 features = ["macros"]
