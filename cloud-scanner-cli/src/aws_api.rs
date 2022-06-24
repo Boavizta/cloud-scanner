@@ -42,7 +42,10 @@ pub async fn list_instances(tags: &Vec<String>) -> Result<Vec<Instance>, Error> 
         .await;
     let client = Client::new(&shared_config);
 
-    warn!("Always using default region: {}", &shared_config.region().unwrap());
+    warn!(
+        "Always using default region: {}",
+        &shared_config.region().unwrap()
+    );
     let mut instances: Vec<Instance> = Vec::new();
 
     // Filter: AND on name, OR on values

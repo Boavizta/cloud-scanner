@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support scanning a region different from where the lambda is deployed.
 - Use the instances workload (cpu) to tune the results.
+- Use a published/versioned crate of boavizta-api-sdk (actual version relies on local sdk).
 
 ## [0.0.4] - 2022-06-24
 
@@ -19,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - this parameter is mandatory
 - Update serverless app to use `aws_region` in default scan
   - ⚠ This _optional_ parameter is not yet supported by the scanner lib (which always defaults to the default region of the lambda)
+
+### Changed
+
+- Update AWS sdk dependencies.
 
 ## [0.0.3] - 2022-06-10
 

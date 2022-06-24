@@ -12,7 +12,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 struct Config {
-    boavizta_api_url: String,
+    boavizta_api_url: Option<String>,
 }
 
 #[tokio::main]
@@ -22,22 +22,21 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
-    // `serde_json::Values` impl `IntoResponse` by default
-    // creating an application/json response
-    match envy::from_env::<Config>() {
-        Ok(config) => println!("{:#?}", config),
+    let config = match envy::from_env::<Config>() {
+        Ok(config) => config,
         Err(error) => panic!("{:#?}", error),
-    }
+    };
 
     println!(
         "Cloud scanner {}, using scanner lib {}",
         get_version(),
         cloud_scanner_cli::get_version()
     );
+    println!("Using config {:#?}", config);
     println!("Scan account invoked with event : {:?}", event);
 
     let query_string_parameters = event.query_string_parameters();
-    
+
     let hours_use_time = match query_string_parameters.first("hours_use_time") {
         Some(hours_use_time) => hours_use_time.parse::<f32>().unwrap(),
         None => {
@@ -91,7 +90,7 @@ mod tests {
     async fn scan_test() {
         let request = Request::default();
         let expected = json!({
-            "message": "Go Serverless v1.0! Your function executed successfully!"
+            "message":"Missing 'hours_use_time' parameter in path"
         })
         .into_response();
         let response = scan(request)
