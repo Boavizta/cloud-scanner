@@ -35,12 +35,17 @@ fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
 pub async fn list_instances(tags: &Vec<String>) -> Result<Vec<Instance>, Error> {
     warn!("Warning: skipping tag filer {:?}", tags);
 
+    warn!("Always using default region ");
     let shared_config = aws_config::from_env()
         //.region(Region::new("eu-west-1"))
         .load()
         .await;
     let client = Client::new(&shared_config);
 
+    warn!(
+        "Always using default region: {}",
+        &shared_config.region().unwrap()
+    );
     let mut instances: Vec<Instance> = Vec::new();
 
     // Filter: AND on name, OR on values

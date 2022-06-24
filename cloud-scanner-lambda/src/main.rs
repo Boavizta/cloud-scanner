@@ -12,7 +12,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 struct Config {
-    boavizta_api_url: String,
+    boavizta_api_url: Option<String>,
 }
 
 #[tokio::main]
@@ -22,22 +22,42 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
-    // `serde_json::Values` impl `IntoResponse` by default
-    // creating an application/json response
-    match envy::from_env::<Config>() {
-        Ok(config) => println!("{:#?}", config),
+    let config = match envy::from_env::<Config>() {
+        Ok(config) => config,
         Err(error) => panic!("{:#?}", error),
-    }
+    };
 
     println!(
         "Cloud scanner {}, using scanner lib {}",
         get_version(),
         cloud_scanner_cli::get_version()
     );
+    println!("Using config {:#?}", config);
     println!("Scan account invoked with event : {:?}", event);
-    warn!("Using hardcoded use time of 1 hour");
 
-    let hours_use_time = 1 as f32;
+    let query_string_parameters = event.query_string_parameters();
+
+    let hours_use_time = match query_string_parameters.first("hours_use_time") {
+        Some(hours_use_time) => hours_use_time.parse::<f32>().unwrap(),
+        None => {
+            println!("Missing 'hours_use_time' parameter in path");
+            return Ok(response(
+                StatusCode::BAD_REQUEST,
+                json!({ "message": "Missing 'hours_use_time' parameter in path" }).to_string(),
+            ));
+        }
+    };
+
+    let aws_region = match query_string_parameters.first("aws_region") {
+        Some(aws_region) => aws_region,
+        None => {
+            println!("No 'aws_region' parameter in path, will fallback to default");
+            "eu-west-1"
+        }
+    };
+
+    println!("Using use time of {}", hours_use_time);
+    println!("Using aws_region {}", aws_region);
     let filter_tags: Vec<String> = Vec::new();
     let impacts: String =
         cloud_scanner_cli::get_default_impacts(&hours_use_time, &filter_tags).await;
@@ -70,7 +90,7 @@ mod tests {
     async fn scan_test() {
         let request = Request::default();
         let expected = json!({
-            "message": "Go Serverless v1.0! Your function executed successfully!"
+            "message":"Missing 'hours_use_time' parameter in path"
         })
         .into_response();
         let response = scan(request)

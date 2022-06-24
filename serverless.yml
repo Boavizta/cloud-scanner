@@ -40,4 +40,9 @@ functions:
     events:
       - http:
           path: /scan
-          method: GET
+          method: get
+          request:
+            parameters:
+              querystrings:
+                hours_use_time: true
+                aws_region: false

@@ -7,9 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Support scanning a region different from where the lambda is deployed.
+- Use the instances workload (cpu) to tune the results.
+- Use a published/versioned crate of boavizta-api-sdk (actual version relies on local sdk).
+
+## [0.0.4] - 2022-06-24
+
 ### Added
 
-- Update serverless app to provide all the function of CLI version.
+- Serverless app supports `use hours_use_time` in default scan
+  - passed as request parameters (example query `https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=10`
+  - this parameter is mandatory
+- Update serverless app to use `aws_region` in default scan
+  - ⚠ This _optional_ parameter is not yet supported by the scanner lib (which always defaults to the default region of the lambda)
+
+### Changed
+
+- Update AWS sdk dependencies.
 
 ## [0.0.3] - 2022-06-10
 
