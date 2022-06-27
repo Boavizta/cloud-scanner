@@ -9,24 +9,10 @@
  */
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct ConfigurationServer {
-    #[serde(rename = "cpu", skip_serializing_if = "Option::is_none")]
-    pub cpu: Option<Box<crate::models::Cpu>>,
-    #[serde(rename = "ram", skip_serializing_if = "Option::is_none")]
-    pub ram: Option<Vec<crate::models::Ram>>,
-    #[serde(rename = "disk", skip_serializing_if = "Option::is_none")]
-    pub disk: Option<Vec<crate::models::Disk>>,
-    #[serde(rename = "power_supply", skip_serializing_if = "Option::is_none")]
-    pub power_supply: Option<Box<crate::models::PowerSupply>>,
-}
+pub struct LocationInner {}
 
-impl ConfigurationServer {
-    pub fn new() -> ConfigurationServer {
-        ConfigurationServer {
-            cpu: None,
-            ram: None,
-            disk: None,
-            power_supply: None,
-        }
+impl LocationInner {
+    pub fn new() -> LocationInner {
+        LocationInner {}
     }
 }

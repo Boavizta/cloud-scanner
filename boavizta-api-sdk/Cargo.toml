@@ -1,6 +1,6 @@
 [package]
 name = "boavizta_api_sdk"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["OpenAPI Generator team and contributors"]
 edition = "2018"
 
@@ -11,6 +11,6 @@ serde_json = "^1.0"
 url = "^2.2"
 [dependencies.reqwest]
 version = "^0.11"
-default-features = false 
-features = ["json", "multipart", "rustls-tls"]
+features = ["json", "multipart"]
 
+[dev-dependencies]
