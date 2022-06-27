@@ -518,6 +518,7 @@ dependencies = [
  "aws-sdk-cloudwatch",
  "aws-sdk-ec2",
  "aws-smithy-types-convert",
+ "aws-types",
  "boavizta_api_sdk",
  "chrono",
  "clap",

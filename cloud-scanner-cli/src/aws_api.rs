@@ -4,27 +4,55 @@ use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 use aws_sdk_cloudwatch::Client as CW_client;
 use aws_sdk_ec2::model::Instance;
 use aws_sdk_ec2::{Client, Error, Region};
+//use aws_sdk_ec2::Client::sdk_config;
 use chrono::Duration;
 use isocountry::CountryCode;
 
 //use aws_smithy_types_convert::date_time::DateTimeExt;
 use chrono::Utc;
 
-/// Returns 3 letters ISO code for the country corresponding to the aws region we are logged into
-pub async fn get_current_iso_country() -> &'static str {
-    let aws_region = get_current_aws_region().await;
-    let cc = get_country_from_aws_region(aws_region.as_str());
+/// Init a sdk config with default credentials and given region.
+/// If region is empty, uses a default region (but will return no error even if the region is invalid)
+pub async fn init_aws_config(aws_region: &str) -> aws_types::sdk_config::SdkConfig {
+    if aws_region.is_empty() {
+        // Use default region (from env)
+        let sdk_config = aws_config::from_env().load().await;
+        warn!(
+            "Cannot parse region, using default region [{}]",
+            sdk_config.region().unwrap()
+        );
+        sdk_config
+    } else {
+        let sdk_config = aws_config::from_env()
+            .region(Region::new(String::from(aws_region)))
+            .load()
+            .await;
+        info!("Using region {}", aws_region);
+        sdk_config
+    }
+}
+
+/// Returns 3 letters ISO code for the country corresponding to the aws region
+pub fn get_iso_country(aws_region: &str) -> &'static str {
+    //let aws_region = get_current_aws_region().await;
+    let cc = get_country_from_aws_region(aws_region);
     cc.alpha3()
 }
 
 /// Converts aws region into country
 fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
     let cc: CountryCode = match aws_region {
-        "eu-west-1" => CountryCode::IRL,
-        "eu-west-3" => CountryCode::FRA,
+        "eu-central-1" => CountryCode::DEU,
         "eu-east-1" => CountryCode::IRL,
+        "eu-north-1" => CountryCode::SWE,
+        "eu-south-1" => CountryCode::ITA,
+        "eu-west-1" => CountryCode::IRL,
         "eu-west-2" => CountryCode::GBR,
-        _ => CountryCode::FRA,
+        "eu-west-3" => CountryCode::FRA,
+        _ => {
+            error!("Unable to match aws region to country code, defaulting to FRA !");
+            CountryCode::FRA
+        }
     };
     cc
 }
@@ -32,20 +60,12 @@ fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
 /// List all instances of the current account
 ///
 /// Filtering instance on tags is not yet implemented.
-pub async fn list_instances(tags: &Vec<String>) -> Result<Vec<Instance>, Error> {
+pub async fn list_instances(tags: &Vec<String>, aws_region: &str) -> Result<Vec<Instance>, Error> {
     warn!("Warning: skipping tag filer {:?}", tags);
 
-    warn!("Always using default region ");
-    let shared_config = aws_config::from_env()
-        //.region(Region::new("eu-west-1"))
-        .load()
-        .await;
+    let shared_config = init_aws_config(aws_region).await;
     let client = Client::new(&shared_config);
 
-    warn!(
-        "Always using default region: {}",
-        &shared_config.region().unwrap()
-    );
     let mut instances: Vec<Instance> = Vec::new();
 
     // Filter: AND on name, OR on values
@@ -76,14 +96,6 @@ fn print_instances(instances: Vec<Instance>) {
     }
 }
 
-/// Returns the AWS region we are connected to
-async fn get_current_aws_region() -> String {
-    let shared_config = aws_config::from_env().load().await;
-    let awr: &Region = shared_config.region().unwrap();
-
-    String::from(awr.as_ref())
-}
-
 // async fn show_regions(client: &Client) -> Result<(), Error> {
 //     let rsp = client.describe_regions().senduse chrono::prelude::*;
 //     println!("Regions:");
@@ -94,8 +106,8 @@ async fn get_current_aws_region() -> String {
 // }
 
 /// Query account for instances and display as text
-pub async fn display_instances_as_text(tags: &Vec<String>) {
-    let instances = list_instances(tags).await;
+pub async fn display_instances_as_text(tags: &Vec<String>, aws_region: &str) {
+    let instances = list_instances(tags, aws_region).await;
     print_instances(instances.unwrap());
 }
 
@@ -264,21 +276,38 @@ async fn test_average_cpu_load_24hrs_of_shutdown_instance() {
     assert_eq!(0 as f64, res);
 }
 
-#[tokio::test]
-async fn test_get_current_region() {
-    let reg: String = get_current_aws_region().await;
-    assert_eq!("eu-west-1", reg);
-}
+//#[tokio::test]
+// async fn test_get_current_region() {
+//     let reg: String = get_current_aws_region().await;
+//     assert_eq!("eu-west-1", reg);
+// }
 
 #[tokio::test]
 async fn test_get_country_code_from_region() {
     let region = "eu-west-3";
     let cc = get_country_from_aws_region(region);
     assert_eq!("FRA", cc.alpha3());
+    //assert_eq!("IRL", get_country_from_aws_region("eu-west-1").alpha3());
 }
 
 #[tokio::test]
 async fn test_get_current_iso_region() {
-    let country_code = get_current_iso_country().await;
+    let aws_region = "eu-west-1";
+    let country_code = get_iso_country(aws_region);
     assert_eq!("IRL", country_code);
+    let aws_region = "eu-west-2";
+    let country_code = get_iso_country(aws_region);
+    assert_eq!("FR", country_code);
+}
+#[tokio::test]
+async fn test_create_sdk_config() {
+    let region: &str = "eu-west-3";
+    let config = init_aws_config(region).await;
+
+    assert_eq!(region, config.region().unwrap().to_string());
+
+    let wrong_region: &str = "impossible-region";
+    let config = init_aws_config(wrong_region).await;
+
+    assert_eq!(wrong_region, config.region().unwrap().to_string())
 }

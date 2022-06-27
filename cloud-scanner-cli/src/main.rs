@@ -48,14 +48,22 @@ async fn main() {
 
     loggerv::init_with_verbosity(args.verbosity).unwrap();
 
+    let region = args.aws_region.unwrap_or(String::from("default-region"));
+
     match args.cmd {
         SubCommand::Standard { hours_use_time } => {
-            cloud_scanner_cli::print_default_impacts_as_json(&hours_use_time, &args.filter_tags)
-                .await
+            cloud_scanner_cli::print_default_impacts_as_json(
+                &hours_use_time,
+                &args.filter_tags,
+                &region,
+            )
+            .await
         }
         SubCommand::Measured {} => {
-            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags).await
+            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags, &region).await
         }
-        SubCommand::ListInstances {} => cloud_scanner_cli::show_instances(&args.filter_tags).await,
+        SubCommand::ListInstances {} => {
+            cloud_scanner_cli::show_instances(&args.filter_tags, &region).await
+        }
     }
 }

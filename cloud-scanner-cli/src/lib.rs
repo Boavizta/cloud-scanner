@@ -6,9 +6,13 @@ mod aws_api;
 mod boavizta_api;
 
 /// Returns default impacts as json
-pub async fn get_default_impacts(hours_use_time: &f32, tags: &Vec<String>) -> String {
-    let instances = aws_api::list_instances(tags).await.unwrap();
-    let country_code = aws_api::get_current_iso_country().await;
+pub async fn get_default_impacts(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+) -> String {
+    let instances = aws_api::list_instances(tags, aws_region).await.unwrap();
+    let country_code = aws_api::get_iso_country(aws_region);
 
     let mut instances_with_impacts: Vec<boavizta_api::AwsInstanceWithImpacts> = Vec::new();
 
@@ -24,15 +28,19 @@ pub async fn get_default_impacts(hours_use_time: &f32, tags: &Vec<String>) -> St
 }
 
 /// Prints impacts without using use time and default Boavizta impacts
-pub async fn print_default_impacts_as_json(hours_use_time: &f32, tags: &Vec<String>) {
-    let j = get_default_impacts(&hours_use_time, tags).await;
+pub async fn print_default_impacts_as_json(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+) {
+    let j = get_default_impacts(&hours_use_time, tags, aws_region).await;
     println!("{}", j);
 }
 
 /// Prints impacts considering the instance workload / CPU load
-pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>) {
+pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>, aws_region: &str) {
     warn!("Warning: getting impacts for specific CPU load is not yet implemented, will just display instances and average load");
-    let instances = aws_api::list_instances(tags).await.unwrap();
+    let instances = aws_api::list_instances(tags, aws_region).await.unwrap();
 
     for instance in &instances {
         let instance_id: &str = instance.instance_id.as_ref().unwrap();
@@ -50,8 +58,8 @@ pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>) {
 }
 
 /// List instances as text
-pub async fn show_instances(tags: &Vec<String>) {
-    aws_api::display_instances_as_text(tags).await;
+pub async fn show_instances(tags: &Vec<String>, aws_region: &str) {
+    aws_api::display_instances_as_text(tags, aws_region).await;
 }
 
 /// Return current version of the cloud-scanner-cli crate
