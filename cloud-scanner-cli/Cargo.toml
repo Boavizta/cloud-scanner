@@ -24,7 +24,7 @@ version = "0.14.0"
 
 [dependencies.aws-sdk-ec2]
 features = ["rustls"]
-version = "0.14.0"
+version = "0.15.0"
 
 [dependencies.aws-smithy-types-convert]
 features = ["convert-chrono"]
