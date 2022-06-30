@@ -10,7 +10,7 @@ pub struct AwsInstanceWithImpacts {
     instance_id: String,
     instance_type: String,
     usage_data: boavizta_api_sdk::models::UsageCloud,
-    impacts: serde_json::Value,
+    pub impacts: serde_json::Value,
 }
 
 /// Returns instance information aggregated with Boavizta impacts for this type of instance.
