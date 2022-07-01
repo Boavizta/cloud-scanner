@@ -1,17 +1,8 @@
+use crate::model::AwsInstanceWithImpacts;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::UsageCloud;
-use serde_derive::{Deserialize, Serialize};
-
-/// Describes an instance with it's impacts
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AwsInstanceWithImpacts {
-    instance_id: String,
-    instance_type: String,
-    usage_data: boavizta_api_sdk::models::UsageCloud,
-    pub impacts: Option<serde_json::Value>,
-}
 
 /// Returns instance information aggregated with Boavizta impacts for this type of instance.
 ///
@@ -20,9 +11,9 @@ pub async fn get_instance_impacts(
     instance: &aws_sdk_ec2::model::Instance,
     usage_data: UsageCloud,
 ) -> AwsInstanceWithImpacts {
-    let instance_id = String::from(instance.instance_id.as_ref().unwrap());
-    let instance_type = get_instance_type_as_string(instance);
-    let impacts = get_impacts_from_instance(instance, usage_data.clone()).await;
+    let instance_id = instance.instance_id.as_ref().unwrap().to_string();
+    let instance_type = instance_type_as_string(instance);
+    let impacts = get_impacts(instance, usage_data.clone()).await;
 
     AwsInstanceWithImpacts {
         instance_id,
@@ -34,26 +25,19 @@ pub async fn get_instance_impacts(
 
 /// Returns the default impacts of an instance from Boavizta API
 ///
-async fn get_impacts_from_instance(
+async fn get_impacts(
     instance: &aws_sdk_ec2::model::Instance,
     usage_data: UsageCloud,
 ) -> Option<serde_json::Value> {
-    // Call boavizta API, passing an instance type, returns a standard impact
-    let instance_type = get_instance_type_as_string(instance);
-    get_impacts(instance_type, usage_data).await
-}
+    let instance_type = instance_type_as_string(instance);
 
-/// Returns the  impacts of an instance from Boavizta API
-///
-/// Returns empty json of impact if any error
-async fn get_impacts(instance_type: String, usage_cloud: UsageCloud) -> Option<serde_json::Value> {
     let mut configuration = configuration::Configuration::new();
     warn!("Using hardcoded Boavizta API URL");
     configuration.base_path = String::from("https://api.boavizta.org");
 
     let opt_instance_type = Some(instance_type.as_str());
     let verbose = Some(false);
-    let usage_cloud: Option<UsageCloud> = Some(usage_cloud);
+    let usage_cloud: Option<UsageCloud> = Some(usage_data);
 
     let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
         &configuration,
@@ -70,13 +54,12 @@ async fn get_impacts(instance_type: String, usage_cloud: UsageCloud) -> Option<s
                 instance_type, e
             );
             None
-            //serde_json::from_str("{}").unwrap()
         }
     }
 }
 
 /// Returns the instance type as a new String
-fn get_instance_type_as_string(instance: &aws_sdk_ec2::model::Instance) -> String {
+fn instance_type_as_string(instance: &aws_sdk_ec2::model::Instance) -> String {
     instance.instance_type().unwrap().as_str().to_owned()
 }
 
@@ -124,13 +107,13 @@ async fn get_default_impact() {
         }, 
         "gwp": {
             "manufacture": 87.0,
-             "unit": "kgCO2eq", 
-             "use": 51.0
+            "unit": "kgCO2eq", 
+            "use": 51.0
             },
         "pe": {
             "manufacture": 1100.0,
-             "unit": "MJ",
-              "use": 1700.0
+            "unit": "MJ",
+            "use": 1700.0
             }
     }
     "#;
@@ -138,9 +121,11 @@ async fn get_default_impact() {
     // Parse the string of data into serde_json::Value.
     let expected: serde_json::Value = serde_json::from_str(data).unwrap();
 
-    let instance_type = String::from("m6g.xlarge");
     let usage_cloud: UsageCloud = UsageCloud::new();
-    let impacts = get_impacts(instance_type, usage_cloud).await;
+    let instance: aws_sdk_ec2::model::Instance = aws_sdk_ec2::model::Instance::builder()
+        .set_instance_type(Some(aws_sdk_ec2::model::InstanceType::M6gXlarge))
+        .build();
+    let impacts = get_impacts(&instance, usage_cloud).await;
 
     assert_eq!(expected, impacts.unwrap());
 }
@@ -170,11 +155,13 @@ async fn test_get_impacts_without_region() {
     // Parse the string of data into serde_json::Value.
     let expected: serde_json::Value = serde_json::from_str(data).unwrap();
 
-    let instance_type = String::from("m6g.xlarge");
     let mut usage_cloud: UsageCloud = UsageCloud::new();
     usage_cloud.days_use_time = Some(4 as f32);
 
-    let impacts = get_impacts(instance_type, usage_cloud).await;
+    let instance: aws_sdk_ec2::model::Instance = aws_sdk_ec2::model::Instance::builder()
+        .set_instance_type(Some(aws_sdk_ec2::model::InstanceType::M6gXlarge))
+        .build();
+    let impacts = get_impacts(&instance, usage_cloud).await;
 
     assert_eq!(expected, impacts.unwrap());
 }
@@ -204,12 +191,27 @@ async fn test_get_impacts_with_region() {
     // Parse the string of data into serde_json::Value.
     let expected: serde_json::Value = serde_json::from_str(data).unwrap();
 
-    let instance_type = String::from("m6g.xlarge");
     let mut usage_cloud: UsageCloud = UsageCloud::new();
     usage_cloud.days_use_time = Some(4 as f32);
     usage_cloud.usage_location = Some(String::from("FRA"));
 
-    let impacts = get_impacts(instance_type, usage_cloud).await;
+    // impl std::convert::From<&str> for InstanceType {
+    //     fn from(s: &str) -> Self {
+    //         match s {
+    //             "a1.2xlarge" => InstanceType::A12xlarge,
+    //             "a1.4xlarge" => InstanceType::A14xlarge,
+    //             "a1.large" => InstanceType::A1Large,
+    //             "a1.medium" => InstanceType::A1Medium,
+    //             "a1.metal" => InstanceType::A1Metal,
+    //             "a1.xlarge" => InstanceType::A1Xlarge,
+
+    // let itype: aws_sdk_ec2::model::InstanceType =
+    //        aws_sdk_ec2::model::InstanceType::from("m6g.xlarge");
+    let instance: aws_sdk_ec2::model::Instance = aws_sdk_ec2::model::Instance::builder()
+        .set_instance_type(Some(aws_sdk_ec2::model::InstanceType::M6gXlarge))
+        .build();
+
+    let impacts = get_impacts(&instance, usage_cloud).await;
 
     assert_eq!(expected, impacts.unwrap());
 }

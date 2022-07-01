@@ -4,7 +4,6 @@ use prometheus_client::encoding::text::Encode;
 use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
-use std::io::Write;
 
 /// Returns the metrics
 fn get_metrics() -> String {
