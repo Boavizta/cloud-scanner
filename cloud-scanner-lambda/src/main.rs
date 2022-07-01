@@ -2,7 +2,6 @@ use lambda_http::{http::StatusCode, IntoResponse, Request, RequestExt, Response}
 use lambda_runtime::{service_fn, Error, LambdaEvent};
 use pkg_version::*;
 use serde_json::{json, Value};
-use std::env;
 #[macro_use]
 extern crate log;
 

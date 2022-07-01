@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
-
+#[macro_use]
 extern crate log;
 extern crate loggerv;
 
@@ -42,13 +42,27 @@ enum SubCommand {
     ListInstances {},
 }
 
+fn set_region(optional_region: Option<String>) -> String {
+    match optional_region {
+        Some(region_arg) => {
+            info!("Using region {}", region_arg);
+            region_arg
+        }
+        None => {
+            let default_region = "eu-west-1".to_string();
+            warn!("Using default region {}", default_region);
+            default_region
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     let args = Arguments::parse();
 
     loggerv::init_with_verbosity(args.verbosity).unwrap();
 
-    let region = args.aws_region.unwrap_or(String::from("default-region"));
+    let region = set_region(args.aws_region);
 
     match args.cmd {
         SubCommand::Standard { hours_use_time } => {

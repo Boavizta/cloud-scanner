@@ -10,7 +10,7 @@ pub struct AwsInstanceWithImpacts {
     instance_id: String,
     instance_type: String,
     usage_data: boavizta_api_sdk::models::UsageCloud,
-    pub impacts: serde_json::Value,
+    pub impacts: Option<serde_json::Value>,
 }
 
 /// Returns instance information aggregated with Boavizta impacts for this type of instance.
@@ -22,7 +22,7 @@ pub async fn get_instance_impacts(
 ) -> AwsInstanceWithImpacts {
     let instance_id = String::from(instance.instance_id.as_ref().unwrap());
     let instance_type = get_instance_type_as_string(instance);
-    let impacts: serde_json::Value = get_impacts_from_instance(instance, usage_data.clone()).await;
+    let impacts = get_impacts_from_instance(instance, usage_data.clone()).await;
 
     AwsInstanceWithImpacts {
         instance_id,
@@ -37,7 +37,7 @@ pub async fn get_instance_impacts(
 async fn get_impacts_from_instance(
     instance: &aws_sdk_ec2::model::Instance,
     usage_data: UsageCloud,
-) -> serde_json::Value {
+) -> Option<serde_json::Value> {
     // Call boavizta API, passing an instance type, returns a standard impact
     let instance_type = get_instance_type_as_string(instance);
     get_impacts(instance_type, usage_data).await
@@ -46,8 +46,9 @@ async fn get_impacts_from_instance(
 /// Returns the  impacts of an instance from Boavizta API
 ///
 /// Returns empty json of impact if any error
-async fn get_impacts(instance_type: String, usage_cloud: UsageCloud) -> serde_json::Value {
+async fn get_impacts(instance_type: String, usage_cloud: UsageCloud) -> Option<serde_json::Value> {
     let mut configuration = configuration::Configuration::new();
+    warn!("Using hardcoded Boavizta API URL");
     configuration.base_path = String::from("https://api.boavizta.org");
 
     let opt_instance_type = Some(instance_type.as_str());
@@ -62,13 +63,14 @@ async fn get_impacts(instance_type: String, usage_cloud: UsageCloud) -> serde_js
     )
     .await;
     match res {
-        Ok(res) => res,
+        Ok(res) => Some(res),
         Err(e) => {
             warn!(
                 "Warning: Cannot get impacts from API for instance type {}: {}",
                 instance_type, e
             );
-            serde_json::from_str("{}").unwrap()
+            None
+            //serde_json::from_str("{}").unwrap()
         }
     }
 }
@@ -140,7 +142,7 @@ async fn get_default_impact() {
     let usage_cloud: UsageCloud = UsageCloud::new();
     let impacts = get_impacts(instance_type, usage_cloud).await;
 
-    assert_eq!(expected, impacts);
+    assert_eq!(expected, impacts.unwrap());
 }
 
 #[tokio::test]
@@ -174,7 +176,7 @@ async fn test_get_impacts_without_region() {
 
     let impacts = get_impacts(instance_type, usage_cloud).await;
 
-    assert_eq!(expected, impacts);
+    assert_eq!(expected, impacts.unwrap());
 }
 
 #[tokio::test]
@@ -209,7 +211,7 @@ async fn test_get_impacts_with_region() {
 
     let impacts = get_impacts(instance_type, usage_cloud).await;
 
-    assert_eq!(expected, impacts);
+    assert_eq!(expected, impacts.unwrap());
 }
 
 #[tokio::test]

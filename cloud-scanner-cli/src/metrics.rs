@@ -58,9 +58,11 @@ fn get_metrics() -> String {
 async fn test_get_get_metrics() {
     let metrics = get_metrics();
 
-    let expected = "# HELP boavizta_number_of_instances_total Number of instances detected during the scan.\n".to_owned()
-        + "# TYPE boavizta_number_of_instances_total gauge\n"
-        + "boavizta_number_of_instances_total{awsregion=\"eu-west-1\",country=\"IRL\"} 15\n"
-        + "# EOF\n";
+    let expected =
+        "# HELP boavizta_number_of_instances_total Number of instances detected during the scan.\n"
+            .to_owned()
+            + "# TYPE boavizta_number_of_instances_total gauge\n"
+            + "boavizta_number_of_instances_total{awsregion=\"eu-west-1\",country=\"IRL\"} 15\n"
+            + "# EOF\n";
     assert_eq!(expected, metrics);
 }
