@@ -46,3 +46,15 @@ functions:
               querystrings:
                 hours_use_time: true
                 aws_region: false
+  summary:
+    handler: "cloud-scanner-lambda.secondbootstrap"
+    environment:
+      BOAVIZTA_API_URL: www.api.example.com
+    events:
+      - http:
+          path: /summary
+          method: get
+          request:
+            parameters:
+              querystrings:
+                aws_region: false

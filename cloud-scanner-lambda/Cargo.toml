@@ -5,6 +5,10 @@ version = "0.0.2"
 [[bin]]
 name = "bootstrap"
 path = "src/main.rs"
+[[bin]]
+name = "secondbootstrap"
+path = "src/summary.rs"
+
 
 [dependencies]
 envy = "*"
