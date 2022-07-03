@@ -61,8 +61,8 @@ cargo build --release
 ### Cli options
 
 ```sh
-cargo run --bin cloud-scanner-cli -- --help
-
+cloud-scanner-cli 0.0.4
+Olivier de Meringo <demeringo@gmail.com>
 List aws instances and their environmental impact (from Boavizta API)
 
 USAGE:
@@ -73,13 +73,13 @@ OPTIONS:
             AWS region (default profile region is assumed if not provided)
 
     -b, --boavizta-api-url <BOAVIZTA_API_URL>
-            Boavizta API URL
+            Optional Boavizta API URL (if you want to use your own instance)
 
     -h, --help
             Print help information
 
-    -o, --out-file <OUT_FILE>
-            Save results to a file (instead of printing json to stdout)
+    -m, --as-metrics
+            Returns OpenMetrics (Prometheus like) instead of json output
 
     -t, --filter-tags <FILTER_TAGS>
             Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
@@ -115,7 +115,10 @@ Easiest way to pass aws credential is use an environment variable to use a speci
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 ```
 
-## Output format
+## Output formats
+
+
+### JSON output (the default)
 
 Cloud scanner returns a json array of instances metadata (instance_id, type usage_data and and usage impacts) on _stdout_.
 
@@ -177,6 +180,33 @@ Cloud scanner returns a json array of instances metadata (instance_id, type usag
   }
 ]
 
+```
+
+### OpenMetrics/Prometheus output
+
+If using `--as-metrics` or `-m` option, cloud-scanner returns consolidated results as OpenMetric/Prometheus format insted of json details.
+
+When using the metric output format, you cannot see the individual impacts of each instance. Instead, impacts of all instances are added to provide a global figure.
+
+```
+cargo run --bin cloud-scanner-cli -- --as-metrics  standard -u 1
+
+# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
+# TYPE boavizta_number_of_instances_total gauge
+boavizta_number_of_instances_total{awsregion="eu-west-1",country="IRL"} 9
+# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
+# TYPE boavizta_number_of_instances_assessed gauge
+boavizta_number_of_instances_assessed{awsregion="eu-west-1",country="IRL"} 6
+# HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
+# TYPE boavizta_duration_of_use_hours gauge
+boavizta_duration_of_use_hours{awsregion="eu-west-1",country="IRL"} 1.0
+# HELP boavizta_pe_manufacture_megajoules Power consumed for manufacture.
+# TYPE boavizta_pe_manufacture_megajoules gauge
+boavizta_pe_manufacture_megajoules{awsregion="eu-west-1",country="IRL"} 2060.0
+# HELP boavizta_pe_use_megajoules Power consumed during usage.
+# TYPE boavizta_pe_use_megajoules gauge
+boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.228
+# EOF
 ```
 
 ## ⚠ Current limitations

@@ -39,5 +39,8 @@ fn test_get_current_iso_region() {
     assert_eq!("IRL", country_code);
     let aws_region = "eu-west-2";
     let country_code = get_iso_country(aws_region);
-    assert_eq!("FR", country_code);
+    assert_eq!("GBR", country_code);
+    let aws_region = "eu-west-3";
+    let country_code = get_iso_country(aws_region);
+    assert_eq!("FRA", country_code);
 }

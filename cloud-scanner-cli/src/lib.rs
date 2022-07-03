@@ -1,4 +1,5 @@
 use crate::countries::*;
+use crate::metrics::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
 use boavizta_api_sdk::models::UsageCloud;
@@ -11,56 +12,45 @@ mod countries;
 mod metrics;
 mod model;
 
-pub fn has_impacts(optional_impacts: &Option<serde_json::Value>) -> bool {
-    warn!("checking impacts {:#?}", optional_impacts);
-    match optional_impacts {
-        Some(i) => {
-            info!("Yes impacts found {}", i);
-            true
-        }
-        None => {
-            warn!("Instance without impact");
-            false
-        }
-    }
-}
-
-/// Returns a summary (summing/aggregating data where possible) of the scan.
-pub async fn get_summary(
+/// Returns a summary (summing/aggregating data where possible) of the scan results.
+pub async fn build_summary(
     instances_with_impacts: &Vec<AwsInstanceWithImpacts>,
+    aws_region: &str,
+    duration_of_use_hours: f64,
 ) -> ScanResultSummary {
-    let mut number_of_instances_assessed: u32 = 0;
-    let mut pe_use_megajoules: f64 = 0.0;
-    let mut pe_manufacture_megajoules: f64 = 0.0;
-
-    for instance in instances_with_impacts {
-        let impacts = &instance.impacts;
-
-        if has_impacts(&impacts) {
-            number_of_instances_assessed = number_of_instances_assessed + 1;
-
-            let v = impacts.as_ref().unwrap();
-
-            pe_use_megajoules = pe_use_megajoules + v["pe"]["use"].as_f64().unwrap();
-            warn!("added pe {}", pe_use_megajoules);
-            pe_manufacture_megajoules =
-                pe_manufacture_megajoules + v["pe"]["manufacture"].as_f64().unwrap();
-        }
-    }
-
     let number_of_instances_total = u32::try_from(instances_with_impacts.len()).unwrap();
 
-    ScanResultSummary {
-        number_of_instances_total: number_of_instances_total,
-        number_of_instances_assessed: number_of_instances_assessed,
-        number_of_instances_not_assessed: number_of_instances_total - number_of_instances_assessed,
-        pe_use_megajoules: pe_use_megajoules,
-        pe_manufacture_megajoules: pe_manufacture_megajoules,
+    let mut summary = ScanResultSummary {
+        number_of_instances_total,
+        aws_region: aws_region.to_owned(),
+        country: countries::get_iso_country(aws_region).to_owned(),
+        duration_of_use_hours,
         ..Default::default()
+    };
+
+    for instance in instances_with_impacts {
+        // Only consider the instances for which we have impact data
+        if let Some(impacts) = &instance.impacts {
+            debug!("This instance has impacts data: {}", impacts);
+            summary.number_of_instances_assessed += 1;
+            summary.adp_manufacture_kgsbeq += impacts["adp"]["manufacture"].as_f64().unwrap();
+            summary.adp_use_kgsbeq += impacts["adp"]["use"].as_f64().unwrap();
+            summary.pe_manufacture_megajoules += impacts["pe"]["manufacture"].as_f64().unwrap();
+            summary.pe_use_megajoules += impacts["pe"]["use"].as_f64().unwrap();
+            summary.gwp_manufacture_kgco2eq += impacts["gwp"]["manufacture"].as_f64().unwrap();
+            summary.gwp_use_kgco2eq += impacts["gwp"]["use"].as_f64().unwrap();
+        } else {
+            debug!("Skipped instance: {:#?} while building summary because instance has no impact data", instance);
+        }
     }
+
+    summary.number_of_instances_not_assessed =
+        summary.number_of_instances_total - summary.number_of_instances_assessed;
+
+    summary
 }
 
-/// Standard scan (standard workload)
+/// Standard scan (using standard/default workload)
 async fn standard_scan(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -90,9 +80,36 @@ pub async fn get_default_impacts(
 ) -> String {
     let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region).await;
 
-    println!("Summary: {:#?}", get_summary(&instances_with_impacts).await);
+    let summary = build_summary(
+        &instances_with_impacts,
+        aws_region,
+        hours_use_time.to_owned().into(),
+    )
+    .await;
+
+    debug!("Summary: {:#?}", summary);
 
     serde_json::to_string(&instances_with_impacts).unwrap()
+}
+
+// Returns default impacts as metrics
+pub async fn get_default_impacts_as_metrics(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+) -> String {
+    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region).await;
+
+    let summary = build_summary(
+        &instances_with_impacts,
+        aws_region,
+        hours_use_time.to_owned().into(),
+    )
+    .await;
+
+    debug!("Summary: {:#?}", summary);
+
+    get_metrics(&summary)
 }
 
 /// Prints impacts without using use time and default Boavizta impacts
@@ -103,6 +120,16 @@ pub async fn print_default_impacts_as_json(
 ) {
     let j = get_default_impacts(&hours_use_time, tags, aws_region).await;
     println!("{}", j);
+}
+
+/// Prints impacts without using use time and default Boavizta impacts
+pub async fn print_default_impacts_as_metrics(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+) {
+    let metrics = get_default_impacts_as_metrics(&hours_use_time, tags, aws_region).await;
+    println!("{}", metrics);
 }
 
 /// Prints impacts considering the instance workload / CPU load

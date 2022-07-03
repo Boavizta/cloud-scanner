@@ -21,7 +21,7 @@ pub struct Labels {
 }
 
 /// Returns the metrics
-fn get_metrics(summary: &ScanResultSummary) -> String {
+pub fn get_metrics(summary: &ScanResultSummary) -> String {
     let label_set: Labels = Labels {
         awsregion: summary.aws_region.to_string(),
         country: summary.country.to_string(),
@@ -134,14 +134,7 @@ async fn test_get_get_metrics() {
 
     let metrics = get_metrics(&summary);
 
-    println!("{}", metrics);
-
-    let expected =
-        "# HELP boavizta_number_of_instances_total Number of instances detected during the scan.\n"
-            .to_owned()
-            + "# TYPE boavizta_number_of_instances_total gauge\n"
-            + "boavizta_number_of_instances_total{awsregion=\"eu-west-1\",country=\"IRL\"} 15\n"
-            + "# EOF\n";
+    //println!("{}", metrics);
 
     let expected = r#"# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
 # TYPE boavizta_number_of_instances_total gauge
