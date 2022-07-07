@@ -1,13 +1,13 @@
 [package]
 edition = "2021"
 name = "cloud-scanner-lambda"
-version = "0.0.2"
+version = "0.0.3"
 [[bin]]
-name = "bootstrap"
+name = "bootstrap-scan"
 path = "src/main.rs"
 [[bin]]
-name = "secondbootstrap"
-path = "src/summary.rs"
+name = "bootstrap-metrics"
+path = "src/metrics.rs"
 
 
 [dependencies]

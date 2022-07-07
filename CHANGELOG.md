@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update serverless app to use `aws_region` in default scan
   - ⚠ This _optional_ parameter is not yet supported by the scanner lib (which always defaults to the default region of the lambda)
 - Export scan result summary as OpenMetrics/Prometheus metrics (see `-m` or `--as-metrics` flag in CLI).
+- Add a route in serverless app that returns metrics for one hour use (e.g. `https://xxxx/dev/metrics?aws_region=eu-west-3`)
 
 ### Changed
 

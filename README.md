@@ -17,7 +17,7 @@ Using default account region.
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
-# Estimate impact for 10 hours of use 
+# Estimate impact for 10 hours of use
 cargo run --bin cloud-scanner-cli standard --hours-use-time 10 | jq
 ```
 
@@ -29,7 +29,7 @@ cargo run --bin cloud-scanner-cli standard --hours-use-time 10 | jq
 docker pull ghcr.io/boavizta/cloud-scanner-cli:latest
 docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
 
-# Note 
+# Note
 # - we map local credentials on the container (-v)
 # - we force a using 'myprofile' profile by setting the AWS_PROFILE environment variable with -e flag
 # - the -it flag is optional, only purpose is to get colored output if any
@@ -58,7 +58,15 @@ docker run -it cloud-scanner-cli --help
 cargo build --release
 ```
 
-### Cli options
+### Deploy as serverless app (aws lambda)
+
+```
+npm i
+export aws_profile = <my profile>
+serverless deploy
+```
+
+## Cli options
 
 ```sh
 cloud-scanner-cli 0.0.4
@@ -115,12 +123,47 @@ Easiest way to pass aws credential is use an environment variable to use a speci
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 ```
 
-## Output formats
+## Serverless routes
 
+### Scan account / region
+
+Returns results in json format (see below, same as CLI)
+
+https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1
+
+Use `hours_use_time` and `aws_region` parameters in the query
+
+### Get Metrics
+
+https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1
+
+returns metrics for one hour of use in prometheus format.
+Use `aws_region` parameters in the query.
+
+```
+# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
+# TYPE boavizta_number_of_instances_total gauge
+boavizta_number_of_instances_total{awsregion="eu-central-1",country="DEU"} 7
+# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
+# TYPE boavizta_number_of_instances_assessed gauge
+boavizta_number_of_instances_assessed{awsregion="eu-central-1",country="DEU"} 5
+# HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
+# TYPE boavizta_duration_of_use_hours gauge
+boavizta_duration_of_use_hours{awsregion="eu-central-1",country="DEU"} 1.0
+# HELP boavizta_pe_manufacture_megajoules Power consumed for manufacture.
+# TYPE boavizta_pe_manufacture_megajoules gauge
+boavizta_pe_manufacture_megajoules{awsregion="eu-central-1",country="DEU"} 1760.0
+# HELP boavizta_pe_use_megajoules Power consumed during usage.
+# TYPE boavizta_pe_use_megajoules gauge
+boavizta_pe_use_megajoules{awsregion="eu-central-1",country="DEU"} 0.86
+# EOF
+```
+
+## Output formats
 
 ### JSON output (the default)
 
-Cloud scanner returns a json array of instances metadata (instance_id, type usage_data and and usage impacts) on _stdout_.
+Cloud scanner returns a json array of instances metadata (instance*id, type usage_data and and usage impacts) on \_stdout*.
 
 ⚠ Returns _empty_ impacts when the _instance type_ is not known in Boavizta database
 
@@ -164,7 +207,7 @@ Cloud scanner returns a json array of instances metadata (instance_id, type usag
       "adp": {
         "manufacture": 0.0084,
         "unit": "kgSbeq",
-        "use": 1.7e-09
+        "use": 1.7e-9
       },
       "gwp": {
         "manufacture": 87,
@@ -179,7 +222,6 @@ Cloud scanner returns a json array of instances metadata (instance_id, type usag
     }
   }
 ]
-
 ```
 
 ### OpenMetrics/Prometheus output
