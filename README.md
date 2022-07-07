@@ -2,13 +2,15 @@
 
 Collect aws cloud usage data, so that it can be combined with impact data of Boavizta API.
 
-⚠ Early Work in progress ! See the [changelog](CHANGELOG.md).
+It can be used from command line app (CLI) or be deployed as a serverless application and return metrics (that can be pushed to a dashboard).
+
+⚠ Work in progress ! See the [changelog](CHANGELOG.md).
 
 At the moment it just returns _standard_ impacts of aws instances in the default region of your account. It does not use metrics of instance usage to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
-## Getting started
+## Getting started 💻
 
 ### List standard impacts of AWS instances (for 10 hours of use)
 
@@ -21,7 +23,7 @@ export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 cargo run --bin cloud-scanner-cli standard --hours-use-time 10 | jq
 ```
 
-## Usage
+## Usage as CLI 💻
 
 ### Run public docker image
 
@@ -58,15 +60,7 @@ docker run -it cloud-scanner-cli --help
 cargo build --release
 ```
 
-### Deploy as serverless app (aws lambda)
-
-```
-npm i
-export aws_profile = <my profile>
-serverless deploy
-```
-
-## Cli options
+### Cli options
 
 ```sh
 cloud-scanner-cli 0.0.4
@@ -123,9 +117,23 @@ Easiest way to pass aws credential is use an environment variable to use a speci
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 ```
 
-## Serverless routes
 
-### Scan account / region
+## Usage as a serverless app (aws lambda) ⚡
+
+The serverless application for aws is configured to be deployed with the serverless framework.
+It is configured to get sufficient permission to scan your resources without requesting authentication.
+
+### Deploy the app
+
+```sh
+npm i
+export aws_profile = <my profile>
+serverless deploy
+```
+
+### Serverless routes
+
+#### Scan account / region
 
 Returns results in json format (see below, same as CLI)
 
@@ -133,7 +141,7 @@ https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_
 
 Use `hours_use_time` and `aws_region` parameters in the query
 
-### Get Metrics
+#### Get Metrics
 
 https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1
 
@@ -254,9 +262,10 @@ boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.228
 ## ⚠ Current limitations
 
 - Return empty impacts when the instance _type_ is not listed in Boavizta database.
-- Query only the _default region_ of you AWS profile (`--aws-region` flag is not yet implemented).
+- `--aws-region` flag only supports eu-based aws regions for the time being (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3)
 - Always returns _standard_ impacts: using instance workload to assess impact is not yet implemented (i.e. using CPU load through the `measured` command has no effect yet).
 - Filtering instances by tag is not yet supported.
+- Passing a private Boavizta API URL is not yet implemented
 
 ### Generate / update Boavizta API sdk
 
