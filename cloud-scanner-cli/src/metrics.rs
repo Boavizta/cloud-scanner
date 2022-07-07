@@ -92,6 +92,46 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         Box::new(boavizta_pe_use_megajoules.clone()),
     );
 
+    let boavizta_adp_manufacture_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_adp_manufacture_kgsbeq",
+        // And the metric help text.
+        "ADP manufacture",
+        Box::new(boavizta_adp_manufacture_kgsbeq.clone()),
+    );
+
+    let boavizta_adp_use_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_adp_use_kgsbeq",
+        // And the metric help text.
+        "ADP use",
+        Box::new(boavizta_adp_use_kgsbeq.clone()),
+    );
+
+    let boavizta_gwp_manufacture_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_gwp_manufacture_kgco2eq",
+        // And the metric help text.
+        "GWP manufacture",
+        Box::new(boavizta_gwp_manufacture_kgco2eq.clone()),
+    );
+
+    let boavizta_gwp_use_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_gwp_use_kgco2eq",
+        // And the metric help text.
+        "GWP of use",
+        Box::new(boavizta_gwp_use_kgco2eq.clone()),
+    );
+
     // Set the values
     boavizta_number_of_instances_total
         .get_or_create(&label_set)
@@ -111,6 +151,22 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
     boavizta_pe_use_megajoules
         .get_or_create(&label_set)
         .set(summary.pe_use_megajoules);
+
+    boavizta_adp_manufacture_kgsbeq
+        .get_or_create(&label_set)
+        .set(summary.adp_manufacture_kgsbeq);
+
+    boavizta_adp_use_kgsbeq
+        .get_or_create(&label_set)
+        .set(summary.adp_use_kgsbeq);
+
+    boavizta_gwp_manufacture_kgco2eq
+        .get_or_create(&label_set)
+        .set(summary.gwp_manufacture_kgco2eq);
+
+    boavizta_gwp_use_kgco2eq
+        .get_or_create(&label_set)
+        .set(summary.gwp_use_kgco2eq);
 
     registry
 }
@@ -134,7 +190,7 @@ async fn test_get_get_metrics() {
 
     let metrics = get_metrics(&summary);
 
-    //println!("{}", metrics);
+    println!("{}", metrics);
 
     let expected = r#"# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
 # TYPE boavizta_number_of_instances_total gauge
@@ -151,6 +207,18 @@ boavizta_pe_manufacture_megajoules{awsregion="eu-west-1",country="IRL"} 0.3
 # HELP boavizta_pe_use_megajoules Power consumed during usage.
 # TYPE boavizta_pe_use_megajoules gauge
 boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.4
+# HELP boavizta_adp_manufacture_kgsbeq ADP manufacture.
+# TYPE boavizta_adp_manufacture_kgsbeq gauge
+boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-1",country="IRL"} 0.1
+# HELP boavizta_adp_use_kgsbeq ADP use.
+# TYPE boavizta_adp_use_kgsbeq gauge
+boavizta_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL"} 0.2
+# HELP boavizta_gwp_manufacture_kgco2eq GWP manufacture.
+# TYPE boavizta_gwp_manufacture_kgco2eq gauge
+boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.5
+# HELP boavizta_gwp_use_kgco2eq GWP of use.
+# TYPE boavizta_gwp_use_kgco2eq gauge
+boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 # EOF
 "#;
 
