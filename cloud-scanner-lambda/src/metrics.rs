@@ -16,11 +16,11 @@ struct Config {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    lambda_http::run(lambda_http::service_fn(|event: Request| scan(event))).await?;
+    lambda_http::run(lambda_http::service_fn(|event: Request| summary(event))).await?;
     Ok(())
 }
 
-async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
+async fn summary(event: Request) -> Result<impl IntoResponse, Error> {
     let config = match envy::from_env::<Config>() {
         Ok(config) => config,
         Err(error) => panic!("{:#?}", error),
@@ -36,17 +36,6 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
 
     let query_string_parameters = event.query_string_parameters();
 
-    let hours_use_time = match query_string_parameters.first("hours_use_time") {
-        Some(hours_use_time) => hours_use_time.parse::<f32>().unwrap(),
-        None => {
-            println!("Missing 'hours_use_time' parameter in path");
-            return Ok(response(
-                StatusCode::BAD_REQUEST,
-                json!({ "message": "Missing 'hours_use_time' parameter in path" }).to_string(),
-            ));
-        }
-    };
-
     let aws_region = match query_string_parameters.first("aws_region") {
         Some(aws_region) => aws_region,
         None => {
@@ -56,11 +45,11 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         }
     };
 
-    println!("Using use time of {}", hours_use_time);
+    println!("Using fixed use time of 1 hour.");
     println!("Using aws_region {}", aws_region);
     let filter_tags: Vec<String> = Vec::new();
     let impacts: String =
-        cloud_scanner_cli::get_default_impacts(&hours_use_time, &filter_tags, aws_region).await;
+        cloud_scanner_cli::get_default_impacts_as_metrics(&1.0, &filter_tags, aws_region).await;
     Ok(response(StatusCode::OK, impacts))
 }
 
@@ -76,7 +65,7 @@ fn get_version() -> String {
 fn response(status_code: StatusCode, body: String) -> Response<String> {
     Response::builder()
         .status(status_code)
-        .header("Content-Type", "application/json")
+        .header("Content-Type", "text/plain")
         .body(body)
         .unwrap()
 }
@@ -93,7 +82,7 @@ mod tests {
             "message":"Missing 'hours_use_time' parameter in path"
         })
         .into_response();
-        let response = scan(request)
+        let response = summary(request)
             .await
             .expect("expected Ok(_) value")
             .into_response();

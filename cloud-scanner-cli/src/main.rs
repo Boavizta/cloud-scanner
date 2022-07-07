@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
-
+#[macro_use]
 extern crate log;
 extern crate loggerv;
 
@@ -20,12 +20,15 @@ struct Arguments {
     #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
     filter_tags: Vec<String>,
-    /// Save results to a file (instead of printing json to stdout)
-    #[clap(short, long, parse(from_os_str))]
-    out_file: Option<PathBuf>,
+    // /// Save results to a file (instead of printing json to stdout)
+    // #[clap(short, long, parse(from_os_str))]
+    // out_file: Option<PathBuf>,
     /// Enable logging, use multiple `v`s to increase verbosity
     #[clap(short, long, parse(from_occurrences))]
     verbosity: u64,
+    /// Returns OpenMetrics (Prometheus like) instead of json output
+    #[clap(short = 'm', long)]
+    as_metrics: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -42,22 +45,45 @@ enum SubCommand {
     ListInstances {},
 }
 
+fn set_region(optional_region: Option<String>) -> String {
+    match optional_region {
+        Some(region_arg) => {
+            info!("Using region {}", region_arg);
+            region_arg
+        }
+        None => {
+            let default_region = "eu-west-1".to_string();
+            warn!("Using default region {}", default_region);
+            default_region
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     let args = Arguments::parse();
 
     loggerv::init_with_verbosity(args.verbosity).unwrap();
 
-    let region = args.aws_region.unwrap_or(String::from("default-region"));
+    let region = set_region(args.aws_region);
 
     match args.cmd {
         SubCommand::Standard { hours_use_time } => {
-            cloud_scanner_cli::print_default_impacts_as_json(
-                &hours_use_time,
-                &args.filter_tags,
-                &region,
-            )
-            .await
+            if args.as_metrics {
+                cloud_scanner_cli::print_default_impacts_as_metrics(
+                    &hours_use_time,
+                    &args.filter_tags,
+                    &region,
+                )
+                .await
+            } else {
+                cloud_scanner_cli::print_default_impacts_as_json(
+                    &hours_use_time,
+                    &args.filter_tags,
+                    &region,
+                )
+                .await
+            }
         }
         SubCommand::Measured {} => {
             cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags, &region).await

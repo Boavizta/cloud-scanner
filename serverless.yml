@@ -34,7 +34,7 @@ plugins:
 
 functions:
   scan:
-    handler: "cloud-scanner-lambda.bootstrap"
+    handler: "cloud-scanner-lambda.bootstrap-scan"
     environment:
       BOAVIZTA_API_URL: www.api.example.com
     events:
@@ -45,4 +45,16 @@ functions:
             parameters:
               querystrings:
                 hours_use_time: true
+                aws_region: false
+  summary:
+    handler: "cloud-scanner-lambda.bootstrap-metrics"
+    environment:
+      BOAVIZTA_API_URL: www.api.example.com
+    events:
+      - http:
+          path: /metrics
+          method: get
+          request:
+            parameters:
+              querystrings:
                 aws_region: false
