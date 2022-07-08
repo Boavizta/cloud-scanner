@@ -138,7 +138,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         .set(summary.number_of_instances_total.into());
     boavizta_number_of_instances_assessed
         .get_or_create(&label_set)
-        .set(summary.number_of_instances_not_assessed.into());
+        .set(summary.number_of_instances_assessed.into());
 
     boavizta_duration_of_use_hours
         .get_or_create(&label_set)
