@@ -1,31 +1,36 @@
-# cloud-scanner
+# Boavizta cloud-scanner 📡
 
-Collect aws cloud usage data, so that it can be combined with impact data of Boavizta API.
+Returns Boavizta impact data corresponding to your AWS Cloud usage.
 
-It can be used from command line app (CLI) or be deployed as a serverless application and return metrics (that can be pushed to a dashboard).
+As a command line or serverless application, cloud-scanner analyse your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
 
 ⚠ Work in progress ! See the [changelog](CHANGELOG.md).
 
-At the moment it just returns _standard_ impacts of aws instances in the default region of your account. It does not use metrics of instance usage to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
+At the moment it just returns _standard_ impacts of AWS instances. It does not yet analyse detailled instance usage (workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
-## Getting started 💻
+## Getting started 🚀
 
-### List standard impacts of AWS instances (for 10 hours of use)
+Show impacts of your EC2 instances for 10 hours of use.
 
-Using default account region.
 
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
-# Estimate impact for 10 hours of use
+# Get impacts of 10 hours of use (on your default account region)
 cargo run --bin cloud-scanner-cli standard --hours-use-time 10 | jq
+
+# Same thing but as metrics
+cargo run --bin cloud-scanner-cli -- --as-metrics standard --hours-use-time 10
+
+# Same query for explicit region
+cargo run --bin cloud-scanner-cli -- --aws-region eu-west-3 standard --hours-use-time 10 | jq
 ```
 
 ## Usage as CLI 💻
 
-### Run public docker image
+### Run public docker image 🐳
 
 ```sh
 docker pull ghcr.io/boavizta/cloud-scanner-cli:latest
@@ -45,7 +50,7 @@ docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFIL
 
 ⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
 
-### Build a local docker image
+### Build a local docker image 🐳
 
 ```sh
 # Local build of docker image
@@ -54,13 +59,13 @@ docker build . --tag cloud-scanner-cli
 docker run -it cloud-scanner-cli --help
 ```
 
-### Building local executable
+### Building local executable 🦀
 
 ```sh
 cargo build --release
 ```
 
-### Cli options
+### CLI options
 
 ```sh
 cloud-scanner-cli 0.0.4
@@ -120,8 +125,8 @@ export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 ## Usage as a serverless app (aws lambda) ⚡
 
-The serverless application for aws is configured to be deployed with the serverless framework.
-It is configured to get sufficient permission to scan your resources without requesting authentication.
+The serverless application for aws is deployed with the serverless framework.
+It creates a role configured to get sufficient permission to scan your resources without requesting authentication.
 
 ### Deploy the app
 
