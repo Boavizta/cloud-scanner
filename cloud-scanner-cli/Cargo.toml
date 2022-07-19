@@ -36,7 +36,7 @@ path = "../boavizta-api-sdk"
 
 [dependencies.clap]
 features = ["derive"]
-version = "3.2.5"
+version = "3.2.13"
 
 [dependencies.tokio]
 features = ["full"]
