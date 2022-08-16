@@ -1,9 +1,10 @@
 [Introduction](intro.md)
 
-# Tutorials
+# Tutorials 🚀
 
-- [Quickstart with CLI](tutorials/quickstart-cli.md)
-- [Quickstart as serverless](tutorials/quickstart-serverless.md)
+- [Quickstart - using docker 🐳](tutorials/quickstart-docker.md)
+- [Quickstart - using cargo 🦀](tutorials/quickstart-rust-cli.md)
+- [Quickstart as serverless ⚡](tutorials/quickstart-serverless.md)
 
 # How-to guides
 
@@ -23,3 +24,5 @@
 - [CLI options](reference/cli-options.md)
 - [Environment variables](reference/env-vars.md)
 - [Output data](reference/output-data.md)
+- [Serverless design](reference/serverless-design.md)
+- [Limitations](reference/limits.md)

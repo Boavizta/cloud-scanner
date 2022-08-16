@@ -2,18 +2,17 @@
 
 Returns Boavizta impact data corresponding to your AWS Cloud usage.
 
-As a command line or serverless application, cloud-scanner analyse your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
+As a command line or serverless application, cloud-scanner analyses your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
 
 ⚠ Work in progress ! See the [changelog](CHANGELOG.md).
 
-At the moment it just returns _standard_ impacts of AWS instances. It does not yet analyse detailled instance usage (workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
+At the moment it only returns _standard_ impacts of AWS instances. It does not yet analyses instance usage (workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
 ## Getting started 🚀
 
 Show impacts of your EC2 instances for 10 hours of use.
-
 
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
@@ -121,7 +120,6 @@ Easiest way to pass aws credential is use an environment variable to use a speci
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 ```
-
 
 ## Usage as a serverless app (aws lambda) ⚡
 

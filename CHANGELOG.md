@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Provide documentation as mdbook (see https://github.com/Boavizta/cloud-scanner/issues/61)
 - Support scanning a region different from where the lambda is deployed.
 - Use the instances workload (cpu) to tune the results.
 - Use a published/versioned crate of boavizta-api-sdk (actual version relies on local sdk).
