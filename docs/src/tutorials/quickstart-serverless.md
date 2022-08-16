@@ -47,7 +47,7 @@ The metrics represent the costs / impacts of one hour of use of the resources pr
 
 Use `aws_region` parameters in the query.
 
-```
+```plaintext
 # HELP boavizta_number_of_instances_total Number of instances detected during the scan.
 # TYPE boavizta_number_of_instances_total gauge
 boavizta_number_of_instances_total{awsregion="eu-central-1",country="DEU"} 7
