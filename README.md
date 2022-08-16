@@ -10,6 +10,10 @@ At the moment it only returns _standard_ impacts of AWS instances. It does not y
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
+## Full documentation
+
+[Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/)
+
 ## Getting started 🚀
 
 Show impacts of your EC2 instances for 10 hours of use.

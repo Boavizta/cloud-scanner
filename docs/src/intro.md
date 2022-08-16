@@ -1,8 +1,10 @@
 # About cloud-scanner
 
-This application returns environmental impacts of your AWS Cloud usage. It combines Boavizta data and metadata of your AWS cloud account to offer a global view of your impacts on a given region.
+🌳 This application returns environmental impacts of your AWS Cloud usage. It combines Boavizta data and metadata of your AWS cloud account to offer a global view of your impacts on a given region.
 
-As a command line or serverless application, cloud-scanner analyses your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
+Use it as a command line _or_ serverless application. 
+
+Cloud-scanner analyses your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
 
 ⚠ Work in progress ! See the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md).
 
