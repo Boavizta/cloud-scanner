@@ -1,0 +1,6 @@
+[book]
+authors = ["olivier de Meringo"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Boavizta cloud scanner"
