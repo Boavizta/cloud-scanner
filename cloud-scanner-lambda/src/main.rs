@@ -1,4 +1,6 @@
 use lambda_http::{http::StatusCode, IntoResponse, Request, RequestExt, Response};
+/*use lambda_http::*;*/
+
 use lambda_runtime::{service_fn, Error, LambdaEvent};
 use pkg_version::*;
 use serde_json::{json, Value};
@@ -97,6 +99,6 @@ mod tests {
             .await
             .expect("expected Ok(_) value")
             .into_response();
-        assert_eq!(response.body(), expected.body())
+        assert_eq!(response.await.body(), expected.await.body());
     }
 }

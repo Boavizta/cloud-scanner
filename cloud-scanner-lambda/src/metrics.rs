@@ -73,7 +73,6 @@ fn response(status_code: StatusCode, body: String) -> Response<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use lambda_runtime::Context;
 
     #[tokio::test]
     async fn scan_test() {
@@ -86,6 +85,6 @@ mod tests {
             .await
             .expect("expected Ok(_) value")
             .into_response();
-        assert_eq!(response.body(), expected.body())
+        assert_eq!(response.await.body(), expected.await.body())
     }
 }
