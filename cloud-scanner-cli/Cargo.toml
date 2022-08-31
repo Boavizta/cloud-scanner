@@ -17,7 +17,7 @@ serde_json = "^1.0"
 
 [dependencies.aws-config]
 features = ["rustls"]
-version = "0.47.0"
+version = "0.48.0"
 
 [dependencies.aws-sdk-cloudwatch]
 features = ["rustls"]
