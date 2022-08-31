@@ -21,7 +21,7 @@ version = "0.47.0"
 
 [dependencies.aws-sdk-cloudwatch]
 features = ["rustls"]
-version = "0.17.0"
+version = "0.18.0"
 
 [dependencies.aws-sdk-ec2]
 features = ["rustls"]
