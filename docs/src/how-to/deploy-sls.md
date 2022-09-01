@@ -1,6 +1,8 @@
-# Deploy serverless
+# Deploy cloud scanner as a serverless application
 
-## From Linux
+You can deploy cloud scanner as a serverless application (AWS lambda).
+
+## Using Linux
 
 1. Install Rust
 2. Install nvm, nodejs
@@ -38,7 +40,7 @@ nvm install --lts
 
 ### Install serverless framework and deps
 
-````sh
+```sh
 npm install -g serverless
 npm i
 # Test packaging
@@ -47,11 +49,10 @@ serverless package
 serverless deploy
 ```
 
-## From Windows
+## Using Windows
 
-Tested method to build on windows is to use Windows Subsystem For Linux (WSL2).
+Tested method to deploy this serverless app from on windows is to use Windows Subsystem For Linux (WSL2).
 
-Prerequisite: install WSL2 and  the latest Ubuntu LTS image (22.04).
-If you do not have it yet, you may inspire from [Set up Node.js on WSL 2](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl).
-
-Once WSL is setup, you just have to follow Linux instructions above inside the Linux VM.
+1. Prerequisite: install WSL2 and  the latest Ubuntu LTS image (22.04).
+_If you do not have it yet, you may inspire from [Set up Node.js on WSL 2](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl)._
+1. After WSL is setup, follow Linux instructions above inside the Linux VM.

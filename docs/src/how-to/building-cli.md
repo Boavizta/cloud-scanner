@@ -1,6 +1,6 @@
-# Building CLI
+# Building cloud-scanner CLI
 
-## Linux
+## On Linux
 
 Install Rust and linux-musl dependencies.
 
@@ -20,13 +20,12 @@ cargo build
 cargo build --release
 ```
 
-## Windows: compile cloud-scanner on wsl2
+## On Windows with WSL2
 
-Tested method to build Rust on windows is to use Windows Subsystem For Linux (WSL2)
+Tested method to build Rust on Windows is to use _Windows Subsystem For Linux_ (WSL2)
 
-Prerequisite: install WSL2 and  the latest Ubuntu LTS image (22.04).
-If you do not have it yet, you may inspire from [Set up Node.js on WSL 2](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl).
-
-Once WSL is setup, you just have to follow Linux instructions above inside the Linux VM.
+1. Prerequisite: install WSL2 and  the latest Ubuntu LTS image (22.04).
+_If you do not WSL yet, you may inspire from [Set up Node.js on WSL 2](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl)._
+2. After WSL is setup, follow Linux instructions above inside the Linux VM.
 
 ## Using docker
