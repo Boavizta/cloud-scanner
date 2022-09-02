@@ -99,9 +99,9 @@ pub async fn get_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
-    api_url:&str,
+    api_url: &str,
 ) -> String {
-    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region,api_url).await;
+    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region, api_url).await;
 
     let summary = build_summary(
         &instances_with_impacts,
@@ -120,7 +120,7 @@ pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
-    api_url:&str,
+    api_url: &str,
 ) {
     let j = get_default_impacts(&hours_use_time, tags, aws_region, api_url).await;
     println!("{}", j);
@@ -131,9 +131,9 @@ pub async fn print_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
-    api_url:&str,
+    api_url: &str,
 ) {
-    let metrics = get_default_impacts_as_metrics(&hours_use_time, tags, aws_region,api_url).await;
+    let metrics = get_default_impacts_as_metrics(&hours_use_time, tags, aws_region, api_url).await;
     println!("{}", metrics);
 }
 

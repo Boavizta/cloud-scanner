@@ -61,8 +61,13 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
     println!("Using use time of {}", hours_use_time);
     println!("Using aws_region {}", aws_region);
     let filter_tags: Vec<String> = Vec::new();
-    let impacts: String =
-        cloud_scanner_cli::get_default_impacts(&hours_use_time, &filter_tags, aws_region,&config.boavizta_api_url ).await;
+    let impacts: String = cloud_scanner_cli::get_default_impacts(
+        &hours_use_time,
+        &filter_tags,
+        aws_region,
+        &config.boavizta_api_url,
+    )
+    .await;
     Ok(response(StatusCode::OK, impacts))
 }
 

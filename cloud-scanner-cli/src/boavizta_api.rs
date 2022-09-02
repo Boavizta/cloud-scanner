@@ -14,7 +14,7 @@ pub async fn get_instance_impacts(
 ) -> AwsInstanceWithImpacts {
     let instance_id = instance.instance_id.as_ref().unwrap().to_string();
     let instance_type = instance_type_as_string(instance);
-    let impacts = get_impacts(instance, usage_data.clone(),api_url).await;
+    let impacts = get_impacts(instance, usage_data.clone(), api_url).await;
 
     AwsInstanceWithImpacts {
         instance_id,
@@ -34,7 +34,6 @@ async fn get_impacts(
     let instance_type = instance_type_as_string(instance);
 
     let mut configuration = configuration::Configuration::new();
-    warn!("Using hardcoded Boavizta API URL");
     configuration.base_path = String::from(api_url);
 
     let opt_instance_type = Some(instance_type.as_str());
@@ -135,7 +134,7 @@ async fn get_default_impact() {
 
 #[tokio::test]
 async fn test_get_impacts_without_region() {
-    let api_url ="https://api.boavizta.org";
+    let api_url = "https://api.boavizta.org";
     let data = r#"   
     {
         "gwp": {
@@ -172,7 +171,7 @@ async fn test_get_impacts_without_region() {
 
 #[tokio::test]
 async fn test_get_impacts_with_region() {
-    let api_url= "https://api.boavizta.org";
+    let api_url = "https://api.boavizta.org";
     let data = r#"   
       {
         "gwp": {
@@ -216,7 +215,7 @@ async fn test_get_impacts_with_region() {
         .set_instance_type(Some(aws_sdk_ec2::model::InstanceType::M6gXlarge))
         .build();
 
-    let impacts = get_impacts(&instance, usage_cloud,api_url).await;
+    let impacts = get_impacts(&instance, usage_cloud, api_url).await;
 
     assert_eq!(expected, impacts.unwrap());
 }
