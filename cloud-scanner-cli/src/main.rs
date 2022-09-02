@@ -59,6 +59,20 @@ fn set_region(optional_region: Option<String>) -> String {
     }
 }
 
+fn set_api_url(optional_url: Option<String>) -> String {
+    match optional_url {
+        Some(url_arg) => {
+            info!("Using url {}", url_arg);
+            url_arg
+        }
+        None => {
+            let default_url = "https://api.boavizta.org/".to_string();
+            warn!("Using default url {}", default_url);
+            default_url
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() {
     let args = Arguments::parse();
@@ -67,6 +81,8 @@ async fn main() {
 
     let region = set_region(args.aws_region);
 
+    let api_url: String = set_api_url(args.boavizta_api_url);
+
     match args.cmd {
         SubCommand::Standard { hours_use_time } => {
             if args.as_metrics {
@@ -74,6 +90,7 @@ async fn main() {
                     &hours_use_time,
                     &args.filter_tags,
                     &region,
+                    &api_url,
                 )
                 .await
             } else {
@@ -81,6 +98,7 @@ async fn main() {
                     &hours_use_time,
                     &args.filter_tags,
                     &region,
+                    &api_url,
                 )
                 .await
             }

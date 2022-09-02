@@ -55,6 +55,7 @@ async fn standard_scan(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
+    api_url: &str,
 ) -> Vec<AwsInstanceWithImpacts> {
     let instances = aws_api::list_instances(tags, aws_region).await.unwrap();
     let country_code = get_iso_country(aws_region);
@@ -66,7 +67,7 @@ async fn standard_scan(
         usage_cloud.usage_location = Some(String::from(country_code));
         usage_cloud.hours_use_time = Some(hours_use_time.to_owned());
 
-        let value = boavizta_api::get_instance_impacts(instance, usage_cloud).await;
+        let value = boavizta_api::get_instance_impacts(instance, usage_cloud, api_url).await;
         instances_with_impacts.push(value);
     }
     instances_with_impacts
@@ -77,8 +78,9 @@ pub async fn get_default_impacts(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
+    api_url: &str,
 ) -> String {
-    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region).await;
+    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region, api_url).await;
 
     let summary = build_summary(
         &instances_with_impacts,
@@ -97,8 +99,9 @@ pub async fn get_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
+    api_url:&str,
 ) -> String {
-    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region).await;
+    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region,api_url).await;
 
     let summary = build_summary(
         &instances_with_impacts,
@@ -117,8 +120,9 @@ pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
+    api_url:&str,
 ) {
-    let j = get_default_impacts(&hours_use_time, tags, aws_region).await;
+    let j = get_default_impacts(&hours_use_time, tags, aws_region, api_url).await;
     println!("{}", j);
 }
 
@@ -127,8 +131,9 @@ pub async fn print_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
+    api_url:&str,
 ) {
-    let metrics = get_default_impacts_as_metrics(&hours_use_time, tags, aws_region).await;
+    let metrics = get_default_impacts_as_metrics(&hours_use_time, tags, aws_region,api_url).await;
     println!("{}", metrics);
 }
 
