@@ -138,8 +138,8 @@ pub async fn print_default_impacts_as_metrics(
 }
 
 /// Prints impacts considering the instance workload / CPU load
-pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>, aws_region: &str) {
-    warn!("Warning: getting impacts for specific CPU load is not yet implemented, will just display instances and average load");
+pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>, aws_region: &str, api_url: &str) {
+    warn!("Warning: getting impacts of precise CPU load is not yet implemented, will just display instances and average load of 24 hours");
     let instances = aws_api::list_instances(tags, aws_region).await.unwrap();
 
     for instance in &instances {
@@ -153,6 +153,7 @@ pub async fn print_cpu_load_impacts_as_json(tags: &Vec<String>, aws_region: &str
         );
         println!("Tags:  {:?}", instance.tags().unwrap());
         println!("Average CPU load:  {}", cpu_load);
+        println!("Not implemented: query  API at {}", api_url);
         println!();
     }
 }

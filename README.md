@@ -10,7 +10,7 @@ At the moment it only returns _standard_ impacts of AWS instances. It does not y
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
-## Full documentation
+## Documentation
 
 [Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/)
 
@@ -71,7 +71,7 @@ cargo build --release
 ### CLI options
 
 ```sh
-cloud-scanner-cli 0.0.4
+cloud-scanner-cli 0.0.6
 Olivier de Meringo <demeringo@gmail.com>
 List aws instances and their environmental impact (from Boavizta API)
 

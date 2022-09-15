@@ -48,12 +48,12 @@ enum SubCommand {
 fn set_region(optional_region: Option<String>) -> String {
     match optional_region {
         Some(region_arg) => {
-            info!("Using region {}", region_arg);
+            info!("Using region: {}", region_arg);
             region_arg
         }
         None => {
             let default_region = "eu-west-1".to_string();
-            warn!("Using default region {}", default_region);
+            warn!("Using default region: {}", default_region);
             default_region
         }
     }
@@ -62,12 +62,12 @@ fn set_region(optional_region: Option<String>) -> String {
 fn set_api_url(optional_url: Option<String>) -> String {
     match optional_url {
         Some(url_arg) => {
-            info!("Using url {}", url_arg);
+            info!("Using API at:  {}", url_arg);
             url_arg
         }
         None => {
             let default_url = "https://api.boavizta.org/".to_string();
-            warn!("Using default url {}", default_url);
+            warn!("Using default API at:  {}", default_url);
             default_url
         }
     }
@@ -104,7 +104,8 @@ async fn main() {
             }
         }
         SubCommand::Measured {} => {
-            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags, &region).await
+            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags, &region, &api_url)
+                .await
         }
         SubCommand::ListInstances {} => {
             cloud_scanner_cli::show_instances(&args.filter_tags, &region).await

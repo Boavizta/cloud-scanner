@@ -520,7 +520,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-cli"
-version = "0.0.5"
+version = "0.0.6"
 dependencies = [
  "aws-config",
  "aws-sdk-cloudwatch",
@@ -543,7 +543,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "0.0.4"
+version = "0.0.6"
 dependencies = [
  "cloud-scanner-cli",
  "envy",

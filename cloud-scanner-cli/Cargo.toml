@@ -2,7 +2,7 @@
 authors = ["Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
-version = "0.0.5"
+version = "0.0.6"
 [dependencies]
 aws-types = "0.47.0"
 chrono = "^0.4"
