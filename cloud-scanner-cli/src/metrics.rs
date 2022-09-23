@@ -197,7 +197,7 @@ async fn test_get_get_metrics() {
 boavizta_number_of_instances_total{awsregion="eu-west-1",country="IRL"} 5
 # HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
 # TYPE boavizta_number_of_instances_assessed gauge
-boavizta_number_of_instances_assessed{awsregion="eu-west-1",country="IRL"} 3
+boavizta_number_of_instances_assessed{awsregion="eu-west-1",country="IRL"} 2
 # HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
 # TYPE boavizta_duration_of_use_hours gauge
 boavizta_duration_of_use_hours{awsregion="eu-west-1",country="IRL"} 1.0

@@ -72,6 +72,7 @@ fn response(status_code: StatusCode, body: String) -> Response<String> {
         .unwrap()
 }
 
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,3 +92,4 @@ mod tests {
         assert_eq!(response.await.body(), expected.await.body())
     }
 }
+ */
