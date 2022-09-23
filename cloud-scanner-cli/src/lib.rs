@@ -122,7 +122,7 @@ pub async fn print_default_impacts_as_json(
     aws_region: &str,
     api_url: &str,
 ) {
-    let j = get_default_impacts(&hours_use_time, tags, aws_region, api_url).await;
+    let j = get_default_impacts(hours_use_time, tags, aws_region, api_url).await;
     println!("{}", j);
 }
 
@@ -133,7 +133,7 @@ pub async fn print_default_impacts_as_metrics(
     aws_region: &str,
     api_url: &str,
 ) {
-    let metrics = get_default_impacts_as_metrics(&hours_use_time, tags, aws_region, api_url).await;
+    let metrics = get_default_impacts_as_metrics(hours_use_time, tags, aws_region, api_url).await;
     println!("{}", metrics);
 }
 
