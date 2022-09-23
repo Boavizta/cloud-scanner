@@ -1,11 +1,8 @@
 use lambda_http::{http::StatusCode, IntoResponse, Request, RequestExt, Response};
-use lambda_runtime::{service_fn, Error, LambdaEvent};
+use lambda_runtime::Error;
 use pkg_version::*;
-use serde_json::{json, Value};
-#[macro_use]
-extern crate log;
 
-type E = Box<dyn std::error::Error + Sync + Send + 'static>;
+extern crate log;
 
 use serde::Deserialize;
 
@@ -16,7 +13,7 @@ struct Config {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    lambda_http::run(lambda_http::service_fn(|event: Request| summary(event))).await?;
+    lambda_http::run(lambda_http::service_fn(summary)).await?;
     Ok(())
 }
 
@@ -78,6 +75,7 @@ fn response(status_code: StatusCode, body: String) -> Response<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::json;
 
     #[tokio::test]
     async fn scan_test() {
