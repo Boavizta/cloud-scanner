@@ -1,9 +1,10 @@
 use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
 use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 // use aws_sdk_cloudwatch::output::ListMetricsOutput;
+use anyhow::{Context, Result};
 use aws_sdk_cloudwatch::Client as CW_client;
 use aws_sdk_ec2::model::Instance;
-use aws_sdk_ec2::{Client, Error, Region};
+use aws_sdk_ec2::{Client, Region};
 use chrono::Duration;
 
 //use aws_smithy_types_convert::date_time::DateTimeExt;
@@ -33,7 +34,7 @@ pub async fn init_aws_config(aws_region: &str) -> aws_types::sdk_config::SdkConf
 /// List all instances of the current account
 ///
 /// Filtering instance on tags is not yet implemented.
-pub async fn list_instances(tags: &Vec<String>, aws_region: &str) -> Result<Vec<Instance>, Error> {
+pub async fn list_instances(tags: &Vec<String>, aws_region: &str) -> Result<Vec<Instance>> {
     warn!("Warning: skipping tag filer {:?}", tags);
 
     let shared_config = init_aws_config(aws_region).await;
@@ -62,9 +63,9 @@ pub async fn list_instances(tags: &Vec<String>, aws_region: &str) -> Result<Vec<
 /// Prints some instance details
 fn print_instances(instances: Vec<Instance>) {
     for instance in &instances {
-        println!("Instance ID: {}", instance.instance_id().unwrap());
-        println!("Type:       {:?}", instance.instance_type().unwrap());
-        println!("Tags:  {:?}", instance.tags().unwrap());
+        println!("Instance ID: {:?}", instance.instance_id());
+        println!("Type:       {:?}", instance.instance_type());
+        println!("Tags:  {:?}", instance.tags());
         println!();
     }
 }
@@ -79,9 +80,15 @@ fn print_instances(instances: Vec<Instance>) {
 // }
 
 /// Query account for instances and display as text
-pub async fn display_instances_as_text(tags: &Vec<String>, aws_region: &str) {
-    let instances = list_instances(tags, aws_region).await;
-    print_instances(instances.unwrap());
+pub async fn display_instances_as_text(tags: &Vec<String>, aws_region: &str) -> Result<()> {
+    let instances = list_instances(tags, aws_region).await.with_context(|| {
+        format!(
+            "Failed to list instances. region:{}, tags:{:?}",
+            aws_region, tags
+        )
+    })?;
+    print_instances(instances);
+    Ok(())
 }
 
 // List metrics.
@@ -124,7 +131,7 @@ pub async fn display_instances_as_text(tags: &Vec<String>, aws_region: &str) {
 // }
 
 /// Returns the instance CPU utilization usage on the last 24 hours
-async fn get_instance_usage(
+async fn get_instance_usage_24_hrs(
     instance_id: &str,
 ) -> Result<GetMetricStatisticsOutput, aws_sdk_cloudwatch::Error> {
     let shared_config = aws_config::from_env().load().await;
@@ -167,30 +174,22 @@ async fn get_instance_usage(
 
 /// Returns average CPU load of an instance over the last 24 hours or 0 if cannot retrieve the value.
 ///
-pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> f64 {
-    let res = get_instance_usage(instance_id).await;
-    let res = match res {
-        Ok(res) => res,
-        Err(e) => {
-            warn!(
-                "Cannot get cpu usage, returning 0 load. Application error: {}",
-                e
-            );
-            return 0 as f64;
-        }
-    };
+pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> Result<f64> {
+    let res = get_instance_usage_24_hrs(instance_id)
+        .await
+        .with_context(|| format!("Cannot get avg cpu load of instance: {}", instance_id))?;
 
-    let datapoints = res.datapoints.unwrap();
-    if datapoints.is_empty() {
-        warn!(
-            "Warning: No load data for instance {}, returning 0 as load",
-            instance_id
-        );
-        0 as f64
-    } else {
-        let first_point = &datapoints[0];
-        first_point.average.unwrap()
+    if let Some(points) = res.datapoints {
+        if !points.is_empty() {
+            let first_point = &points[0];
+            return Ok(first_point.average.unwrap());
+        }
     }
+    warn!(
+        "No cpu load data for instance {}, returning 0 as load",
+        instance_id
+    );
+    Ok(0 as f64)
 }
 
 // #[tokio::test]
@@ -205,7 +204,7 @@ pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> f64 {
 #[tokio::test]
 async fn test_get_instance_usage_metrics() {
     let instance_id = "i-001dc0ebbf9cb25c0";
-    let res = get_instance_usage(instance_id).await.unwrap();
+    let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
     let datapoints = res.datapoints.unwrap();
     assert_eq!(1, datapoints.len());
     println!("{:#?}", datapoints);
@@ -214,7 +213,7 @@ async fn test_get_instance_usage_metrics() {
 #[tokio::test]
 async fn test_get_instance_usage_metrics_of_shutdown_instance() {
     let instance_id = "i-03e0b3b1246001382";
-    let res = get_instance_usage(instance_id).await.unwrap();
+    let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
     let datapoints = res.datapoints.unwrap();
     assert_eq!(0, datapoints.len());
 }
@@ -222,7 +221,7 @@ async fn test_get_instance_usage_metrics_of_shutdown_instance() {
 #[tokio::test]
 async fn test_get_instance_usage_metrics_of_non_existing_instance() {
     let instance_id = "IDONOTEXISTS";
-    let res = get_instance_usage(instance_id).await.unwrap();
+    let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
     let datapoints = res.datapoints.unwrap();
     assert_eq!(0, datapoints.len());
 }
@@ -230,7 +229,7 @@ async fn test_get_instance_usage_metrics_of_non_existing_instance() {
 #[tokio::test]
 async fn test_average_cpu_load_24hrs() {
     let instance_id = "i-001dc0ebbf9cb25c0";
-    let res = get_average_cpu_load_24hrs(instance_id).await;
+    let res = get_average_cpu_load_24hrs(instance_id).await.unwrap();
     assert_ne!(0 as f64, res);
     assert!((0.1 as f64) < res);
 }
@@ -238,14 +237,14 @@ async fn test_average_cpu_load_24hrs() {
 #[tokio::test]
 async fn test_average_cpu_load_24hrs_of_non_existing_instance() {
     let instance_id = "IDONOTEXISTS";
-    let res = get_average_cpu_load_24hrs(instance_id).await;
+    let res = get_average_cpu_load_24hrs(instance_id).await.unwrap();
     assert_eq!(0 as f64, res);
 }
 
 #[tokio::test]
 async fn test_average_cpu_load_24hrs_of_shutdown_instance() {
     let instance_id = "i-03e0b3b1246001382";
-    let res = get_average_cpu_load_24hrs(instance_id).await;
+    let res = get_average_cpu_load_24hrs(instance_id).await.unwrap();
     assert_eq!(0 as f64, res);
 }
 

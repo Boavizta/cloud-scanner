@@ -65,7 +65,8 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         aws_region,
         &config.boavizta_api_url,
     )
-    .await;
+    .await
+    .unwrap();
     Ok(response(StatusCode::OK, impacts))
 }
 
