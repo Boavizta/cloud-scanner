@@ -11,7 +11,7 @@ struct Arguments {
     #[clap(subcommand)]
     cmd: SubCommand,
     #[clap(short, long)]
-    /// AWS region (default profile region is assumed if not provided)
+    /// AWS region (The default aws profile region is used if not provided)
     aws_region: Option<String>,
     #[clap(short, long)]
     /// Optional Boavizta API URL (if you want to use your own instance)
@@ -19,28 +19,25 @@ struct Arguments {
     #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
     filter_tags: Vec<String>,
-    // /// Save results to a file (instead of printing json to stdout)
-    // #[clap(short, long, parse(from_os_str))]
-    // out_file: Option<PathBuf>,
+    #[clap(short, long,  action = clap::ArgAction::Count)]
     /// Enable logging, use multiple `v`s to increase verbosity
-    #[clap(short, long, parse(from_occurrences))]
-    verbosity: u64,
-    /// Returns OpenMetrics (Prometheus like) instead of json output
+    verbosity: u8,
+    /// Returns OpenMetrics (Prometheus) instead of json output
     #[clap(short = 'm', long)]
     as_metrics: bool,
 }
 
 #[derive(Subcommand, Debug)]
 enum SubCommand {
-    /// get Average (standard) impacts for a given usage duration
+    /// Get Average (standard) impacts for a given usage duration (without considering cpu use)
     Standard {
         #[clap(short = 'u', long)]
         /// The number of hours of use for which we want to estimate the impacts
         hours_use_time: f32,
     },
-    ///get impacts related to measured instance usage: depending on usage rate (use instance workload),
+    ///Get impacts related to instances usage rate (take into account instance cpu  use)
     Measured {},
-    ///just list instances and their metadata (without impacts)
+    ///Just list instances and their metadata (without impacts)
     ListInstances {},
 }
 
@@ -76,7 +73,7 @@ fn set_api_url(optional_url: Option<String>) -> String {
 async fn main() -> Result<()> {
     let args = Arguments::parse();
 
-    loggerv::init_with_verbosity(args.verbosity).context("Cannot initialize logger")?;
+    loggerv::init_with_verbosity(args.verbosity.into()).context("Cannot initialize logger")?;
 
     let region = set_region(args.aws_region);
 

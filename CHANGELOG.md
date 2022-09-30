@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use the instances workload (cpu) to tune the results.
 - Use a published/versioned crate of boavizta-api-sdk (actual version relies on local sdk).
-- Improve error handling
 
 ### Changed
 
 - Update dependencies.
 - Use feature flag on lambda http (support alb and apigw_rest).
 - Clean up code to get rid of Clippy warnings.
+- Improve error handling using Anyhow (see <https://github.com/Boavizta/cloud-scanner/issues/17>)
+- Upgrade to Clap v 4.0.x to provide CLI parsing and help.
 
 ## [0.0.6] - 2022-09-15
 
