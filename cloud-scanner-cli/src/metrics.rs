@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
 use prometheus_client::encoding::text::encode;
@@ -21,7 +22,7 @@ pub struct Labels {
 }
 
 /// Returns the metrics
-pub fn get_metrics(summary: &ScanResultSummary) -> String {
+pub fn get_metrics(summary: &ScanResultSummary) -> Result<String> {
     let label_set: Labels = Labels {
         awsregion: summary.aws_region.to_string(),
         country: summary.country.to_string(),
@@ -30,9 +31,10 @@ pub fn get_metrics(summary: &ScanResultSummary) -> String {
     let registry = register_all_metrics(summary, label_set);
 
     let mut buffer = vec![];
-    encode(&mut buffer, &registry).unwrap();
+    encode(&mut buffer, &registry).context("Fails to encode result into metrics")?;
+    let metrics = String::from_utf8(buffer).context("Unable to format metrics")?;
 
-    String::from_utf8(buffer).unwrap()
+    Ok(metrics)
 }
 
 fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Registry {
@@ -188,7 +190,7 @@ async fn test_get_get_metrics() {
         country: "IRL".to_string(),
     };
 
-    let metrics = get_metrics(&summary);
+    let metrics = get_metrics(&summary).unwrap();
 
     println!("{}", metrics);
 

@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 #[macro_use]
 extern crate log;
@@ -72,10 +73,10 @@ fn set_api_url(optional_url: Option<String>) -> String {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     let args = Arguments::parse();
 
-    loggerv::init_with_verbosity(args.verbosity).unwrap();
+    loggerv::init_with_verbosity(args.verbosity).context("Cannot initialize logger")?;
 
     let region = set_region(args.aws_region);
 
@@ -90,7 +91,7 @@ async fn main() {
                     &region,
                     &api_url,
                 )
-                .await
+                .await?
             } else {
                 cloud_scanner_cli::print_default_impacts_as_json(
                     &hours_use_time,
@@ -98,15 +99,16 @@ async fn main() {
                     &region,
                     &api_url,
                 )
-                .await
+                .await?
             }
         }
         SubCommand::Measured {} => {
             cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags, &region, &api_url)
-                .await
+                .await?
         }
         SubCommand::ListInstances {} => {
-            cloud_scanner_cli::show_instances(&args.filter_tags, &region).await
+            cloud_scanner_cli::show_instances(&args.filter_tags, &region).await?
         }
     }
+    Ok(())
 }
