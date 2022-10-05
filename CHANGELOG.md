@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - Use the instances workload (cpu) to tune the results.
-- Use a published/versioned crate of boavizta-api-sdk (actual version relies on local sdk).
 
 ### Changed
 
@@ -18,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve error handling using Anyhow (see <https://github.com/Boavizta/cloud-scanner/issues/17>)
 - Upgrade to Clap v 4.0.x to provide CLI parsing and help.
 - Fix wrong default API url in CLI and serverless environment, see <https://github.com/Boavizta/cloud-scanner/issues/125>
+- Use a public crate to provide boavizta-api-sdk . Previous version relies on local SDK code in this repository. This SDK is now maintained in its own repository at <https://github.com/Boavizta/boaviztapi-sdk-rust> (see <https://github.com/Boavizta/cloud-scanner/issues/112>).
 
 ## [0.0.6] - 2022-09-15
 
