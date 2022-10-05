@@ -1,7 +1,8 @@
 [package]
+authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-lambda"
-version = "0.0.6"
+version = "0.0.7-alpha.1"
 [[bin]]
 name = "bootstrap-scan"
 path = "src/main.rs"
