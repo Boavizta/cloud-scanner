@@ -202,15 +202,18 @@ pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> Result<f64> {
 // }
 
 #[tokio::test]
-async fn test_get_instance_usage_metrics() {
-    let instance_id = "i-001dc0ebbf9cb25c0";
+#[ignore]
+async fn test_get_instance_usage_metrics_of_running_instance() {
+    // This instance  needs to be running
+    let instance_id = "i-0a3e6b8cdb50c49b8";
     let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
     let datapoints = res.datapoints.unwrap();
-    assert_eq!(1, datapoints.len());
     println!("{:#?}", datapoints);
+    assert_eq!(1, datapoints.len());
 }
 
 #[tokio::test]
+#[ignore]
 async fn test_get_instance_usage_metrics_of_shutdown_instance() {
     let instance_id = "i-03e0b3b1246001382";
     let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
@@ -227,11 +230,15 @@ async fn test_get_instance_usage_metrics_of_non_existing_instance() {
 }
 
 #[tokio::test]
-async fn test_average_cpu_load_24hrs() {
-    let instance_id = "i-001dc0ebbf9cb25c0";
-    let res = get_average_cpu_load_24hrs(instance_id).await.unwrap();
-    assert_ne!(0 as f64, res);
-    assert!((0.1 as f64) < res);
+#[ignore]
+async fn test_average_cpu_load_24hrs_of_running_instance() {
+    // This instance  needs to be running
+    let instance_id = "i-03c8f84a6318a8186";
+    let avg_cpu_load_24 = get_average_cpu_load_24hrs(instance_id).await.unwrap();
+    assert_ne!(0 as f64, avg_cpu_load_24);
+    println!("{:#?}", avg_cpu_load_24);
+    assert!((0 as f64) < avg_cpu_load_24);
+    assert!((100 as f64) > avg_cpu_load_24);
 }
 
 #[tokio::test]
