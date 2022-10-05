@@ -424,9 +424,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "boavizta_api_sdk"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a0ae605d053c1f6390d798099ed0e425ae6dd781b1242abd17fd20037aa0b45"
+checksum = "f744d2ef9af3bca02537b5f73e8261f6e918055f0899836cf5d2ed37de888aa1"
 dependencies = [
  "reqwest",
  "serde",
