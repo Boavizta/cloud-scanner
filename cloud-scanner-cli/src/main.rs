@@ -14,7 +14,7 @@ struct Arguments {
     /// AWS region (The default aws profile region is used if not provided)
     aws_region: Option<String>,
     #[clap(short, long)]
-    /// Optional Boavizta API URL (if you want to use your own instance)
+    /// Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. https://api.boavizta.org)
     boavizta_api_url: Option<String>,
     #[clap(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
@@ -62,7 +62,7 @@ fn set_api_url(optional_url: Option<String>) -> String {
             url_arg
         }
         None => {
-            let default_url = "https://api.boavizta.org/".to_string();
+            let default_url = "https://api.boavizta.org".to_string();
             warn!("Using default API at:  {}", default_url);
             default_url
         }

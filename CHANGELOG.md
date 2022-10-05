@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clean up code to get rid of Clippy warnings.
 - Improve error handling using Anyhow (see <https://github.com/Boavizta/cloud-scanner/issues/17>)
 - Upgrade to Clap v 4.0.x to provide CLI parsing and help.
+- Fix wrong default API url in CLI and serverless environment, see <https://github.com/Boavizta/cloud-scanner/issues/125>
 
 ## [0.0.6] - 2022-09-15
 

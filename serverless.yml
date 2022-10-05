@@ -36,7 +36,8 @@ functions:
   scan:
     handler: "cloud-scanner-lambda.bootstrap-scan"
     environment:
-      BOAVIZTA_API_URL: www.api.example.com
+      # Custom api URL (without the trailing slash like https://api.boavizta.org)
+      BOAVIZTA_API_URL: https://api.boavizta.org
     events:
       - http:
           path: /scan
@@ -46,10 +47,11 @@ functions:
               querystrings:
                 hours_use_time: true
                 aws_region: false
-  summary:
+  metrics:
     handler: "cloud-scanner-lambda.bootstrap-metrics"
     environment:
-      BOAVIZTA_API_URL: www.api.example.com
+      # Custom api URL (without the trailing slash like https://api.boavizta.org)
+      BOAVIZTA_API_URL: https://api.boavizta.org
     events:
       - http:
           path: /metrics

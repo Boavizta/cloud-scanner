@@ -98,7 +98,7 @@ async fn get_instance_default_impacts_through_sdk_works() {
 }
 
 #[tokio::test]
-async fn get_default_impact() {
+async fn get_default_impact_of_m6gxlarge() {
     let api_url = "https://api.boavizta.org";
     let data = r#"   
     {
