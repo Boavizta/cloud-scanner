@@ -4,15 +4,15 @@ Returns Boavizta impact data corresponding to your AWS Cloud usage.
 
 As a command line or serverless application, cloud-scanner analyses your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
 
-⚠ Work in progress ! See the [changelog](CHANGELOG.md).
-
 At the moment it only returns _standard_ impacts of AWS instances. It does not yet analyses instance usage (workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
 
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
 ## Documentation
 
-[Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/)
+The complete documentation can be found here: [Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/).
+
+This readme only provide a quick introduction.
 
 ## Getting started 🚀
 
@@ -22,13 +22,13 @@ Show impacts of your EC2 instances for 10 hours of use.
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 # Get impacts of 10 hours of use (on your default account region)
-cargo run --bin cloud-scanner-cli standard --hours-use-time 10 | jq
+cargo run standard --hours-use-time 10 | jq
 
 # Same thing but as metrics
-cargo run --bin cloud-scanner-cli -- --as-metrics standard --hours-use-time 10
+cargo run  -- --as-metrics standard --hours-use-time 10
 
 # Same query for explicit region
-cargo run --bin cloud-scanner-cli -- --aws-region eu-west-3 standard --hours-use-time 10 | jq
+cargo run  -- --aws-region eu-west-3 standard --hours-use-time 10 | jq
 ```
 
 ## Usage as CLI 💻
@@ -71,41 +71,33 @@ cargo build --release
 ### CLI options
 
 ```sh
-cloud-scanner-cli 0.0.6
-Olivier de Meringo <demeringo@gmail.com>
+
+
 List aws instances and their environmental impact (from Boavizta API)
 
-USAGE:
-    cloud-scanner-cli [OPTIONS] <SUBCOMMAND>
+Usage: cloud-scanner-cli [OPTIONS] <COMMAND>
 
-OPTIONS:
-    -a, --aws-region <AWS_REGION>
-            AWS region (default profile region is assumed if not provided)
+Commands:
+  standard        Get Average (standard) impacts for a given usage duration (without considering cpu use)
+  measured        Get impacts related to instances usage rate (take into account instance cpu  use)
+  list-instances  Just list instances and their metadata (without impacts)
+  help            Print this message or the help of the given subcommand(s)
 
-    -b, --boavizta-api-url <BOAVIZTA_API_URL>
-            Optional Boavizta API URL (if you want to use your own instance)
-
-    -h, --help
-            Print help information
-
-    -m, --as-metrics
-            Returns OpenMetrics (Prometheus like) instead of json output
-
-    -t, --filter-tags <FILTER_TAGS>
-            Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
-
-    -v, --verbosity
-            Enable logging, use multiple `v`s to increase verbosity
-
-    -V, --version
-            Print version information
-
-SUBCOMMANDS:
-    help              Print this message or the help of the given subcommand(s)
-    list-instances    just list instances and their metadata (without impacts)
-    measured          get impacts related to measured instance usage: depending on usage rate
-                          (use instance workload),
-    standard          get Average (standard) impacts for a given usage duration
+Options:
+  -a, --aws-region <AWS_REGION>
+          AWS region (The default aws profile region is used if not provided)
+  -b, --boavizta-api-url <BOAVIZTA_API_URL>
+          Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. https://api.boavizta.org)
+  -t, --filter-tags <FILTER_TAGS>
+          Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
+  -v, --verbosity...
+          Enable logging, use multiple `v`s to increase verbosity
+  -m, --as-metrics
+          Returns OpenMetrics (Prometheus) instead of json output
+  -h, --help
+          Print help information
+  -V, --version
+          Print version information
 ```
 
 ### Get measured impacts of instances for a given period
@@ -241,12 +233,12 @@ Cloud scanner returns a json array of instances metadata (instance*id, type usag
 
 ### OpenMetrics/Prometheus output
 
-If using `--as-metrics` or `-m` option, cloud-scanner returns consolidated results as OpenMetric/Prometheus format insted of json details.
+If using `--as-metrics` or `-m` option, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json details.
 
 When using the metric output format, you cannot see the individual impacts of each instance. Instead, impacts of all instances are added to provide a global figure.
 
-```
-cargo run --bin cloud-scanner-cli -- --as-metrics  standard -u 1
+```sh
+cargo run -- --as-metrics  standard -u 1
 
 # HELP boavizta_number_of_instances_total Number of instances detected during the scan.
 # TYPE boavizta_number_of_instances_total gauge
@@ -268,14 +260,9 @@ boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.228
 
 ## ⚠ Current limitations
 
-- Return empty impacts when the instance _type_ is not listed in Boavizta database.
-- `--aws-region` flag only supports eu-based aws regions for the time being (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3)
+⚠ Work in progress ! See the [changelog](CHANGELOG.md) and issues on this repository.
+
+- Return _empty_ impacts when the instance _type_ is not listed in Boavizta database.
+- `--aws-region` flag only supports eu-based aws region (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
 - Always returns _standard_ impacts: using instance workload to assess impact is not yet implemented (i.e. using CPU load through the `measured` command has no effect yet).
 - Filtering instances by tag is not yet supported.
-- Passing a private Boavizta API URL is not yet implemented
-
-### Generate / update Boavizta API sdk
-
-```sh
-docker run --rm -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://api.boavizta.org/openapi.json   -g rust  -o /local/boavizta-api-sdk --package-name boavizta_api_sdk
-```

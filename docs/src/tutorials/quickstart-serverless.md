@@ -1,10 +1,10 @@
-#  Run as serverless  ⚡
+# Use cloud-scanner as a serverless  application⚡
 
-This will deploy the cloud-scanner _inside_ your AWS account. You can use it to 
+This will deploy the cloud-scanner _inside_ your AWS account. You can use it to: 
+
 - scan the account to get json impacts (as you would do with the CLI)
 - or
 - get metrics (that you can scrape with prometheus or the monitoring system of your choice)
-
 
 The application is build and deployed using the serverless framework (see [serverless-design](../reference/serverless-design.md)).
 
