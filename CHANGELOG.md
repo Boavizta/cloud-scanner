@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
 - Use the instances workload (cpu) to tune the results.
+
+## [0.0.7] - 2022-10-06
 
 ### Changed
 
@@ -18,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade to Clap v 4.0.x to provide CLI parsing and help.
 - Fix wrong default API url in CLI and serverless environment, see <https://github.com/Boavizta/cloud-scanner/issues/125>
 - Use a public crate to provide boavizta-api-sdk . Previous version relies on local SDK code in this repository. This SDK is now maintained in its own repository at <https://github.com/Boavizta/boaviztapi-sdk-rust> (see <https://github.com/Boavizta/cloud-scanner/issues/112>).
-- Let cargo run execute the CLI by default, instead of providing a --bin option to cargo. (see <https://github.com/Boavizta/cloud-scanner/issues/123>)
+- Cargo run CLI by default (see <https://github.com/Boavizta/cloud-scanner/issues/123>)
 
 ## [0.0.6] - 2022-09-15
 

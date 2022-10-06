@@ -94,7 +94,7 @@ dependencies = [
  "http",
  "hyper",
  "ring",
- "time 0.3.14",
+ "time 0.3.15",
  "tokio",
  "tower",
  "tracing",
@@ -251,7 +251,7 @@ dependencies = [
  "percent-encoding",
  "regex",
  "ring",
- "time 0.3.14",
+ "time 0.3.15",
  "tracing",
 ]
 
@@ -354,7 +354,7 @@ dependencies = [
  "itoa",
  "num-integer",
  "ryu",
- "time 0.3.14",
+ "time 0.3.15",
 ]
 
 [[package]]
@@ -490,9 +490,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.0.5"
+version = "4.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5e0d0fdd7dc774d433c78c9de5695ca04724beaec6a7d4d13ac6014608f3eaf"
+checksum = "3b1a0a4208c6c483b952ad35c6eed505fc13b46f08f631b81e828084a9318d74"
 dependencies = [
  "atty",
  "bitflags",
@@ -505,9 +505,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "4.0.1"
+version = "4.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca689d7434ce44517a12a89456b2be4d1ea1cafcd8f581978c03d45f5a5c12a7"
+checksum = "db342ce9fda24fb191e2ed4e102055a4d381c1086a06630174cd8da8d5d917ce"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -527,7 +527,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-cli"
-version = "0.0.7-alpha.1"
+version = "0.0.7"
 dependencies = [
  "anyhow",
  "aws-config",
@@ -551,7 +551,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "0.0.7-alpha.1"
+version = "0.0.7"
 dependencies = [
  "cloud-scanner-cli",
  "envy",
@@ -951,9 +951,9 @@ dependencies = [
 
 [[package]]
 name = "lambda_http"
-version = "0.6.1"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf9542aeed47b5ac3484b290b78f0af4d35739886dfaaa85da3151327a8ce47a"
+checksum = "9b1881c01539f63a1d20ef0a1915931547fdbbbf3b5e57a3b731ddbe9611b043"
 dependencies = [
  "aws_lambda_events",
  "base64",
@@ -1567,9 +1567,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.9.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fd0db749597d91ff862fd1d55ea87f7855a744a8425a64695b6fca237d1dad1"
+checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
 
 [[package]]
 name = "socket2"
@@ -1646,9 +1646,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c3f9a28b618c3a6b9251b6908e9c99e04b9e5c02e6581ccbb67d59c34ef7f9b"
+checksum = "d634a985c4d4238ec39cacaed2e7ae552fbd3c476b552c1deac3021b7d7eaf0c"
 dependencies = [
  "libc",
  "num_threads",
