@@ -1,6 +1,9 @@
 [workspace]
 
-members = [
+default-members = [
     "cloud-scanner-cli",
+]
+
+members = [
     "cloud-scanner-lambda",
 ]

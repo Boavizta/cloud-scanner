@@ -1,4 +1,4 @@
-# Quick start using docker 🐳
+# Quick start run CLI using docker 🐳
 
 No installation needed, you will run a public docker image of cloud-scanner CLI.
 
@@ -7,7 +7,7 @@ No installation needed, you will run a public docker image of cloud-scanner CLI.
 - Docker.
 - A working AWS account (and you AWS CLI profile already configured)
 
-## Run cloud-scanner
+## Run cloud-scanner cli
 
 ```sh
 docker pull ghcr.io/boavizta/cloud-scanner-cli:latest
