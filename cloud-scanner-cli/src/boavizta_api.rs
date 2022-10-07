@@ -3,6 +3,7 @@ use crate::model::AwsInstanceWithImpacts;
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::UsageCloud;
+use boavizta_api_sdk::models::Allocation;
 
 /// Returns instance information aggregated with Boavizta impacts for this type of instance.
 ///
@@ -44,6 +45,7 @@ async fn get_impacts(
         &configuration,
         opt_instance_type,
         verbose,
+        Some(Allocation::TOTAL),
         usage_cloud,
     )
     .await;
@@ -88,6 +90,7 @@ async fn get_instance_default_impacts_through_sdk_works() {
         &configuration,
         instance_type,
         verbose,
+        Some(Allocation::TOTAL),
         usage_cloud,
     )
     .await;
@@ -236,6 +239,7 @@ async fn get_instance_default_impacts_through_sdk_fails_for_some_instance_types(
             &configuration,
             instance_type,
             verbose,
+            Some(Allocation::TOTAL),
             usage_cloud,
         )
         .await;
