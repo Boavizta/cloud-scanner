@@ -2,8 +2,8 @@ use crate::model::AwsInstanceWithImpacts;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
-use boavizta_api_sdk::models::UsageCloud;
 use boavizta_api_sdk::models::Allocation;
+use boavizta_api_sdk::models::UsageCloud;
 
 /// Returns instance information aggregated with Boavizta impacts for this type of instance.
 ///
