@@ -1,13 +1,23 @@
 use isocountry::CountryCode;
 
-/// Returns 3 letters ISO coutnry code code corresponding to an aws region
-pub fn get_iso_country(aws_region: &str) -> &'static str {
-    let cc = get_country_from_aws_region(aws_region);
-    cc.alpha3()
+#[derive(Debug)]
+pub struct UsageLocation {
+    pub aws_region: String,
+    /// The 3-letters ISO country code corresponding to the country of the aws_region
+    pub iso_country_code: String,
 }
 
-/// Converts aws region into country code
-pub fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
+impl From<&str> for UsageLocation {
+    fn from(aws_region: &str) -> Self {
+        UsageLocation {
+            aws_region: String::from(aws_region),
+            iso_country_code: get_country_from_aws_region(aws_region).alpha3().to_owned(),
+        }
+    }
+}
+
+/// Converts aws region into country code, returns FRA if not found
+fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
     let cc: CountryCode = match aws_region {
         "eu-central-1" => CountryCode::DEU,
         "eu-east-1" => CountryCode::IRL,
@@ -24,23 +34,29 @@ pub fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
     cc
 }
 
-#[test]
-fn test_get_country_code_from_region() {
-    let region = "eu-west-3";
-    let cc = get_country_from_aws_region(region);
-    assert_eq!("FRA", cc.alpha3());
-    //assert_eq!("IRL", get_country_from_aws_region("eu-west-1").alpha3());
-}
+#[cfg(test)]
+mod tests {
+    //use super::*;
+    use super::UsageLocation;
 
-#[test]
-fn test_get_current_iso_region() {
-    let aws_region = "eu-west-1";
-    let country_code = get_iso_country(aws_region);
-    assert_eq!("IRL", country_code);
-    let aws_region = "eu-west-2";
-    let country_code = get_iso_country(aws_region);
-    assert_eq!("GBR", country_code);
-    let aws_region = "eu-west-3";
-    let country_code = get_iso_country(aws_region);
-    assert_eq!("FRA", country_code);
+    #[test]
+    fn test_get_country_code_for_supported_aws_region() {
+        let location = UsageLocation::from("eu-west-1");
+        assert_eq!("IRL", location.iso_country_code);
+
+        let location = UsageLocation::from("eu-west-2");
+        assert_eq!("GBR", location.iso_country_code);
+
+        let location = UsageLocation::from("eu-west-3");
+        assert_eq!("FRA", location.iso_country_code);
+    }
+
+    #[test]
+    fn test_get_country_code_for_unsupported_aws_region() {
+        let location = UsageLocation::from("us-east-1");
+        assert_eq!("FRA", location.iso_country_code);
+
+        let location = UsageLocation::from("");
+        assert_eq!("FRA", location.iso_country_code);
+    }
 }

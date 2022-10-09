@@ -21,10 +21,12 @@ pub async fn build_summary(
 ) -> Result<ScanResultSummary> {
     let number_of_instances_total = u32::try_from(instances_with_impacts.len())?;
 
+    let usage_location: UsageLocation = UsageLocation::from(aws_region);
+
     let mut summary = ScanResultSummary {
         number_of_instances_total,
         aws_region: aws_region.to_owned(),
-        country: countries::get_iso_country(aws_region).to_owned(),
+        country: usage_location.iso_country_code,
         duration_of_use_hours,
         ..Default::default()
     };
@@ -61,13 +63,14 @@ async fn standard_scan(
     let instances = aws_api::list_instances(tags, aws_region)
         .await
         .context("Cannot perform standard scan")?;
-    let country_code = get_iso_country(aws_region);
+
+    let usage_location = UsageLocation::from(aws_region);
 
     let mut instances_with_impacts: Vec<AwsInstanceWithImpacts> = Vec::new();
 
     for instance in &instances {
         let mut usage_cloud: UsageCloud = UsageCloud::new();
-        usage_cloud.usage_location = Some(String::from(country_code));
+        usage_cloud.usage_location = Some(usage_location.iso_country_code.to_owned());
         usage_cloud.hours_use_time = Some(hours_use_time.to_owned());
 
         let value = boavizta_api::get_instance_impacts(instance, usage_cloud, api_url).await;
