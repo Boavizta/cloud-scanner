@@ -1,4 +1,4 @@
-use crate::countries::*;
+use crate::usage_location::*;
 use crate::metrics::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
@@ -8,7 +8,7 @@ extern crate log;
 use pkg_version::*;
 mod aws_api;
 mod boavizta_api;
-mod countries;
+mod usage_location;
 mod metrics;
 mod model;
 use anyhow::{Context, Result};
