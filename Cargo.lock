@@ -394,9 +394,9 @@ dependencies = [
 
 [[package]]
 name = "aws_lambda_events"
-version = "0.6.3"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55d7e5deac5e49330042b4e174dafe84ebf71685bfcd94f285bac7aa31e0aeb1"
+checksum = "20e4623e6898c4590b27eb26d64f498513b9e4c7b52537f64f75d3f423483c51"
 dependencies = [
  "base64",
  "bytes",
@@ -556,7 +556,7 @@ dependencies = [
  "cloud-scanner-cli",
  "envy",
  "lambda_http",
- "lambda_runtime",
+ "lambda_runtime 0.6.1",
  "log",
  "pkg-version",
  "serde",
@@ -951,9 +951,9 @@ dependencies = [
 
 [[package]]
 name = "lambda_http"
-version = "0.6.2"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b1881c01539f63a1d20ef0a1915931547fdbbbf3b5e57a3b731ddbe9611b043"
+checksum = "e92800e377a35109541e00ccb7cbf4026c44b2987e5ecdb2233aecc115f20ca7"
 dependencies = [
  "aws_lambda_events",
  "base64",
@@ -962,9 +962,9 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
- "lambda_runtime",
+ "lambda_runtime 0.7.0",
  "mime",
- "query_map",
+ "percent-encoding",
  "serde",
  "serde_json",
  "serde_urlencoded",
@@ -982,7 +982,27 @@ dependencies = [
  "futures",
  "http",
  "hyper",
- "lambda_runtime_api_client",
+ "lambda_runtime_api_client 0.6.0",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-stream",
+ "tower",
+ "tracing",
+]
+
+[[package]]
+name = "lambda_runtime"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b64c1a62e7f43f7c3aed77806c182a338acbed3d95995380d6a9c1eb8650767"
+dependencies = [
+ "async-stream",
+ "bytes",
+ "futures",
+ "http",
+ "hyper",
+ "lambda_runtime_api_client 0.7.0",
  "serde",
  "serde_json",
  "tokio",
@@ -996,6 +1016,18 @@ name = "lambda_runtime_api_client"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b54698c666ffe503cb51fa66e4567e53e806128a10359de7095999d925a771ed"
+dependencies = [
+ "http",
+ "hyper",
+ "tokio",
+ "tower-service",
+]
+
+[[package]]
+name = "lambda_runtime_api_client"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7210012be904051520f0dc502140ba599bae3042b65b3737b87727f1aa88a7d6"
 dependencies = [
  "http",
  "hyper",
@@ -1279,9 +1311,9 @@ dependencies = [
 
 [[package]]
 name = "query_map"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe3212d819cbdcce67f786cdaf3fe0c2e9d09a6dcd9c9367a1bd344135b8c809"
+checksum = "4465aacac3bebc9484cf7a56dc8b2d7feacb657da6002a9198b4f7af4247a204"
 dependencies = [
  "form_urlencoded",
  "serde",
