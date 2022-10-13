@@ -1,16 +1,16 @@
-use crate::usage_location::*;
 use crate::metrics::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
+use crate::usage_location::*;
 use boavizta_api_sdk::models::UsageCloud;
 #[macro_use]
 extern crate log;
 use pkg_version::*;
 mod aws_api;
 mod boavizta_api;
-mod usage_location;
 mod metrics;
 mod model;
+mod usage_location;
 use anyhow::{Context, Result};
 
 /// Returns a summary (summing/aggregating data where possible) of the scan results.
@@ -80,7 +80,7 @@ async fn standard_scan(
 }
 
 /// Returns default impacts as json
-pub async fn get_default_impacts(
+pub async fn get_default_impacts_as_json(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
@@ -139,7 +139,7 @@ pub async fn print_default_impacts_as_json(
     aws_region: &str,
     api_url: &str,
 ) -> Result<()> {
-    let j = get_default_impacts(hours_use_time, tags, aws_region, api_url).await?;
+    let j = get_default_impacts_as_json(hours_use_time, tags, aws_region, api_url).await?;
     println!("{}", j);
     Ok(())
 }
