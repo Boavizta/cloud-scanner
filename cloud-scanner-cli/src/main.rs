@@ -100,7 +100,10 @@ async fn main() -> Result<()> {
             }
         }
         SubCommand::Measured {} => {
-            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags, &region, &api_url)
+
+            // TODO drop hardcoded hour_use_time
+            let hours_use_time: f32  = 24 as f32;
+            cloud_scanner_cli::print_cpu_load_impacts_as_json(&hours_use_time,&args.filter_tags, &region, &api_url)
                 .await?
         }
         SubCommand::ListInstances {} => {

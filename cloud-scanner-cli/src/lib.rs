@@ -79,6 +79,51 @@ async fn standard_scan(
     Ok(instances_with_impacts)
 }
 
+/// CPU usage scan (using standard/default workload)
+async fn get_usage_based_impacts(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+    api_url: &str,
+) -> Result<Vec<AwsInstanceWithImpacts>> {
+    let instances = aws_api::list_instances(tags, aws_region)
+        .await
+        .context("Cannot list the instances")?;
+
+    // Getting CPU load of the instances 
+
+  
+
+
+
+    let usage_location = UsageLocation::from(aws_region);
+
+    let mut instances_with_impacts: Vec<AwsInstanceWithImpacts> = Vec::new();
+
+    for instance in &instances {
+        let instance_id: &str = instance.instance_id.as_ref().unwrap();
+        let duration_seconds: i32 =  (*hours_use_time * 3600 as f32 ) as i32;
+        let cpu_load = aws_api::get_average_cpu(instance_id, duration_seconds)
+            .await
+            .context("Failed to get average cpu load")?;
+
+
+        let mut usage_cloud: UsageCloud = UsageCloud::new();
+        usage_cloud.usage_location = Some(usage_location.iso_country_code.to_owned());
+        usage_cloud.hours_use_time = Some(hours_use_time.to_owned());
+        
+
+        // TODO: include usage here
+        //usage_cloud.time_workload= 
+
+        //usage_cloud.time_workload = "123";
+
+        let value = boavizta_api::get_instance_impacts(instance, usage_cloud, api_url).await;
+        instances_with_impacts.push(value);
+    }
+    Ok(instances_with_impacts)
+}
+
 /// Returns default impacts as json
 pub async fn get_default_impacts_as_json(
     hours_use_time: &f32,
@@ -158,10 +203,13 @@ pub async fn print_default_impacts_as_metrics(
 
 /// Prints impacts considering the instance workload / CPU load
 pub async fn print_cpu_load_impacts_as_json(
+    hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
     api_url: &str,
 ) -> Result<()> {
+
+
     warn!("Warning: getting impacts of precise CPU load is not yet implemented, will just display instances and average load of 24 hours");
     let instances = aws_api::list_instances(tags, aws_region)
         .await
@@ -169,7 +217,8 @@ pub async fn print_cpu_load_impacts_as_json(
 
     for instance in &instances {
         let instance_id: &str = instance.instance_id.as_ref().unwrap();
-        let cpu_load = aws_api::get_average_cpu_load_24hrs(instance_id)
+        let duration_seconds = ( *hours_use_time  * 3600 as f32 ) as i32;
+        let cpu_load = aws_api::get_average_cpu(instance_id, duration_seconds )
             .await
             .context("Failed to get average cpu load")?;
         println!("Instance ID: {}", instance.instance_id().unwrap());
