@@ -25,7 +25,7 @@ pub async fn get_instance_impacts(
     }
 }
 
-/// Returns the default impacts of an instance from Boavizta API
+/// Returns the impacts of an instance from Boavizta API
 ///
 ///  The manufacture impacts returned represent the entire lifecycle of instance (i.e. Allocation TOTAL )
 async fn get_impacts(
@@ -46,7 +46,7 @@ async fn get_impacts(
         &configuration,
         opt_instance_type,
         verbose,
-        Some(Allocation::TOTAL),
+        Some(Allocation::Total),
         usage_cloud,
     )
     .await;
@@ -114,6 +114,26 @@ mod tests {
     }
     "#;
 
+    const IMPACT_OF_M6XLARGE_FR_100_PERCENT_CPU: &str = r#"   
+    {
+        "adp": {
+            "manufacture": 0.0083, 
+            "unit":"kgSbeq", 
+            "use": 7.87e-6
+        }, 
+        "gwp": {
+            "manufacture": 83.0,
+            "unit": "kgCO2eq", 
+            "use": 16.0
+            },
+        "pe": {
+            "manufacture": 1100.0,
+            "unit": "MJ",
+            "use": 1828.0
+            }
+    }
+    "#;
+
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
         let mut configuration = configuration::Configuration::new();
@@ -137,7 +157,7 @@ mod tests {
             &configuration,
             instance_type,
             verbose,
-            Some(Allocation::TOTAL),
+            Some(Allocation::Total),
             usage_cloud,
         )
         .await;
@@ -209,6 +229,30 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_get_impacts_using_cpu_load() {
+        //unimplemented!();
+
+        // Parse the string of data into serde_json::Value.
+        let expected: serde_json::Value =
+            serde_json::from_str(IMPACT_OF_M6XLARGE_FR_100_PERCENT_CPU).unwrap();
+
+        let mut usage_cloud: UsageCloud = UsageCloud::new();
+        //usage_cloud.days_use_time = Some(4 as f32);
+        usage_cloud.usage_location = Some(String::from("FRA"));
+
+        let instance: aws_sdk_ec2::model::Instance = aws_sdk_ec2::model::Instance::builder()
+            .set_instance_type(Some(aws_sdk_ec2::model::InstanceType::M6gXlarge))
+            .build();
+
+        //usage_cloud.hours_use_time = Some(1_f32);
+        usage_cloud.time_workload = Some(100_f32);
+
+        let impacts = get_impacts(&instance, usage_cloud, TEST_API_URL).await;
+
+        assert_eq!(expected, impacts.unwrap());
+    }
+
+    #[tokio::test]
     async fn get_instance_default_impacts_through_sdk_fails_for_some_instance_types() {
         let mut configuration = configuration::Configuration::new();
         configuration.base_path = String::from(TEST_API_URL);
@@ -224,7 +268,7 @@ mod tests {
                 &configuration,
                 instance_type,
                 verbose,
-                Some(Allocation::TOTAL),
+                Some(Allocation::Total),
                 usage_cloud,
             )
             .await;

@@ -80,7 +80,7 @@ async fn standard_scan(
 }
 
 /// CPU usage scan (using standard/default workload)
-async fn get_usage_based_impacts(
+async fn get_load_based_impacts(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
@@ -88,13 +88,7 @@ async fn get_usage_based_impacts(
 ) -> Result<Vec<AwsInstanceWithImpacts>> {
     let instances = aws_api::list_instances(tags, aws_region)
         .await
-        .context("Cannot list the instances")?;
-
-    // Getting CPU load of the instances 
-
-  
-
-
+        .context("Cannot list the instances.")?;
 
     let usage_location = UsageLocation::from(aws_region);
 
@@ -102,21 +96,18 @@ async fn get_usage_based_impacts(
 
     for instance in &instances {
         let instance_id: &str = instance.instance_id.as_ref().unwrap();
-        let duration_seconds: i32 =  (*hours_use_time * 3600 as f32 ) as i32;
+        let duration_seconds: i32 = (*hours_use_time * 3600_f32) as i32;
         let cpu_load = aws_api::get_average_cpu(instance_id, duration_seconds)
             .await
-            .context("Failed to get average cpu load")?;
-
+            .context(format!(
+                "Failed to get  average cpu load of instance {}. ",
+                instance_id
+            ))?;
 
         let mut usage_cloud: UsageCloud = UsageCloud::new();
         usage_cloud.usage_location = Some(usage_location.iso_country_code.to_owned());
         usage_cloud.hours_use_time = Some(hours_use_time.to_owned());
-        
-
-        // TODO: include usage here
-        //usage_cloud.time_workload= 
-
-        //usage_cloud.time_workload = "123";
+        usage_cloud.time_workload = Some(cpu_load as f32);
 
         let value = boavizta_api::get_instance_impacts(instance, usage_cloud, api_url).await;
         instances_with_impacts.push(value);
@@ -124,8 +115,30 @@ async fn get_usage_based_impacts(
     Ok(instances_with_impacts)
 }
 
+pub async fn get_load_impacts_as_json_string(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+    api_url: &str,
+) -> Result<String> {
+    let instances_with_impacts = get_load_based_impacts(hours_use_time, tags, aws_region, api_url)
+        .await
+        .context("Cannot perform load scan")?;
+
+    let summary = build_summary(
+        &instances_with_impacts,
+        aws_region,
+        hours_use_time.to_owned().into(),
+    )
+    .await;
+
+    debug!("Summary: {:#?}", summary);
+
+    Ok(serde_json::to_string(&instances_with_impacts)?)
+}
+
 /// Returns default impacts as json
-pub async fn get_default_impacts_as_json(
+pub async fn get_default_impacts_as_json_string(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
@@ -177,6 +190,36 @@ pub async fn get_default_impacts_as_metrics(
     Ok(metrics)
 }
 
+// Returns load based impacts as metrics
+pub async fn get_load_impacts_as_metrics(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+    api_url: &str,
+) -> Result<String> {
+    let instances_with_impacts = get_load_based_impacts(hours_use_time, tags, aws_region, api_url)
+        .await
+        .context("Cannot perform load scan")?;
+
+    let summary = build_summary(
+        &instances_with_impacts,
+        aws_region,
+        hours_use_time.to_owned().into(),
+    )
+    .await?;
+
+    debug!("Summary: {:#?}", summary);
+
+    let metrics = get_metrics(&summary).with_context(|| {
+        format!(
+            "Unable to get default impacts as metrics for {}",
+            aws_region
+        )
+    })?;
+
+    Ok(metrics)
+}
+
 /// Prints impacts without using use time and default Boavizta impacts
 pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
@@ -184,7 +227,7 @@ pub async fn print_default_impacts_as_json(
     aws_region: &str,
     api_url: &str,
 ) -> Result<()> {
-    let j = get_default_impacts_as_json(hours_use_time, tags, aws_region, api_url).await?;
+    let j = get_default_impacts_as_json_string(hours_use_time, tags, aws_region, api_url).await?;
     println!("{}", j);
     Ok(())
 }
@@ -201,6 +244,18 @@ pub async fn print_default_impacts_as_metrics(
     Ok(())
 }
 
+/// Prints impacts without using use time and default Boavizta impacts
+pub async fn print_cpu_load_impacts_as_metrics(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+    api_url: &str,
+) -> Result<()> {
+    let metrics = get_load_impacts_as_metrics(hours_use_time, tags, aws_region, api_url).await?;
+    println!("{}", metrics);
+    Ok(())
+}
+
 /// Prints impacts considering the instance workload / CPU load
 pub async fn print_cpu_load_impacts_as_json(
     hours_use_time: &f32,
@@ -208,31 +263,33 @@ pub async fn print_cpu_load_impacts_as_json(
     aws_region: &str,
     api_url: &str,
 ) -> Result<()> {
-
-
-    warn!("Warning: getting impacts of precise CPU load is not yet implemented, will just display instances and average load of 24 hours");
-    let instances = aws_api::list_instances(tags, aws_region)
-        .await
-        .context("Failed to list instances")?;
-
-    for instance in &instances {
-        let instance_id: &str = instance.instance_id.as_ref().unwrap();
-        let duration_seconds = ( *hours_use_time  * 3600 as f32 ) as i32;
-        let cpu_load = aws_api::get_average_cpu(instance_id, duration_seconds )
-            .await
-            .context("Failed to get average cpu load")?;
-        println!("Instance ID: {}", instance.instance_id().unwrap());
-        println!("Type:       {:?}", instance.instance_type().unwrap());
-        println!(
-            "AZ of use:  {:?}",
-            instance.placement().unwrap().availability_zone().unwrap()
-        );
-        println!("Tags:  {:?}", instance.tags().unwrap());
-        println!("Average CPU load:  {}", cpu_load);
-        println!("Not implemented: query  API at {}", api_url);
-        println!();
-    }
+    let j = get_load_impacts_as_json_string(hours_use_time, tags, aws_region, api_url).await?;
+    println!("{}", j);
     Ok(())
+
+    // //warn!("Warning: getting impacts of precise CPU load is not yet implemented, will just display instances and average load of 24 hours");
+    // let instances = aws_api::list_instances(tags, aws_region)
+    //     .await
+    //     .context("Failed to list instances")?;
+
+    // for instance in &instances {
+    //     let instance_id: &str = instance.instance_id.as_ref().unwrap();
+    //     let duration_seconds = (*hours_use_time * 3600 as f32) as i32;
+    //     let cpu_load = aws_api::get_average_cpu(instance_id, duration_seconds)
+    //         .await
+    //         .context("Failed to get average cpu load")?;
+    //     println!("Instance ID: {}", instance.instance_id().unwrap());
+    //     println!("Type:       {:?}", instance.instance_type().unwrap());
+    //     println!(
+    //         "AZ of use:  {:?}",
+    //         instance.placement().unwrap().availability_zone().unwrap()
+    //     );
+    //     println!("Tags:  {:?}", instance.tags().unwrap());
+    //     println!("Average CPU load:  {}", cpu_load);
+    //     println!("Not implemented: query  API at {}", api_url);
+    //     println!();
+    // }
+    // Ok(())
 }
 
 /// List instances as text
