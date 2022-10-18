@@ -1,4 +1,7 @@
 service: boavizta-cloud-scanner
+
+useDotenv: true
+
 provider:
   name: aws
   runtime: rust
@@ -17,7 +20,8 @@ provider:
         - Effect: Allow
           Action: "cloudwatch:DescribeAlarm"
           Resource: "*"
-
+  environment:
+    BOAVIZTA_API_URL: ${env:BOAVIZTA_API_URL}
 package:
   individually: true
 
@@ -35,9 +39,6 @@ plugins:
 functions:
   scan:
     handler: "cloud-scanner-lambda.bootstrap-scan"
-    environment:
-      # Custom api URL (without the trailing slash like https://api.boavizta.org)
-      BOAVIZTA_API_URL: https://api.boavizta.org
     events:
       - http:
           path: /scan
@@ -49,9 +50,6 @@ functions:
                 aws_region: false
   metrics:
     handler: "cloud-scanner-lambda.bootstrap-metrics"
-    environment:
-      # Custom api URL (without the trailing slash like https://api.boavizta.org)
-      BOAVIZTA_API_URL: https://api.boavizta.org
     events:
       - http:
           path: /metrics
