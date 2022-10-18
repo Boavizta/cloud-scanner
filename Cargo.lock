@@ -424,15 +424,16 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "boavizta_api_sdk"
-version = "0.2.0-alpha.1"
+version = "0.2.0-alpha.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17b32fe92a10e4e3adef39a44db247be9046b39f11d3d340167679137f677dcc"
+checksum = "5879f50b84ae02f28158af5e612cd08886cf25ef422064837c3802f4ad8178c8"
 dependencies = [
  "reqwest",
  "serde",
  "serde_derive",
  "serde_json",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -551,7 +552,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "0.0.7"
+version = "0.0.8"
 dependencies = [
  "cloud-scanner-cli",
  "envy",
@@ -1866,6 +1867,15 @@ name = "urlencoding"
 version = "2.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8db7427f936968176eaa7cdf81b7f98b980b18495ec28f1b5791ac3bfe3eea9"
+
+[[package]]
+name = "uuid"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "feb41e78f93363bb2df8b0e86a2ca30eed7806ea16ea0c790d757cf93f79be83"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "version_check"

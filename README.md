@@ -4,8 +4,6 @@ Returns Boavizta impact data corresponding to your AWS Cloud usage.
 
 As a command line or serverless application, cloud-scanner analyses your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
 
-At the moment it only returns _standard_ impacts of AWS instances. It does not yet analyses instance usage (workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
-
 ![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
 
 ## Documentation
@@ -21,10 +19,13 @@ Show impacts of your EC2 instances for 10 hours of use.
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
-# Get impacts of 10 hours of use (on your default account region)
+# Get default impacts of 10 hours of use (on your default account region)
 cargo run standard --hours-use-time 10 | jq
 
-# Same thing but as metrics
+# Get measured (considering instance average cpu load) impacts of 10 hours of use (on your default account region)
+cargo run measured --hours-use-time 10 | jq
+
+# Get default impacts but as metrics
 cargo run  -- --as-metrics standard --hours-use-time 10
 
 # Same query for explicit region
