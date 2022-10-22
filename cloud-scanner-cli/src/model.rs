@@ -24,3 +24,12 @@ pub struct ScanResultSummary {
     pub aws_region: String,
     pub country: String,
 }
+
+/*
+// TODO:  a  neutral usage model that we  could pass to the impact API adapter ?
+
+pub enum ManufacturactingAllocation {
+    LinearAllocation,
+    TotalAllocation,
+}
+*/

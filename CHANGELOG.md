@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Use the instances workload (cpu) to tune the results.
+- Use the instances workload (cpu load) to tune the results.
 
 ## [0.0.7] - 2022-10-06
 

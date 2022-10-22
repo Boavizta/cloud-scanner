@@ -36,7 +36,11 @@ enum SubCommand {
         hours_use_time: f32,
     },
     ///Get impacts related to instances usage rate (take into account instance cpu  use)
-    Measured {},
+    Measured {
+        #[clap(short = 'u', long)]
+        /// The number of hours of use for which we want to estimate the impacts
+        hours_use_time: f32,
+    },
     ///Just list instances and their metadata (without impacts)
     ListInstances {},
 }
@@ -99,9 +103,24 @@ async fn main() -> Result<()> {
                 .await?
             }
         }
-        SubCommand::Measured {} => {
-            cloud_scanner_cli::print_cpu_load_impacts_as_json(&args.filter_tags, &region, &api_url)
+        SubCommand::Measured { hours_use_time } => {
+            if args.as_metrics {
+                cloud_scanner_cli::print_cpu_load_impacts_as_metrics(
+                    &hours_use_time,
+                    &args.filter_tags,
+                    &region,
+                    &api_url,
+                )
                 .await?
+            } else {
+                cloud_scanner_cli::print_cpu_load_impacts_as_json(
+                    &hours_use_time,
+                    &args.filter_tags,
+                    &region,
+                    &api_url,
+                )
+                .await?
+            }
         }
         SubCommand::ListInstances {} => {
             cloud_scanner_cli::show_instances(&args.filter_tags, &region).await?

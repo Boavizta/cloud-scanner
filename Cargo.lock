@@ -551,7 +551,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "0.0.7"
+version = "0.0.9"
 dependencies = [
  "cloud-scanner-cli",
  "envy",
