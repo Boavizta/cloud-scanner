@@ -41,7 +41,7 @@ enum SubCommand {
         /// The number of hours of use for which we want to estimate the impacts
         hours_use_time: f32,
     },
-    ///Just list instances and their metadata (without impacts)
+    /// List instances and  average cpu load for the last 5 minutes (no impacts)
     ListInstances {},
 }
 
