@@ -6,7 +6,7 @@ As a command line or serverless application, cloud-scanner analyses your EC2 ins
 
 At the moment it only returns _standard_ impacts of AWS instances. It does not yet analyses instance usage (workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration.
 
-![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
+![Scanner in context](docs/src/images/cloud-scanner-system-in-context.png)
 
 ## Documentation
 
