@@ -6,13 +6,13 @@ As a command line or serverless application, cloud-scanner analyses your EC2 ins
 
 Cloud-scanner can be automated to produce metrics at regular interval and monitor your impacts in a dashboard.
 
-![cloud-scanner-metrics-dashboard](images/cloud-scanner-dashboard-clear.png)
+![A example dashboard rendering cloud scanner metrics](docs/src/images/cloud-scanner-dashboard-clear.png "A example dashboard rendering cloud scanner metrics")
 
 Principle:
 
-![Scanner in context](docs/src/images/cloud-scanner-system-in-context.png)
+![System in context diagram of cloud scanner](docs/src/images/cloud-scanner-system-in-context.png "System in context diagram of cloud scanner")
 
-## Usage
+## Usage and documentation
 
 The complete documentation: [Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/).
 
@@ -55,7 +55,7 @@ docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFIL
 
 ⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
 
-See [Run as docker - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/docker-guide.html) 
+See [Run as docker - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/docker-guide.html)
 
 ### Building local executable 🦀
 
@@ -133,6 +133,8 @@ See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud
 
 ## ⚠ Current limitations
 
+Cloud scanner is stable, but with limited functionality.
+
 At the moment:
 
 - Returns _empty_ impacts (i.e. zero values) for EC2 the instance _types_ that are not listed in Boavizta database.
@@ -140,4 +142,4 @@ At the moment:
 - Returns _default_ impacts of AWS instances. It does not yet analyses instance usage (cpu workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration. (i.e. using instance CPU load through the `measured` command line flag has no effect).
 - Filtering instances by tag is not yet supported.
 
-This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository.
+This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository.

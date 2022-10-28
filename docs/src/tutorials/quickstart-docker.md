@@ -28,4 +28,4 @@ docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFIL
 
 ⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
 
-Alternatively you may build a local docker image, see (docker-guide)
+Alternatively you may build and use a local docker image, See [build a local docker image](../how-to/docker-guide.md#build-a-local-docker-image)

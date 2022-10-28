@@ -1,7 +1,6 @@
 # CLI options
 
-``sh
-
+```sh
 
 List aws instances and their environmental impact (from Boavizta API)
 

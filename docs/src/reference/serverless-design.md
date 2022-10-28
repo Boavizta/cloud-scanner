@@ -12,11 +12,9 @@ _This is certainly not the only way to deploy the application. If you want more 
 
 The `scan` route returns individual instances metrics in json format (see below, same as CLI)
 
-` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1``
-
 Use `hours_use_time` and `aws_region` parameters in the query
 
-E.g.: ` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1`
+E.g.: `https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1`
 
 ```json
 [
@@ -133,7 +131,7 @@ The `metrics` route returns aggregated account metrics _for one hour of use_ in 
 
 Use `aws_region` parameters in the query.
 
-E.g.: ` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1`
+E.g.: `https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1`
 
 ```text
 # HELP boavizta_number_of_instances_total Number of instances detected during the scan.
