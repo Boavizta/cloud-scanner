@@ -6,25 +6,136 @@ The cloud-scanner-cli is wrapped into a set of lambdas functions exposed behind 
 
 _This is certainly not the only way to deploy the application. If you want more control, you could compile, package and deploy the application with Terraform or CDK, but this is not documented yet._
 
-
 ## Serverless routes
 
-### Scan account / region
+### Instance impacts as JSON
 
-Returns results in json format (see below, same as CLI)
+The `scan` route returns individual instances metrics in json format (see below, same as CLI)
 
-https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1
+` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1``
 
 Use `hours_use_time` and `aws_region` parameters in the query
 
-### Get Metrics
+E.g.: ` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1`
 
-https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1
+```json
+[
+  {
+    "instance_id": "i-03c8f84a6318a8186",
+    "instance_type": "a1.medium",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0063,
+        "unit": "kgSbeq",
+        "use": 8e-12
+      },
+      "gwp": {
+        "manufacture": 31,
+        "unit": "kgCO2eq",
+        "use": 0.0001
+      },
+      "pe": {
+        "manufacture": 430,
+        "unit": "MJ",
+        "use": 0.004
+      }
+    }
+  },
+  {
+    "instance_id": "i-033df52f12f30ca66",
+    "instance_type": "m6g.xlarge",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0083,
+        "unit": "kgSbeq",
+        "use": 8e-10
+      },
+      "gwp": {
+        "manufacture": 83,
+        "unit": "kgCO2eq",
+        "use": 0.01
+      },
+      "pe": {
+        "manufacture": 1100,
+        "unit": "MJ",
+        "use": 0.4
+      }
+    }
+  },
+  {
+    "instance_id": "i-0a3e6b8cdb50c49b8",
+    "instance_type": "c5n.xlarge",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0086,
+        "unit": "kgSbeq",
+        "use": 1e-9
+      },
+      "gwp": {
+        "manufacture": 64,
+        "unit": "kgCO2eq",
+        "use": 0.02
+      },
+      "pe": {
+        "manufacture": 840,
+        "unit": "MJ",
+        "use": 0.5
+      }
+    }
+  },
+  {
+    "instance_id": "i-003ea8da7bb9bfff9",
+    "instance_type": "m6g.xlarge",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0083,
+        "unit": "kgSbeq",
+        "use": 8e-10
+      },
+      "gwp": {
+        "manufacture": 83,
+        "unit": "kgCO2eq",
+        "use": 0.01
+      },
+      "pe": {
+        "manufacture": 1100,
+        "unit": "MJ",
+        "use": 0.4
+      }
+    }
+  }
+]
+```
 
-returns metrics for one hour of use in prometheus format.
+### Account impacts as metrics
+
+The `metrics` route returns aggregated account metrics _for one hour of use_ in Prometheus format.
+
 Use `aws_region` parameters in the query.
 
-```
+E.g.: ` https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1`
+
+```text
 # HELP boavizta_number_of_instances_total Number of instances detected during the scan.
 # TYPE boavizta_number_of_instances_total gauge
 boavizta_number_of_instances_total{awsregion="eu-central-1",country="DEU"} 7
@@ -42,3 +153,5 @@ boavizta_pe_manufacture_megajoules{awsregion="eu-central-1",country="DEU"} 1760.
 boavizta_pe_use_megajoules{awsregion="eu-central-1",country="DEU"} 0.86
 # EOF
 ```
+
+See also [Set up monitoring dashboard](../how-to/set-up-dashboard.md) for an example of scrapping and displaying these metrics.
