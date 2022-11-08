@@ -23,10 +23,13 @@ Show impacts of your EC2 instances for 10 hours of use.
 ```sh
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
-# Get impacts of 10 hours of use (on your default account region)
+# Get default impacts of 10 hours of use (on your default account region)
 cargo run standard --hours-use-time 10 | jq
 
-# Same thing but as metrics
+# Get measured (considering instance average cpu load) impacts of 10 hours of use (on your default account region)
+cargo run measured --hours-use-time 10 | jq
+
+# Get default impacts but as metrics
 cargo run  -- --as-metrics standard --hours-use-time 10
 
 # Same query for explicit region

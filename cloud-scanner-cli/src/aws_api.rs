@@ -87,7 +87,13 @@ pub async fn display_instances_as_text(tags: &Vec<String>, aws_region: &str) -> 
             aws_region, tags
         )
     })?;
-    print_instances(instances);
+    print_instances(instances.clone());
+
+    for instance in &instances {
+        let id = instance.instance_id().unwrap();
+        let load = get_average_cpu(id).await?;
+        println! {"id: {}, cpuload: {}", &id, &load};
+    }
     Ok(())
 }
 
@@ -131,7 +137,8 @@ pub async fn display_instances_as_text(tags: &Vec<String>, aws_region: &str) -> 
 // }
 
 /// Returns the instance CPU utilization usage on the last 24 hours
-async fn get_instance_usage_24_hrs(
+/// duration seconds seems to be the sampling period
+async fn get_average_cpu_usage_of_last_5_minutes(
     instance_id: &str,
 ) -> Result<GetMetricStatisticsOutput, aws_sdk_cloudwatch::Error> {
     let shared_config = aws_config::from_env().load().await;
@@ -140,10 +147,14 @@ async fn get_instance_usage_24_hrs(
     let now: chrono::DateTime<Utc> = Utc::now();
     let now_aws = aws_sdk_cloudwatch::types::DateTime::from_secs(now.timestamp());
 
-    let one_day = Duration::days(1);
-    let period = one_day.num_seconds() as i32;
+    //let one_day = Duration::days(1);
+
+    // We want statistics about the last 5 minutes
+    let last_minutes = Duration::minutes(5);
+    // We want only one value for this duration (the last 5 minutes)  so we set the sampling period to the duration of the last 5 minute to analyse.
+    let sample_period_seconds = 60;
     //let period = Duration::minutes(5).num_seconds() as i32;
-    let start_time: chrono::DateTime<Utc> = now - one_day;
+    let start_time: chrono::DateTime<Utc> = now - last_minutes;
 
     let start_time_aws: aws_sdk_cloudwatch::types::DateTime =
         aws_sdk_cloudwatch::types::DateTime::from_secs(start_time.timestamp());
@@ -161,7 +172,7 @@ async fn get_instance_usage_24_hrs(
         .end_time(now_aws)
         .metric_name(cpu_metric_name)
         .namespace(ec2_namespace)
-        .period(period)
+        .period(sample_period_seconds)
         .set_dimensions(Some(dimensions))
         .start_time(start_time_aws)
         .statistics(Statistic::Average)
@@ -172,104 +183,115 @@ async fn get_instance_usage_24_hrs(
     Ok(resp)
 }
 
-/// Returns average CPU load of an instance over the last 24 hours or 0 if cannot retrieve the value.
-///
-pub async fn get_average_cpu_load_24hrs(instance_id: &str) -> Result<f64> {
-    let res = get_instance_usage_24_hrs(instance_id)
+/// Returns average CPU load of an instance
+pub async fn get_average_cpu(instance_id: &str) -> Result<f64> {
+    let res = get_average_cpu_usage_of_last_5_minutes(instance_id)
         .await
-        .with_context(|| format!("Cannot get avg cpu load of instance: {}", instance_id))?;
+        .with_context(|| {
+            format!(
+                "Cannot retrieve average CPU load of instance: {}",
+                instance_id
+            )
+        })?;
 
     if let Some(points) = res.datapoints {
+        //  dbg!(points.clone());
         if !points.is_empty() {
+            if points.len() > 1 {
+                warn!("Some datapoints were skipped when getting instance CPU usage, whe expected a single result but received {}. Only the first was considered", points.len());
+            }
             let first_point = &points[0];
             return Ok(first_point.average.unwrap());
         }
     }
     warn!(
-        "No cpu load data for instance {}, returning 0 as load",
+        "No CPU load data was returned for instance {}, it is likely stopped, using 0 as load",
         instance_id
     );
     Ok(0 as f64)
 }
 
-// #[tokio::test]
-// async fn test_get_and_print_metrics() {
-//     let lmo: ListMetricsOutput = list_instance_metrics().await.unwrap();
-//     let metrics = lmo.metrics().unwrap();
+#[cfg(test)]
+mod tests {
 
-//     assert!(46 <= metrics.len());
-//     print_metrics(metrics);
-// }
+    use super::*;
 
-#[tokio::test]
-#[ignore]
-async fn test_get_instance_usage_metrics_of_running_instance() {
-    // This instance  needs to be running
-    let instance_id = "i-0a3e6b8cdb50c49b8";
-    let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
-    let datapoints = res.datapoints.unwrap();
-    println!("{:#?}", datapoints);
-    assert_eq!(1, datapoints.len());
-}
+    #[tokio::test]
+    #[ignore]
+    async fn test_get_instance_usage_metrics_of_running_instance() {
+        // This instance  needs to be running
+        let instance_id = "i-0a3e6b8cdb50c49b8";
+        let res = get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .await
+            .unwrap();
+        let datapoints = res.datapoints.unwrap();
+        println!("{:#?}", datapoints);
+        assert_eq!(1, datapoints.len());
+    }
 
-#[tokio::test]
-#[ignore]
-async fn test_get_instance_usage_metrics_of_shutdown_instance() {
-    let instance_id = "i-03e0b3b1246001382";
-    let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
-    let datapoints = res.datapoints.unwrap();
-    assert_eq!(0, datapoints.len());
-}
+    #[tokio::test]
+    #[ignore]
+    async fn test_get_instance_usage_metrics_of_shutdown_instance() {
+        let instance_id = "i-03e0b3b1246001382";
+        let res = get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .await
+            .unwrap();
+        let datapoints = res.datapoints.unwrap();
+        assert_eq!(0, datapoints.len());
+    }
 
-#[tokio::test]
-async fn test_get_instance_usage_metrics_of_non_existing_instance() {
-    let instance_id = "IDONOTEXISTS";
-    let res = get_instance_usage_24_hrs(instance_id).await.unwrap();
-    let datapoints = res.datapoints.unwrap();
-    assert_eq!(0, datapoints.len());
-}
+    #[tokio::test]
+    async fn test_get_instance_usage_metrics_of_non_existing_instance() {
+        let instance_id = "IDONOTEXISTS";
+        let res = get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .await
+            .unwrap();
+        let datapoints = res.datapoints.unwrap();
+        assert_eq!(0, datapoints.len());
+    }
 
-#[tokio::test]
-#[ignore]
-async fn test_average_cpu_load_24hrs_of_running_instance() {
-    // This instance  needs to be running
-    let instance_id = "i-03c8f84a6318a8186";
-    let avg_cpu_load_24 = get_average_cpu_load_24hrs(instance_id).await.unwrap();
-    assert_ne!(0 as f64, avg_cpu_load_24);
-    println!("{:#?}", avg_cpu_load_24);
-    assert!((0 as f64) < avg_cpu_load_24);
-    assert!((100 as f64) > avg_cpu_load_24);
-}
+    #[tokio::test]
+    #[ignore]
+    async fn test_average_cpu_load_24hrs_of_running_instance() {
+        // This instance  needs to be running for the test to pass
+        let instance_id = "i-03c8f84a6318a8186";
+        let avg_cpu_load = get_average_cpu(instance_id).await.unwrap();
+        assert_ne!(0 as f64, avg_cpu_load);
+        println!("{:#?}", avg_cpu_load);
+        assert!((0 as f64) < avg_cpu_load);
+        assert!((100 as f64) > avg_cpu_load);
+    }
 
-#[tokio::test]
-async fn test_average_cpu_load_24hrs_of_non_existing_instance() {
-    let instance_id = "IDONOTEXISTS";
-    let res = get_average_cpu_load_24hrs(instance_id).await.unwrap();
-    assert_eq!(0 as f64, res);
-}
+    #[tokio::test]
+    async fn test_average_cpu_load_24hrs_of_non_existing_instance() {
+        let instance_id = "IDONOTEXISTS";
+        let res = get_average_cpu(instance_id).await.unwrap();
+        assert_eq!(0 as f64, res);
+    }
 
-#[tokio::test]
-async fn test_average_cpu_load_24hrs_of_shutdown_instance() {
-    let instance_id = "i-03e0b3b1246001382";
-    let res = get_average_cpu_load_24hrs(instance_id).await.unwrap();
-    assert_eq!(0 as f64, res);
-}
+    #[tokio::test]
+    async fn test_average_cpu_load_24hrs_of_shutdown_instance() {
+        let instance_id = "i-03e0b3b1246001382";
+        let res = get_average_cpu(instance_id).await.unwrap();
+        assert_eq!(0 as f64, res);
+    }
 
-//#[tokio::test]
-// async fn test_get_current_region() {
-//     let reg: String = get_current_aws_region().await;
-//     assert_eq!("eu-west-1", reg);
-// }
+    //#[tokio::test]
+    // async fn test_get_current_region() {
+    //     let reg: String = get_current_aws_region().await;
+    //     assert_eq!("eu-west-1", reg);
+    // }
 
-#[tokio::test]
-async fn test_create_sdk_config() {
-    let region: &str = "eu-west-3";
-    let config = init_aws_config(region).await;
+    #[tokio::test]
+    async fn test_create_sdk_config() {
+        let region: &str = "eu-west-3";
+        let config = init_aws_config(region).await;
 
-    assert_eq!(region, config.region().unwrap().to_string());
+        assert_eq!(region, config.region().unwrap().to_string());
 
-    let wrong_region: &str = "impossible-region";
-    let config = init_aws_config(wrong_region).await;
+        let wrong_region: &str = "impossible-region";
+        let config = init_aws_config(wrong_region).await;
 
-    assert_eq!(wrong_region, config.region().unwrap().to_string())
+        assert_eq!(wrong_region, config.region().unwrap().to_string())
+    }
 }

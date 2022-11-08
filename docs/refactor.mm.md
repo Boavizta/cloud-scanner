@@ -9,15 +9,15 @@ Objective is to make code more testable / isolate the domain objects from the AP
     * CloudRessourceQuery Object
       * Location
       * filters like tags
-      * other options like off machine
     * CloudResource object
       * Region
       * Type
       * ID
       * instance type
       * Tags
-      * Average CPU load
-      * Duration 
+      * Option<CloudResoucreUsage>
+        * Average CPU load
+        * Duration used to calculate average ?
   * ImpactProvider returns the impacts of a CloudResource
     * Input the CloudResource and Usage Scenario
     * Impact object
@@ -41,5 +41,12 @@ Objective is to make code more testable / isolate the domain objects from the AP
       * a set of metrics for each instance ID (i.e instance id in the name)
     * Json exporter
       * an array of impacts serialized as json
+  * ParkingLot
+    * Add option to cloud scan query ?
+      * Boolean like measure Usage yes / no ? (This is more an optimization that may not be needed yet)
+      * other options like include off machines ?
+    * Refactor cloud resource to support being a disk or other type ?
+
+
 @endmindmap
 ```
