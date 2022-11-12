@@ -4,7 +4,8 @@ use clap::{Parser, Subcommand};
 extern crate log;
 extern crate loggerv;
 
-#[macro_use] extern crate rocket;
+#[macro_use]
+extern crate rocket;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
@@ -41,7 +42,7 @@ enum SubCommand {
     Measured {},
     ///Just list instances and their metadata (without impacts)
     ListInstances {},
-    ///  Serve metrics on a http endpoint 
+    ///  Serve metrics on a http endpoint
     ServeMetrics {},
 }
 
@@ -111,23 +112,11 @@ async fn main() -> Result<()> {
             cloud_scanner_cli::show_instances(&args.filter_tags, &region).await?
         }
         SubCommand::ServeMetrics {} => {
-
-            serve().await;
-             /* cloud_scanner_cli::print_default_impacts_as_metrics(
-                &hours_use_time,
-                &args.filter_tags,
-                &region,
-                &api_url,
-            )
-            .await?*/
+            run_metric_server().await?;
         }
     }
     Ok(())
 }
-
-
-
-
 
 #[get("/")]
 fn index() -> &'static str {
@@ -137,25 +126,24 @@ fn index() -> &'static str {
 #[get("/metrics")]
 async fn metrics() -> String {
     let hours_use_time: f32 = 1.0;
-    let tags    = Vec::new();
+    let tags = Vec::new();
     let aws_region = "eu-west-1".to_string();
     let api_url = "https://api.boavizta.org";
-    let metrics = cloud_scanner_cli::get_default_impacts_as_metrics(&hours_use_time, &tags,  &aws_region, &api_url).await;
-    let m = metrics.unwrap();
-    m
-    //&m.to_owned()
-    }
+    let metrics = cloud_scanner_cli::get_default_impacts_as_metrics(
+        &hours_use_time,
+        &tags,
+        &aws_region,
+        api_url,
+    )
+    .await;
+    metrics.unwrap()
+}
 
-// #[launch]
-// fn rocket() -> _ {
-//     rocket::build().mount("/", routes![index])
-// }
-
-async fn serve( ) -> Result<(), rocket::Error>  {
+async fn run_metric_server() -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
-    .mount("/", routes![index, metrics])
-    .launch()
-    .await?;
+        .mount("/", routes![index, metrics])
+        .launch()
+        .await?;
 
     Ok(())
 }

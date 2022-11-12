@@ -1,3 +1,8 @@
+//!  # cloud_scanner_cli
+//!
+//!  A command line application to combine Environmental impacts of your Cloud instances using Boavizta API.
+//!
+
 use crate::countries::*;
 use crate::metrics::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
@@ -6,11 +11,11 @@ use boavizta_api_sdk::models::UsageCloud;
 #[macro_use]
 extern crate log;
 use pkg_version::*;
-mod aws_api;
-mod boavizta_api;
-mod countries;
-mod metrics;
-mod model;
+pub mod aws_api;
+pub mod boavizta_api;
+pub mod countries;
+pub mod metrics;
+pub mod model;
 use anyhow::{Context, Result};
 
 /// Returns a summary (summing/aggregating data where possible) of the scan results.
