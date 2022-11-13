@@ -4,7 +4,6 @@
 //!
 
 use crate::countries::*;
-use crate::metric_endpoint::*;
 use crate::metrics::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
@@ -19,7 +18,7 @@ use pkg_version::*;
 pub mod aws_api;
 pub mod boavizta_api;
 pub mod countries;
-pub mod metric_endpoint;
+pub mod metric_server;
 pub mod metrics;
 pub mod model;
 
@@ -202,10 +201,10 @@ pub async fn show_instances(tags: &Vec<String>, aws_region: &str) -> Result<()> 
 }
 
 pub async fn expose_metrics(api_url: &str) -> Result<()> {
-    let config = metric_endpoint::Config {
+    let config = metric_server::Config {
         boavizta_url: api_url.to_string(),
     };
-    metric_endpoint::run(config).await?;
+    metric_server::run(config).await?;
     Ok(())
 }
 /// Return current version of the cloud-scanner-cli crate
