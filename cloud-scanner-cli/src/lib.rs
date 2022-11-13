@@ -4,18 +4,25 @@
 //!
 
 use crate::countries::*;
+use crate::metric_endpoint::*;
 use crate::metrics::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
 use boavizta_api_sdk::models::UsageCloud;
+
+#[macro_use]
+extern crate rocket;
+
 #[macro_use]
 extern crate log;
 use pkg_version::*;
 pub mod aws_api;
 pub mod boavizta_api;
 pub mod countries;
+pub mod metric_endpoint;
 pub mod metrics;
 pub mod model;
+
 use anyhow::{Context, Result};
 
 /// Returns a summary (summing/aggregating data where possible) of the scan results.
@@ -194,6 +201,10 @@ pub async fn show_instances(tags: &Vec<String>, aws_region: &str) -> Result<()> 
     Ok(())
 }
 
+pub async fn expose_metrics(api_url: &str) -> Result<()> {
+    metric_endpoint::run().await?;
+    Ok(())
+}
 /// Return current version of the cloud-scanner-cli crate
 pub fn get_version() -> String {
     const MAJOR: u32 = pkg_version_major!();
