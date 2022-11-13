@@ -108,7 +108,7 @@ async fn main() -> Result<()> {
         SubCommand::ListInstances {} => {
             cloud_scanner_cli::show_instances(&args.filter_tags, &region).await?
         }
-        SubCommand::Serve {} => cloud_scanner_cli::expose_metrics(&api_url).await?,
+        SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
     }
     Ok(())
 }

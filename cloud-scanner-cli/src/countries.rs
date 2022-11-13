@@ -1,3 +1,5 @@
+//! A module to map AWS regions to ISO country codes
+
 use isocountry::CountryCode;
 
 /// Returns 3 letters ISO coutnry code code corresponding to an aws region

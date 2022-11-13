@@ -1,3 +1,4 @@
+//! cloud scanner entities
 use serde_derive::{Deserialize, Serialize};
 
 /// Describes an instance with its impacts

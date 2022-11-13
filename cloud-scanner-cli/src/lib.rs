@@ -110,7 +110,7 @@ pub async fn get_default_impacts(
     Ok(serde_json::to_string(&instances_with_impacts)?)
 }
 
-// Returns default impacts as metrics
+/// Returns default impacts as metrics
 pub async fn get_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -140,7 +140,7 @@ pub async fn get_default_impacts_as_metrics(
     Ok(metrics)
 }
 
-/// Prints impacts without using use time and default Boavizta impacts
+/// Prints default impacts  to standard output in json format
 pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -152,7 +152,7 @@ pub async fn print_default_impacts_as_json(
     Ok(())
 }
 
-/// Prints impacts without using use time and default Boavizta impacts
+/// Prints default impacts  to standard output as metrics in prometheus format
 pub async fn print_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -194,13 +194,14 @@ pub async fn print_cpu_load_impacts_as_json(
     Ok(())
 }
 
-/// List instances as text
+/// List instances and metadata to standard output
 pub async fn show_instances(tags: &Vec<String>, aws_region: &str) -> Result<()> {
     aws_api::display_instances_as_text(tags, aws_region).await?;
     Ok(())
 }
 
-pub async fn expose_metrics(api_url: &str) -> Result<()> {
+/// Starts a server that exposes metrics http like <http://localhost:8000/metrics?aws-region=eu-west-1>
+pub async fn serve_metrics(api_url: &str) -> Result<()> {
     let config = metric_server::Config {
         boavizta_url: api_url.to_string(),
     };
