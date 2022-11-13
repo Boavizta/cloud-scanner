@@ -202,7 +202,10 @@ pub async fn show_instances(tags: &Vec<String>, aws_region: &str) -> Result<()> 
 }
 
 pub async fn expose_metrics(api_url: &str) -> Result<()> {
-    metric_endpoint::run().await?;
+    let config = metric_endpoint::Config {
+        boavizta_url: api_url.to_string(),
+    };
+    metric_endpoint::run(config).await?;
     Ok(())
 }
 /// Return current version of the cloud-scanner-cli crate
