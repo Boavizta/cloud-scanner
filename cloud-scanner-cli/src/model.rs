@@ -1,3 +1,4 @@
+//! cloud scanner entities
 use serde_derive::{Deserialize, Serialize};
 
 /// Describes an instance with its impacts
@@ -9,6 +10,7 @@ pub struct AwsInstanceWithImpacts {
     pub impacts: Option<serde_json::Value>,
 }
 
+/// The aggregated impacts and meta data about the scan results
 #[derive(Debug, Default)]
 pub struct ScanResultSummary {
     pub number_of_instances_total: u32,

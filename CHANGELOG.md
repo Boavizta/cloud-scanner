@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use the instances workload (cpu) to tune the results.
 
+## [0.0.8] - 2022-11-13
+
+### Added
+
+- Option to returns metrics through an http endpoint (Start the CLI with `cloud-scanner serve`). Metrics are recalculated each time the endpoint is scraped for example at <http://localhost:8000/metrics?aws_region=eu-west-1>).
+
 ## [0.0.7] - 2022-10-06
 
 ### Changed

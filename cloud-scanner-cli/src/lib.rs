@@ -1,16 +1,27 @@
+//!  # cloud_scanner_cli
+//!
+//!  A command line application to combine Environmental impacts of your Cloud instances using Boavizta API.
+//!
+
 use crate::countries::*;
 use crate::metrics::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
 use boavizta_api_sdk::models::UsageCloud;
+
+#[macro_use]
+extern crate rocket;
+
 #[macro_use]
 extern crate log;
 use pkg_version::*;
-mod aws_api;
-mod boavizta_api;
-mod countries;
-mod metrics;
-mod model;
+pub mod aws_api;
+pub mod boavizta_api;
+pub mod countries;
+pub mod metric_server;
+pub mod metrics;
+pub mod model;
+
 use anyhow::{Context, Result};
 
 /// Returns a summary (summing/aggregating data where possible) of the scan results.
@@ -99,7 +110,7 @@ pub async fn get_default_impacts(
     Ok(serde_json::to_string(&instances_with_impacts)?)
 }
 
-// Returns default impacts as metrics
+/// Returns default impacts as metrics
 pub async fn get_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -129,7 +140,7 @@ pub async fn get_default_impacts_as_metrics(
     Ok(metrics)
 }
 
-/// Prints impacts without using use time and default Boavizta impacts
+/// Prints default impacts  to standard output in json format
 pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -141,7 +152,7 @@ pub async fn print_default_impacts_as_json(
     Ok(())
 }
 
-/// Prints impacts without using use time and default Boavizta impacts
+/// Prints default impacts  to standard output as metrics in prometheus format
 pub async fn print_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -183,12 +194,20 @@ pub async fn print_cpu_load_impacts_as_json(
     Ok(())
 }
 
-/// List instances as text
+/// List instances and metadata to standard output
 pub async fn show_instances(tags: &Vec<String>, aws_region: &str) -> Result<()> {
     aws_api::display_instances_as_text(tags, aws_region).await?;
     Ok(())
 }
 
+/// Starts a server that exposes metrics http like <http://localhost:8000/metrics?aws-region=eu-west-1>
+pub async fn serve_metrics(api_url: &str) -> Result<()> {
+    let config = metric_server::Config {
+        boavizta_url: api_url.to_string(),
+    };
+    metric_server::run(config).await?;
+    Ok(())
+}
 /// Return current version of the cloud-scanner-cli crate
 pub fn get_version() -> String {
     const MAJOR: u32 = pkg_version_major!();

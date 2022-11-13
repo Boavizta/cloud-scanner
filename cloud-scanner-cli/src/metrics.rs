@@ -1,3 +1,4 @@
+//!  Formatting results into Prometheus metrics
 use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 

@@ -39,6 +39,8 @@ enum SubCommand {
     Measured {},
     ///Just list instances and their metadata (without impacts)
     ListInstances {},
+    ///  Serve metrics on http://localhost:3000/metrics
+    Serve {},
 }
 
 fn set_region(optional_region: Option<String>) -> String {
@@ -106,6 +108,7 @@ async fn main() -> Result<()> {
         SubCommand::ListInstances {} => {
             cloud_scanner_cli::show_instances(&args.filter_tags, &region).await?
         }
+        SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
     }
     Ok(())
 }
