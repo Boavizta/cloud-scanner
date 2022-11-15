@@ -20,12 +20,14 @@ pub async fn run(config: Config) -> Result<(), rocket::Error> {
 /// Just display help
 #[get("/")]
 fn index(config: &State<Config>) -> String {
+    warn!("Getting something on /");
     format!("Cloud scanner metric server is running.\n\nUsing boavizta API at: {}.\nValues are exposed on /metrics path and require passing a **region** in query string.\n e.g.  http://localhost:8000/metrics?aws_region=eu-west-3", config.boavizta_url)
 }
 
 /// Returns the metrics
 #[get("/metrics?<aws_region>")]
 async fn metrics(config: &State<Config>, aws_region: &str) -> String {
+    warn!("Getting something on /metrics");
     let hours_use_time: f32 = 1.0;
     let tags = Vec::new();
     let metrics = crate::get_default_impacts_as_metrics(

@@ -205,6 +205,7 @@ pub async fn serve_metrics(api_url: &str) -> Result<()> {
     let config = metric_server::Config {
         boavizta_url: api_url.to_string(),
     };
+    warn!("Starting metric server.");
     metric_server::run(config).await?;
     Ok(())
 }

@@ -55,6 +55,13 @@ docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFIL
 
 ⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
 
+⚠ Running metric server in container require setting  extra variables:
+  - to map AWS credentials 
+  - to map SSL ca certificates 
+  - and more importantly to configure rocket to listen to 0.0.0.0 instead of 127.0.0.1 (which is internal to the container): `ROCKET_ADDRESS=0.0.0.0`
+``` sh
+docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE=$AWS_PROFILE ghcr.io/boavizta/cloud-scanner-cli:latest s
+
 See [Run as docker - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/docker-guide.html)
 
 ### Building local executable 🦀

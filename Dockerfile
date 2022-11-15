@@ -1,4 +1,4 @@
-FROM rust:1.64 as chef
+FROM rust:1.65 as chef
 RUN rustup target add x86_64-unknown-linux-musl
 RUN apt update && apt install -y musl-tools musl-dev
 RUN update-ca-certificates
@@ -20,4 +20,6 @@ FROM alpine AS runtime
 #RUN addgroup -S myuser && adduser -S myuser -G myuser
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/cloud-scanner-cli /usr/local/bin/
 #USER myuser
+
+EXPOSE 8000
 ENTRYPOINT ["/usr/local/bin/cloud-scanner-cli"]
