@@ -1,3 +1,4 @@
+//! Provide access to AWS inventory APIs
 use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
 use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 // use aws_sdk_cloudwatch::output::ListMetricsOutput;

@@ -67,7 +67,7 @@ Cloud scanner returns a json array of instances metadata.
 
 ## OpenMetrics/Prometheus output
 
-As CLI application, If using `--as-metrics` or `-m` option, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json details.
+As CLI application, If using `--as-metrics` or `-m`  option or the `serve` command, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json details.
 This is also the default format of the serverless app `metrics` route.
 
 When using the metric output format, you cannot see the individual impacts of each instance. Instead, impacts of all instances are added to provide a global figure.

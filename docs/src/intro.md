@@ -1,6 +1,6 @@
 # About cloud-scanner  📡
 
-Cloud-scanner returns environmental impacts of your AWS Instances usage.
+[Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances usage.
 
 It combines real time usage data from your AWS account with [Boavizta API](https://github.com/Boavizta/boaviztapi/) to offer a global view of your impacts on a given region.
 
@@ -12,6 +12,8 @@ Cloud-scanner can be used:
 Cloud-scanner can be automated to produce metrics at regular interval and monitor your impacts in a dashboard.
 
 ![A example dashboard rendering cloud scanner metrics](images/cloud-scanner-dashboard-clear.png "A example dashboard rendering cloud scanner metrics")
+
+Cloud-scanner is an Open Source application maintained here: <https://github.com/Boavizta/cloud-scanner>.
 
 ## Principle
 

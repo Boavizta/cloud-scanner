@@ -1,3 +1,4 @@
+//!  Provide access to Boavizta API cloud impacts functions
 use crate::model::AwsInstanceWithImpacts;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;

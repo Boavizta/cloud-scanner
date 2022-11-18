@@ -2,7 +2,8 @@
 
 # Tutorials 🚀
 
-- [Quickstart - using docker 🐳](tutorials/quickstart-docker.md)
+- [Quickstart - using CLI docker 🐳](tutorials/quickstart-docker.md)
+- [Quickstart - dashboard using docker 🐳](tutorials/quickstart-dashboard-docker.md)
 - [Quickstart - using cargo 🦀](tutorials/quickstart-rust-cli.md)
 - [Quickstart as serverless ⚡](tutorials/quickstart-serverless.md)
 
