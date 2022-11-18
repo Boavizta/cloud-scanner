@@ -28,6 +28,7 @@ docker-compose up
 
 - ⚠ The docker-compose is **not** intended  for production deployment but rather for quick testing.
   - ports of all services are exposed.
-  - grafana is served on http.
+  - Grafana is served on http with default login.
 - You may have to update the line mapping your AWS profile (Replace `AWS_PROFILE=${AWS_PROFILE}` by `AWS_PROFILE=the-real-name-of-your-profile`).
 - In corporate environments, you may need to provide your certificates authorities certificates (`ca-certificates`) to the cloud-scanner container (uncomment the mapping line in the docker-compose file).
+- In production environment, you may want to tune the scraping interval (30 seconds in this demo) in the prometheus configuration file.

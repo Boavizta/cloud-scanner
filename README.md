@@ -57,10 +57,13 @@ docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFIL
 
 ⚠ Running metric server in container require setting  extra variables:
   - to map AWS credentials 
-  - to map SSL ca certificates 
+  - to map SSL ca certificates
   - and more importantly to configure rocket to listen to 0.0.0.0 instead of 127.0.0.1 (which is internal to the container): `ROCKET_ADDRESS=0.0.0.0`
+
 ``` sh
-docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE=$AWS_PROFILE ghcr.io/boavizta/cloud-scanner-cli:latest s
+# Run cli to serve metrics on http://localhost:8000
+docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE=$AWS_PROFILE ghcr.io/boavizta/cloud-scanner-cli:latest
+```
 
 See [Run as docker - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/docker-guide.html)
 
@@ -75,8 +78,6 @@ See [Building CLI - Boavizta cloud scanner 📡](https://boavizta.github.io/clou
 ### CLI options
 
 ```sh
-
-
 List aws instances and their environmental impact (from Boavizta API)
 
 Usage: cloud-scanner-cli [OPTIONS] <COMMAND>
@@ -85,6 +86,7 @@ Commands:
   standard        Get Average (standard) impacts for a given usage duration (without considering cpu use)
   measured        Get impacts related to instances usage rate (take into account instance cpu  use)
   list-instances  Just list instances and their metadata (without impacts)
+  serve           Serve metrics on http://localhost:3000/metrics
   help            Print this message or the help of the given subcommand(s)
 
 Options:

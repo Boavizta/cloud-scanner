@@ -5,7 +5,7 @@ No installation needed, you will run a public docker image of cloud-scanner CLI.
 ## Pre-requisites
 
 - Docker.
-- A working AWS account (and you AWS CLI profile already configured)
+- A working AWS account (and your AWS CLI profile already configured)
 
 ## Run cloud-scanner cli
 
@@ -37,6 +37,6 @@ docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs
 
 - to map AWS credentials
 - to map SSL ca certificates
-- and more importantly to configure Rocket to listen to 0.0.0.0 instead of default127.0.0.1 (which is internal to the container. This is done with the extra variable: `ROCKET_ADDRESS=0.0.0.0`
+- and more importantly to configure Rocket to listen to 0.0.0.0 instead of default 127.0.0.1 (which is internal to the container. This is done with the extra variable: `ROCKET_ADDRESS=0.0.0.0`
 
 Alternatively you may build and use a local docker image, See [build a local docker image](../how-to/docker-guide.md#build-a-local-docker-image)
