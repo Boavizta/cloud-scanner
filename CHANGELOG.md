@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use the instances workload (cpu) to tune the results.
 
+## [0.0.9]- 2022-11-18
+
+### Added
+
+- A example of usage in a monitoring stack (including dashboard) of via docker-compose. See [Quickstart dashboard](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-dashoard-docke.html) in documentation. Many Thanks to @obinjf for his contributions.
+
 ## [0.0.8] - 2022-11-13
 
 ### Added
