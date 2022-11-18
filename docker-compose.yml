@@ -13,7 +13,8 @@ services:
       - ROCKET_ADDRESS=0.0.0.0
       - ROCKET_PORT=8000
     volumes:
-      - $HOME/.aws/credentials:/root/.aws/credentials:ro
+      - $HOME/.aws:/root/.aws:ro
+      # - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certsca-certificates.crt
     ports:
       - "8000:8000"
     networks:
