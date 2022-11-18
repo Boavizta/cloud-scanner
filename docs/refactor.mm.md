@@ -10,12 +10,12 @@ Objective is to make code more testable / isolate the domain objects from the AP
       * Location
       * filters like tags
     * CloudResource object
-      * Region
+      * Location
       * Type
       * ID
       * instance type
       * Tags
-      * Option<CloudResoucreUsage>
+      * Option<CloudResourceUsage>
         * Average CPU load
         * Duration used to calculate average ?
   * ImpactProvider returns the impacts of a CloudResource

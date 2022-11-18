@@ -52,7 +52,7 @@ mod tests {
     }
 
     #[test]
-    fn test_get_country_code_for_unsupported_aws_region() {
+    fn test_get_country_code_of_unsupported_aws_region_returns_FRA() {
         let location = UsageLocation::from("us-east-1");
         assert_eq!("FRA", location.iso_country_code);
 

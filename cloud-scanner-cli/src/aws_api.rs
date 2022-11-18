@@ -253,7 +253,7 @@ mod tests {
 
     #[tokio::test]
     #[ignore]
-    async fn test_average_cpu_load_24hrs_of_running_instance() {
+    async fn test_average_cpu_load_24hrs_of_running_instance_is_not_zero() {
         // This instance  needs to be running for the test to pass
         let instance_id = "i-03c8f84a6318a8186";
         let avg_cpu_load = get_average_cpu(instance_id).await.unwrap();
@@ -264,14 +264,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_average_cpu_load_24hrs_of_non_existing_instance() {
+    async fn test_average_cpu_load_24hrs_of_non_existing_instance_is_zero() {
         let instance_id = "IDONOTEXISTS";
         let res = get_average_cpu(instance_id).await.unwrap();
         assert_eq!(0 as f64, res);
     }
 
     #[tokio::test]
-    async fn test_average_cpu_load_24hrs_of_shutdown_instance() {
+    async fn test_average_cpu_load_24hrs_of_shutdown_instance_is_zero() {
         let instance_id = "i-03e0b3b1246001382";
         let res = get_average_cpu(instance_id).await.unwrap();
         assert_eq!(0 as f64, res);
@@ -284,7 +284,7 @@ mod tests {
     // }
 
     #[tokio::test]
-    async fn test_create_sdk_config() {
+    async fn test_create_sdk_config_works_with_wrong_region() {
         let region: &str = "eu-west-3";
         let config = init_aws_config(region).await;
 
