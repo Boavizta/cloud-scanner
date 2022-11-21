@@ -610,6 +610,7 @@ name = "cloud-scanner-cli"
 version = "0.0.9"
 dependencies = [
  "anyhow",
+ "async-trait",
  "aws-config",
  "aws-sdk-cloudwatch",
  "aws-sdk-ec2",

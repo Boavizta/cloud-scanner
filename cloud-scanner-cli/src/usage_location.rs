@@ -1,6 +1,8 @@
 use isocountry::CountryCode;
 
-#[derive(Debug)]
+/// TODO! the usage location should be part of the cloud_inventory model (region names are tied to a specific cloud provider)
+
+#[derive(Clone, Debug)]
 pub struct UsageLocation {
     pub aws_region: String,
     /// The 3-letters ISO country code corresponding to the country of the aws_region
