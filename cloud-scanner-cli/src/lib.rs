@@ -3,7 +3,7 @@
 //!  A command line application to combine Environmental impacts of your Cloud instances using Boavizta API.
 //!
 
-use crate::metrics::get_metrics;
+use crate::metric_exporter::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
 use crate::usage_location::*;
@@ -16,9 +16,12 @@ extern crate rocket;
 extern crate log;
 use pkg_version::*;
 pub mod aws_api;
+pub mod aws_inventory;
 pub mod boavizta_api;
+pub mod cloud_inventory;
+pub mod cloud_resource;
+pub mod metric_exporter;
 pub mod metric_server;
-pub mod metrics;
 pub mod model;
 pub mod usage_location;
 

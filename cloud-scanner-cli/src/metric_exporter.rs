@@ -22,7 +22,7 @@ pub struct Labels {
     pub country: String,
 }
 
-/// Returns the metrics
+/// Returns the metrics as a String
 pub fn get_metrics(summary: &ScanResultSummary) -> Result<String> {
     let label_set: Labels = Labels {
         awsregion: summary.aws_region.to_string(),
@@ -174,28 +174,31 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
     registry
 }
 
-#[tokio::test]
-async fn test_get_get_metrics() {
-    let summary: ScanResultSummary = ScanResultSummary {
-        number_of_instances_total: 5,
-        number_of_instances_assessed: 2,
-        number_of_instances_not_assessed: 3,
-        duration_of_use_hours: 1.0,
-        adp_manufacture_kgsbeq: 0.1,
-        adp_use_kgsbeq: 0.2,
-        pe_manufacture_megajoules: 0.3,
-        pe_use_megajoules: 0.4,
-        gwp_manufacture_kgco2eq: 0.5,
-        gwp_use_kgco2eq: 0.6,
-        aws_region: "eu-west-1".to_string(),
-        country: "IRL".to_string(),
-    };
+mod tests {
+    use super::*;
 
-    let metrics = get_metrics(&summary).unwrap();
+    #[tokio::test]
+    async fn test_get_get_metrics() {
+        let summary: ScanResultSummary = ScanResultSummary {
+            number_of_instances_total: 5,
+            number_of_instances_assessed: 2,
+            number_of_instances_not_assessed: 3,
+            duration_of_use_hours: 1.0,
+            adp_manufacture_kgsbeq: 0.1,
+            adp_use_kgsbeq: 0.2,
+            pe_manufacture_megajoules: 0.3,
+            pe_use_megajoules: 0.4,
+            gwp_manufacture_kgco2eq: 0.5,
+            gwp_use_kgco2eq: 0.6,
+            aws_region: "eu-west-1".to_string(),
+            country: "IRL".to_string(),
+        };
 
-    println!("{}", metrics);
+        let metrics = get_metrics(&summary).unwrap();
 
-    let expected = r#"# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
+        println!("{}", metrics);
+
+        let expected = r#"# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
 # TYPE boavizta_number_of_instances_total gauge
 boavizta_number_of_instances_total{awsregion="eu-west-1",country="IRL"} 5
 # HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
@@ -225,5 +228,6 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 # EOF
 "#;
 
-    assert_eq!(expected, metrics);
+        assert_eq!(expected, metrics);
+    }
 }
