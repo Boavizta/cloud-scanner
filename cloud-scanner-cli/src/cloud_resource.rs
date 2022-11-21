@@ -24,7 +24,7 @@ impl fmt::Display for CloudResource {
 /// Usage of a cloud resource
 #[derive(Debug, Default, PartialEq)]
 pub struct CloudResourceUsage {
-    pub average_cpu_load: f32,
+    pub average_cpu_load: f64,
     pub usage_duration_seconds: u32,
 }
 

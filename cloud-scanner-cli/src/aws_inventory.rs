@@ -165,18 +165,23 @@ impl CloudInventory for AwsInventory {
         let mut res: Vec<CloudResource> = Vec::new();
         for instance in instances {
             let instance_id = instance.instance_id().unwrap().to_string();
-            let cpuload = self
+            let cpuload: f64 = self
                 .clone()
                 .get_average_cpu(&instance_id)
                 .await
                 .context("Cannot get CPU load of instance")
                 .unwrap();
 
+            let usage: CloudResourceUsage = CloudResourceUsage {
+                average_cpu_load: cpuload,
+                usage_duration_seconds: 300,
+            };
+
             let cs = CloudResource {
                 id: instance_id,
                 location: location.clone(),
                 resource_type: String::from("ec2"),
-                usage: None,
+                usage: Some(usage),
             };
             res.push(cs);
         }
@@ -188,9 +193,9 @@ impl CloudInventory for AwsInventory {
 #[cfg(test)]
 mod tests {
     use super::*;
-    //use anyhow::{Context, Result};
 
     #[tokio::test]
+    #[ignore]
     async fn test_list_resources() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let tags: Vec<String> = vec!["".to_string()];
@@ -200,7 +205,7 @@ mod tests {
             .context("Failed to list")
             .unwrap();
 
-        assert_eq!(0, res.len());
+        assert_eq!(4, res.len());
     }
 
     #[tokio::test]
@@ -215,4 +220,74 @@ mod tests {
     }
 
     // Verify tests from here
+    #[tokio::test]
+    #[ignore]
+    async fn test_get_instance_usage_metrics_of_running_instance() {
+        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+
+        // This instance  needs to be running
+        let instance_id = "i-0a3e6b8cdb50c49b8";
+        let res = inventory
+            .get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .await
+            .unwrap();
+        let datapoints = res.datapoints.unwrap();
+        println!("{:#?}", datapoints);
+        assert_eq!(1, datapoints.len());
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_get_instance_usage_metrics_of_shutdown_instance() {
+        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let instance_id = "i-03e0b3b1246001382";
+        let res = inventory
+            .get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .await
+            .unwrap();
+        let datapoints = res.datapoints.unwrap();
+        assert_eq!(0, datapoints.len());
+    }
+
+    #[tokio::test]
+    async fn test_get_instance_usage_metrics_of_non_existing_instance() {
+        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let instance_id = "IDONOTEXISTS";
+        let res = inventory
+            .get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .await
+            .unwrap();
+        let datapoints = res.datapoints.unwrap();
+        assert_eq!(0, datapoints.len());
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_average_cpu_load_of_running_instance_is_not_zero() {
+        // This instance  needs to be running for the test to pass
+        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+
+        let instance_id = "i-03c8f84a6318a8186";
+        let avg_cpu_load = inventory.get_average_cpu(instance_id).await.unwrap();
+        assert_ne!(0 as f64, avg_cpu_load);
+        println!("{:#?}", avg_cpu_load);
+        assert!((0 as f64) < avg_cpu_load);
+        assert!((100 as f64) > avg_cpu_load);
+    }
+
+    #[tokio::test]
+    async fn test_average_cpu_load_of_non_existing_instance_is_zero() {
+        let instance_id = "IDONOTEXISTS";
+        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let res = inventory.get_average_cpu(instance_id).await.unwrap();
+        assert_eq!(0 as f64, res);
+    }
+
+    #[tokio::test]
+    async fn test_average_cpu_load_of_shutdown_instance_is_zero() {
+        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let instance_id = "i-03e0b3b1246001382";
+        let res = inventory.get_average_cpu(instance_id).await.unwrap();
+        assert_eq!(0 as f64, res);
+    }
 }
