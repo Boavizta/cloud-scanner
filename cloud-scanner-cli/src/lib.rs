@@ -20,6 +20,7 @@ pub mod aws_inventory;
 pub mod boavizta_api;
 pub mod cloud_inventory;
 pub mod cloud_resource;
+pub mod impact_provider;
 pub mod metric_exporter;
 pub mod metric_server;
 pub mod model;
