@@ -165,7 +165,6 @@ mod tests {
         let expected: serde_json::Value = serde_json::from_str(DEFAULT_IMPACT_OF_M6XLARGE).unwrap();
 
         let usage_cloud: UsageCloud = UsageCloud::new();
-        //usage_cloud.days_use_time = Some(4 as f32);
 
         let instance: aws_sdk_ec2::model::Instance = aws_sdk_ec2::model::Instance::builder()
             .set_instance_type(Some(aws_sdk_ec2::model::InstanceType::M6gXlarge))
@@ -183,6 +182,8 @@ mod tests {
 
         let mut usage_cloud: UsageCloud = UsageCloud::new();
         //usage_cloud.days_use_time = Some(4 as f32);
+        // usage_cloud.days_use_time = Some(1 as f32);
+        //usage_cloud.hours_use_time = Some(1 as f32);
         usage_cloud.usage_location = Some(String::from("FRA"));
 
         // impl std::convert::From<&str> for InstanceType {

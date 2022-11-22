@@ -106,22 +106,22 @@ mod tests {
 
     const TEST_API_URL: &str = "https://api.boavizta.org";
 
-    const DEFAULT_RAW_IMPACTS_OF_M6XLARGE_FR: &str = r#"   
+    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str = r#"   
     {
         "adp": {
             "manufacture": 0.0084, 
             "unit":"kgSbeq", 
-            "use": 6.5e-6
+            "use": 7.5e-10
         }, 
         "gwp": {
             "manufacture": 87.0,
             "unit": "kgCO2eq", 
-            "use": 13.0
+            "use": 0.0015
             },
         "pe": {
             "manufacture": 1100.0,
             "unit": "MJ",
-            "use": 1500.0
+            "use": 0.17
             }
     }
     "#;
@@ -145,15 +145,15 @@ mod tests {
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
             usage: Some(CloudResourceUsage {
-                average_cpu_load: 10.0,
-                usage_duration_seconds: 3600 * 24,
+                average_cpu_load: 100.0, // Will not be considered in v1
+                usage_duration_seconds: 3600,
             }),
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let res = api.get_raws_impacts(instance1).await.unwrap();
 
         let expected: serde_json::Value =
-            serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6XLARGE_24HRS_FR).unwrap();
+            serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap();
         assert_eq!(expected, res);
     }
 
