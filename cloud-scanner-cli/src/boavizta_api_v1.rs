@@ -1,7 +1,7 @@
 //!  Provide access to Boavizta API cloud impacts functions
 //use crate::model::AwsInstanceWithImpacts;
 use crate::cloud_resource::*;
-use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider};
+use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ResourceImpacts};
 use crate::usage_location::*;
 use anyhow::{Context, Result};
 /// Get impacts of cloud resources through Boavizta API
@@ -26,7 +26,7 @@ impl BoaviztaApiV1 {
     // Returns the impacts of an instance from Boavizta API
     ///
     ///  The manufacture impacts returned represent the entire lifecycle of instance (i.e. Allocation TOTAL )
-    async fn get_raws_impacts(self, cr: CloudResource) -> Option<serde_json::Value> {
+    async fn get_raws_impacts(&self, cr: CloudResource) -> Option<serde_json::Value> {
         let instance_type = cr.resource_type;
 
         let cru = cr.usage.unwrap();
@@ -57,14 +57,13 @@ impl BoaviztaApiV1 {
     }
 
     // /// Creates a CloudResourceWithImpacts from a CloudResource
-    // pub fn get_resource_with_impacts(self, cr :CloudResource) ->  CloudResourceWithImpacts {
-
-    //     impacts
-    //     cri : CloudResourceWithImpacts = CloudResourceWithImpacts{
-
-    //     }
-    //     cri
-    // }
+    async fn get_resource_with_impacts(
+        &self,
+        resource: &CloudResource,
+    ) -> CloudResourceWithImpacts {
+        let raw_impacts = self.get_raws_impacts(resource.clone()).await;
+        boa_impacts_to_cloud_resource_with_impacts(resource, &raw_impacts)
+    }
 }
 
 /*
@@ -94,8 +93,45 @@ impl ImpactProvider for BoaviztaApiV1 {
         &self,
         resources: Vec<CloudResource>,
     ) -> Result<Vec<CloudResourceWithImpacts>> {
-        let v: Vec<CloudResourceWithImpacts> = Vec::new();
+        let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
+
+        for resource in resources.iter() {
+            let cri = self.get_resource_with_impacts(resource).await;
+            v.push(cri.clone());
+        }
+
         Ok(v)
+    }
+}
+
+/// Convert
+pub fn boa_impacts_to_cloud_resource_with_impacts(
+    cloud_resource: &CloudResource,
+    raw_result: &Option<serde_json::Value>,
+) -> CloudResourceWithImpacts {
+    let resource_impacts: ResourceImpacts;
+    if let Some(results) = raw_result {
+        debug!("This cloud resource has impacts data: {}", results);
+        resource_impacts = ResourceImpacts {
+            adp_manufacture_kgsbeq: results["adp"]["manufacture"].as_f64().unwrap(),
+            adp_use_kgsbeq: results["adp"]["use"].as_f64().unwrap(),
+            pe_manufacture_megajoules: results["pe"]["manufacture"].as_f64().unwrap(),
+            pe_use_megajoules: results["pe"]["use"].as_f64().unwrap(),
+            gwp_manufacture_kgco2eq: results["gwp"]["manufacture"].as_f64().unwrap(),
+            gwp_use_kgco2eq: results["gwp"]["use"].as_f64().unwrap(),
+        };
+    } else {
+        debug!(
+            "Skipped resource: {:#?} while building impacts, it has no impact data",
+            cloud_resource
+        );
+        resource_impacts = ResourceImpacts {
+            ..Default::default()
+        };
+    };
+    CloudResourceWithImpacts {
+        cloud_resource: cloud_resource.clone(),
+        resource_impacts: resource_impacts,
     }
 }
 
@@ -157,6 +193,79 @@ mod tests {
         assert_eq!(expected, res);
     }
 
+    #[tokio::test]
+    async fn should_retrieve_multiple_raw_default_impacts_fr() {
+        let instance1: CloudResource = CloudResource {
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_type: "m6g.xlarge".to_string(),
+            usage: Some(CloudResourceUsage {
+                average_cpu_load: 100.0, // Will not be considered in v1
+                usage_duration_seconds: 3600,
+            }),
+        };
+
+        let instance2: CloudResource = CloudResource {
+            id: "inst-2".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_type: "m6g.xlarge".to_string(),
+            usage: Some(CloudResourceUsage {
+                average_cpu_load: 100.0, // Will not be considered in v1
+                usage_duration_seconds: 3600,
+            }),
+        };
+
+        let instance3: CloudResource = CloudResource {
+            id: "inst-3".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_type: "type-not-in-boa".to_string(),
+            usage: Some(CloudResourceUsage {
+                average_cpu_load: 100.0, // Will not be considered in v1
+                usage_duration_seconds: 3600,
+            }),
+        };
+
+        let mut instances: Vec<CloudResource> = Vec::new();
+        instances.push(instance1);
+        instances.push(instance2);
+        instances.push(instance3);
+
+        let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
+        let res = api.get_impacts(instances).await.unwrap();
+
+        assert_eq!(3, res.len());
+        assert_eq!(res[0].cloud_resource.id, "inst-1");
+        assert_eq!(res[1].cloud_resource.id, "inst-2");
+        assert_eq!(res[0].resource_impacts.pe_use_megajoules, 0.17);
+        assert_eq!(res[1].resource_impacts.pe_use_megajoules, 0.17);
+        assert_eq!(res[2].resource_impacts.pe_use_megajoules, 0.0);
+    }
+
+    #[test]
+    fn should_convert_results_to_impacts() {
+        let instance1: CloudResource = CloudResource {
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_type: "m6g.xlarge".to_string(),
+            usage: Some(CloudResourceUsage {
+                average_cpu_load: 100.0, // Will not be considered in v1
+                usage_duration_seconds: 3600,
+            }),
+        };
+
+        let raw_impacts =
+            Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap());
+
+        let cloud_resource_with_impacts: CloudResourceWithImpacts =
+            boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts);
+
+        assert_eq!(
+            0.17,
+            cloud_resource_with_impacts
+                .resource_impacts
+                .pe_use_megajoules
+        );
+    }
     /*
     #[tokio::test]
     async fn get_instance_default_impacts_through_sdk_works() {

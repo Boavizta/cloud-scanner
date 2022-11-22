@@ -2,7 +2,7 @@ use crate::UsageLocation;
 use std::fmt;
 
 ///  A cloud resource (could be an instance, function or any other resource)
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct CloudResource {
     pub id: String,
     pub location: UsageLocation,
@@ -22,7 +22,7 @@ impl fmt::Display for CloudResource {
 }
 
 /// Usage of a cloud resource
-#[derive(Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct CloudResourceUsage {
     pub average_cpu_load: f64,
     pub usage_duration_seconds: u32,

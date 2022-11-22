@@ -21,15 +21,15 @@ pub trait ImpactProvider {
     ) -> Result<Vec<CloudResourceWithImpacts>>;
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct CloudResourceWithImpacts {
-    cloud_resource: CloudResource,
-    resource_impacts: Impacts,
+    pub cloud_resource: CloudResource,
+    pub resource_impacts: ResourceImpacts,
 }
 
 /// Impacts of an individual resource
-#[derive(Debug, Default)]
-pub struct Impacts {
+#[derive(Clone, Debug, Default)]
+pub struct ResourceImpacts {
     pub adp_manufacture_kgsbeq: f64,
     pub adp_use_kgsbeq: f64,
     pub pe_manufacture_megajoules: f64,
@@ -39,7 +39,7 @@ pub struct Impacts {
 }
 
 /// The aggregated impacts and meta data about the scan results
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ImpactsSummary {
     pub number_of_instances_total: u32,
     pub number_of_instances_assessed: u32,
