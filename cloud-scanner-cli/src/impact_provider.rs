@@ -1,4 +1,3 @@
-
 //! A module to allow retrieving impacts of cloud resources
 //!  It define s a Impact procvider  trait that you should use when implementing vendor specific inventory .
 ///
@@ -16,7 +15,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait ImpactProvider {
     /// Returns a list list of CloudImpacts
-    async fn get_individual_impacts(
+    async fn get_impacts(
         &self,
         resources: Vec<CloudResource>,
     ) -> Result<Vec<CloudResourceWithImpacts>>;

@@ -18,6 +18,7 @@ use pkg_version::*;
 pub mod aws_api;
 pub mod aws_inventory;
 pub mod boavizta_api;
+pub mod boavizta_api_v1;
 pub mod cloud_inventory;
 pub mod cloud_resource;
 pub mod impact_provider;
