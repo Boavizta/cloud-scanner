@@ -180,7 +180,7 @@ impl CloudInventory for AwsInventory {
             let cs = CloudResource {
                 id: instance_id,
                 location: location.clone(),
-                resource_type: String::from("ec2"),
+                resource_type: instance.instance_type().unwrap().as_str().to_owned(),
                 usage: Some(usage),
             };
             res.push(cs);
