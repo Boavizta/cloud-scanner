@@ -29,6 +29,14 @@ pub struct CloudResourceUsage {
     pub usage_duration_seconds: u32,
 }
 
+/// Define how to allocate the manufacturing impacts of a resource
+pub enum ManufacturingAllocation {
+    /// Amortized allocation (prorata of usage duration)
+    LinearAllocation,
+    /// Total (Full impact regardless of usage duration)
+    TotalAllocation,
+}
+
 #[cfg(test)]
 mod tests {
 

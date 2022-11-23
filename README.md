@@ -24,16 +24,16 @@ Show impacts of your EC2 instances for 10 hours of use.
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 # Get default impacts of 10 hours of use (on your default account region)
-cargo run standard --hours-use-time 10 | jq
+cargo run estimate --hours-use-time 10 | jq
 
 # Get measured (considering instance average cpu load) impacts of 10 hours of use (on your default account region)
 cargo run measured --hours-use-time 10 | jq
 
 # Get default impacts but as metrics
-cargo run  -- --as-metrics standard --hours-use-time 10
+cargo run  -- --as-metrics estimate --hours-use-time 10
 
 # Same query for explicit region
-cargo run  -- --aws-region eu-west-3 standard --hours-use-time 10 | jq
+cargo run  -- --aws-region eu-west-3 estimate --hours-use-time 10 | jq
 ```
 
 ## Usage as CLI 💻
@@ -52,8 +52,8 @@ docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
 # Just list instances
 docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest list-instances
 
-# List instances and standard impacts (for 10 hours of use)
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest standard --hours-use-time 10
+# List instances and estimate impacts (for 10 hours of use)
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --hours-use-time 10
 ```
 
 ⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
@@ -86,11 +86,10 @@ List aws instances and their environmental impact (from Boavizta API)
 Usage: cloud-scanner-cli [OPTIONS] <COMMAND>
 
 Commands:
-  standard        Get Average (standard) impacts for a given usage duration (without considering cpu use)
-  measured        Get impacts related to instances usage rate (take into account instance cpu  use)
-  list-instances  Just list instances and their metadata (without impacts)
-  serve           Serve metrics on http://localhost:3000/metrics
-  help            Print this message or the help of the given subcommand(s)
+  estimate   Get estimation of impacts for a given usage duration
+  inventory  List instances and  their average cpu load for the last 5 minutes (no impact data)
+  serve      Serve metrics on http://localhost:3000/metrics
+  help       Print this message or the help of the given subcommand(s)
 
 Options:
   -a, --aws-region <AWS_REGION>
@@ -139,7 +138,7 @@ serverless deploy
 
 ## Output formats
 
-Cloud scanner CLI and serverless application return data as _json_ or _Open Metrics_ (Prometheus) format.
+Cloud scanner CLI and serverless application returns data as _json_ or _Open Metrics_ (Prometheus) format.
 
 See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/output-data.html)
 
@@ -149,8 +148,8 @@ Cloud scanner is stable, but with limited functionality.
 
 At the moment:
 
-- Returns _empty_ impacts (i.e. zero values) for EC2 the instance _types_ that are not listed in Boavizta database.
-- `--aws-region` flag only supports eu-based aws region (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
+- Cloud scanner returns _empty_ impacts (i.e. zero values) for EC2 the instance _types_ that are not listed in Boavizta database.
+- `--aws-region` flag only supports eu-based aws regions (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
 - Returns _default_ impacts of AWS instances. It does not yet analyses instance usage (cpu workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration. (i.e. using instance CPU load through the `measured` command line flag has no effect).
 - Filtering instances by tag is not yet supported.
 

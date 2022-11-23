@@ -1,5 +1,6 @@
-//! A module to perform inventory of cloud resources
-
+//! A module to perform inventory of  AWS cloud resources.
+//!
+//!  ⚠ Only ec2 instances are supported  today.
 use crate::cloud_inventory::CloudInventory;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
@@ -22,8 +23,8 @@ pub struct AwsInventory {
 }
 
 impl AwsInventory {
-    /// Creates an AWS inventory
-    /// Initialize it with a specific region an configure the SDK's taht will do the inventory.
+    /// Creates an AWS inventory.
+    /// Initializes it with a specific region and configures the SDK's that will query your account to perform the inventory of resources.
     pub async fn new(aws_region: &str) -> Self {
         let shared_config = Self::load_aws_config(aws_region).await;
         AwsInventory {
@@ -33,8 +34,10 @@ impl AwsInventory {
         }
     }
 
-    /// Initialize a sdk config with default credentials and  region passed as argument
-    /// If region is empty, uses a default region (but will return no error even if the region is invalid)
+    /// Initialize a AWS SDK config with default credentials from the environment and  a region passed as argument.
+    ///
+    /// - If region is empty, uses a default region.
+    /// - ⚠  If the region is invalid, it does **not** return error.
     async fn load_aws_config(aws_region: &str) -> aws_types::sdk_config::SdkConfig {
         if aws_region.is_empty() {
             // Use default region (from env)
@@ -54,9 +57,9 @@ impl AwsInventory {
         }
     }
 
-    /// List all instances of the current account
+    /// List all ec2 instances of the current account.
     ///
-    /// Filtering instance on tags is not yet implemented.
+    /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
     async fn list_instances(self, tags: &Vec<String>) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
@@ -78,7 +81,8 @@ impl AwsInventory {
         Ok(instances)
     }
 
-    /// Returns average CPU load of an instance
+    /// Returns average CPU load of a given instance.
+    ///
     async fn get_average_cpu(self, instance_id: &str) -> Result<f64> {
         let res = self
             .get_average_cpu_usage_of_last_5_minutes(instance_id)

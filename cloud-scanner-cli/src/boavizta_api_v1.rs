@@ -2,8 +2,7 @@
 //use crate::model::AwsInstanceWithImpacts;
 use crate::cloud_resource::*;
 use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ResourceImpacts};
-use crate::usage_location::*;
-use anyhow::{Context, Result};
+use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
@@ -25,24 +24,22 @@ impl BoaviztaApiV1 {
 
     // Returns the raw impacts (json) of an instance from Boavizta API
     ///
-    ///  The usage impacts are calculated for the given usage duration (` usage_duration_hours` ).
+    ///  The usage impacts are calculated for the given usage duration (` usage_duration_hours` ) without considering the load of te resource or the time during wich this load is measured.
     /// The manufacture impacts returned represent the entire lifecycle of instance (i.e. it is using the 'Allocation' TOTAL )
     async fn get_raws_impacts(
         &self,
         cr: CloudResource,
         usage_duration_hours: &f32,
     ) -> Option<serde_json::Value> {
+        warn!("Getting impacts of a measured CPU load is unsupported with Boavizta API v0.1.x, returning default impacts.");
         let instance_type = cr.resource_type;
-
-        let cru = cr.usage.unwrap();
-
+        let verbose = Some(false);
         let mut usage_cloud: UsageCloud = UsageCloud::new();
-
+        //let cru = cr.usage.unwrap();
         //usage_cloud.hours_use_time = Some((cru.usage_duration_seconds / 3600) as f32);
         usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
         usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
 
-        let verbose = Some(false);
         let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
             &self.configuration,
             Some(instance_type.as_str()),
@@ -152,6 +149,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 mod tests {
 
     use super::*;
+    use crate::UsageLocation;
 
     const TEST_API_URL: &str = "https://api.boavizta.org";
 
