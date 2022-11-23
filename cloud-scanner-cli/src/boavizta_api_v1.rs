@@ -25,15 +25,21 @@ impl BoaviztaApiV1 {
 
     // Returns the raw impacts (json) of an instance from Boavizta API
     ///
-    ///  The manufacture impacts returned represent the entire lifecycle of instance (i.e. it is using the 'Allocation' TOTAL )
-    async fn get_raws_impacts(&self, cr: CloudResource) -> Option<serde_json::Value> {
+    ///  The usage impacts are calculated for the given usage duration (` usage_duration_hours` ).
+    /// The manufacture impacts returned represent the entire lifecycle of instance (i.e. it is using the 'Allocation' TOTAL )
+    async fn get_raws_impacts(
+        &self,
+        cr: CloudResource,
+        usage_duration_hours: &f32,
+    ) -> Option<serde_json::Value> {
         let instance_type = cr.resource_type;
 
         let cru = cr.usage.unwrap();
 
         let mut usage_cloud: UsageCloud = UsageCloud::new();
 
-        usage_cloud.hours_use_time = Some((cru.usage_duration_seconds / 3600) as f32);
+        //usage_cloud.hours_use_time = Some((cru.usage_duration_seconds / 3600) as f32);
+        usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
         usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
 
         let verbose = Some(false);
@@ -60,8 +66,11 @@ impl BoaviztaApiV1 {
     async fn get_resource_with_impacts(
         &self,
         resource: &CloudResource,
+        usage_duration_hours: &f32,
     ) -> CloudResourceWithImpacts {
-        let raw_impacts = self.get_raws_impacts(resource.clone()).await;
+        let raw_impacts = self
+            .get_raws_impacts(resource.clone(), usage_duration_hours)
+            .await;
         boa_impacts_to_cloud_resource_with_impacts(resource, &raw_impacts)
     }
 }
@@ -90,13 +99,17 @@ pub struct Impacts {
 #[async_trait]
 impl ImpactProvider for BoaviztaApiV1 {
     /// Get cloud resources impacts from the Boavizta API
+    /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration (i.e. project impacts for a specific duration).
     async fn get_impacts(
         &self,
         resources: Vec<CloudResource>,
+        usage_duration_hours: &f32,
     ) -> Result<Vec<CloudResourceWithImpacts>> {
         let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
         for resource in resources.iter() {
-            let cri = self.get_resource_with_impacts(resource).await;
+            let cri = self
+                .get_resource_with_impacts(resource, usage_duration_hours)
+                .await;
             v.push(cri.clone());
         }
         Ok(v)
@@ -184,7 +197,8 @@ mod tests {
             }),
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let res = api.get_raws_impacts(instance1).await.unwrap();
+        let one_hour = 1.0 as f32;
+        let res = api.get_raws_impacts(instance1, &one_hour).await.unwrap();
 
         let expected: serde_json::Value =
             serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap();
@@ -227,9 +241,10 @@ mod tests {
         instances.push(instance1);
         instances.push(instance2);
         instances.push(instance3);
+        let one_hour = 1.0 as f32;
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let res = api.get_impacts(instances).await.unwrap();
+        let res = api.get_impacts(instances, &one_hour).await.unwrap();
 
         assert_eq!(3, res.len());
         assert_eq!(res[0].cloud_resource.id, "inst-1");

@@ -15,10 +15,12 @@ use serde::{Deserialize, Serialize};
 /// Implementing this trait when creating a new ImpactProvider (for example to support a different version of Boavizata db) ensures that cloud-scanner will be able to use it.
 #[async_trait]
 pub trait ImpactProvider {
-    /// Returns a list list of CloudImpacts
+    /// Returns a list list of CloudImpacts.
+    /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration (i.e. project impacts for a specific duration).
     async fn get_impacts(
         &self,
         resources: Vec<CloudResource>,
+        usage_duration_hours: &f32,
     ) -> Result<Vec<CloudResourceWithImpacts>>;
 }
 

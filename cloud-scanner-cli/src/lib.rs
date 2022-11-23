@@ -115,11 +115,9 @@ async fn standard_scan(
         .await
         .context("Cannot perform standard scan")?;
 
-    let usage_location = UsageLocation::from(aws_region);
-
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let res = api
-        .get_impacts(cloud_resources)
+        .get_impacts(cloud_resources, hours_use_time)
         .await
         .context("Failure while retrieving impacts")?;
 
