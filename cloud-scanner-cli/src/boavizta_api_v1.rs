@@ -109,25 +109,24 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
     cloud_resource: &CloudResource,
     raw_result: &Option<serde_json::Value>,
 ) -> CloudResourceWithImpacts {
-    let resource_impacts: ResourceImpacts;
+    let resource_impacts: Option<ResourceImpacts>;
     if let Some(results) = raw_result {
         debug!("This cloud resource has impacts data: {}", results);
-        resource_impacts = ResourceImpacts {
+
+        resource_impacts = Some(ResourceImpacts {
             adp_manufacture_kgsbeq: results["adp"]["manufacture"].as_f64().unwrap(),
             adp_use_kgsbeq: results["adp"]["use"].as_f64().unwrap(),
             pe_manufacture_megajoules: results["pe"]["manufacture"].as_f64().unwrap(),
             pe_use_megajoules: results["pe"]["use"].as_f64().unwrap(),
             gwp_manufacture_kgco2eq: results["gwp"]["manufacture"].as_f64().unwrap(),
             gwp_use_kgco2eq: results["gwp"]["use"].as_f64().unwrap(),
-        };
+        });
     } else {
         debug!(
             "Skipped resource: {:#?} while building impacts, it has no impact data",
             cloud_resource
         );
-        resource_impacts = ResourceImpacts {
-            ..Default::default()
-        };
+        resource_impacts = None;
     };
     CloudResourceWithImpacts {
         cloud_resource: cloud_resource.clone(),
@@ -236,9 +235,14 @@ mod tests {
         assert_eq!(3, res.len());
         assert_eq!(res[0].cloud_resource.id, "inst-1");
         assert_eq!(res[1].cloud_resource.id, "inst-2");
-        assert_eq!(res[0].resource_impacts.pe_use_megajoules, 0.17);
-        assert_eq!(res[1].resource_impacts.pe_use_megajoules, 0.17);
-        assert_eq!(res[2].resource_impacts.pe_use_megajoules, 0.0);
+
+        let r0 = res[0].resource_impacts.clone().unwrap();
+        let r1 = res[1].resource_impacts.clone().unwrap();
+        let r2 = res[2].resource_impacts.clone().is_none();
+
+        assert_eq!(0.17, r0.pe_use_megajoules);
+        assert_eq!(0.17, r1.pe_use_megajoules);
+        assert_eq!(true, r2);
     }
 
     #[test]
@@ -263,6 +267,7 @@ mod tests {
             0.17,
             cloud_resource_with_impacts
                 .resource_impacts
+                .unwrap()
                 .pe_use_megajoules
         );
     }
