@@ -71,7 +71,7 @@ impl BoaviztaApiV1 {
         let raw_impacts = self
             .get_raws_impacts(resource.clone(), usage_duration_hours)
             .await;
-        boa_impacts_to_cloud_resource_with_impacts(resource, &raw_impacts)
+        boa_impacts_to_cloud_resource_with_impacts(resource, &raw_impacts, usage_duration_hours)
     }
 }
 
@@ -120,6 +120,7 @@ impl ImpactProvider for BoaviztaApiV1 {
 pub fn boa_impacts_to_cloud_resource_with_impacts(
     cloud_resource: &CloudResource,
     raw_result: &Option<serde_json::Value>,
+    impacts_duration_hours: &f32,
 ) -> CloudResourceWithImpacts {
     let resource_impacts: Option<ResourceImpacts>;
     if let Some(results) = raw_result {
@@ -143,6 +144,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
     CloudResourceWithImpacts {
         cloud_resource: cloud_resource.clone(),
         resource_impacts: resource_impacts,
+        impacts_duration_hours: impacts_duration_hours.to_owned(),
     }
 }
 
@@ -274,8 +276,10 @@ mod tests {
         let raw_impacts =
             Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap());
 
+        let one_hour: f32 = 1 as f32;
+
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
-            boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts);
+            boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
 
         assert_eq!(
             0.17,

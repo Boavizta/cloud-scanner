@@ -27,7 +27,10 @@ pub trait ImpactProvider {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CloudResourceWithImpacts {
     pub cloud_resource: CloudResource,
+    /// The impacts
     pub resource_impacts: Option<ResourceImpacts>,
+    /// The duration for which impacts are calculated
+    pub impacts_duration_hours: f32,
 }
 
 /// Impacts of an individual resource
