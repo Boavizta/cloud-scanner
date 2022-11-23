@@ -1,8 +1,9 @@
 use crate::UsageLocation;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 ///  A cloud resource (could be an instance, function or any other resource)
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CloudResource {
     pub id: String,
     pub location: UsageLocation,
@@ -22,7 +23,7 @@ impl fmt::Display for CloudResource {
 }
 
 /// Usage of a cloud resource
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct CloudResourceUsage {
     pub average_cpu_load: f64,
     pub usage_duration_seconds: u32,

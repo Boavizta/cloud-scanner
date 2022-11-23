@@ -57,7 +57,7 @@ impl AwsInventory {
     /// List all instances of the current account
     ///
     /// Filtering instance on tags is not yet implemented.
-    async fn list_instances(self, tags: Vec<String>) -> Result<Vec<Instance>> {
+    async fn list_instances(self, tags: &Vec<String>) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
         let client = &self.ec2_client;
@@ -152,7 +152,7 @@ impl AwsInventory {
 #[async_trait]
 impl CloudInventory for AwsInventory {
     /// list resources
-    async fn list_resources(&self, tags: Vec<String>) -> Result<Vec<CloudResource>> {
+    async fn list_resources(&self, tags: &Vec<String>) -> Result<Vec<CloudResource>> {
         let instances: Vec<Instance> = self
             .clone()
             .list_instances(tags)
@@ -200,7 +200,7 @@ mod tests {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let tags: Vec<String> = vec!["".to_string()];
         let res: Vec<CloudResource> = inventory
-            .list_resources(tags)
+            .list_resources(&tags)
             .await
             .context("Failed to list")
             .unwrap();

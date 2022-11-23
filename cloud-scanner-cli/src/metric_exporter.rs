@@ -9,6 +9,7 @@ use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
 
+use crate::impact_provider::ImpactsSummary;
 use crate::model::ScanResultSummary;
 
 // Define a type representing a metric label set, i.e. a key value pair.
@@ -38,7 +39,158 @@ pub fn get_metrics(summary: &ScanResultSummary) -> Result<String> {
     Ok(metrics)
 }
 
+pub fn get_metrics_new(summary: &ImpactsSummary) -> Result<String> {
+    let label_set: Labels = Labels {
+        awsregion: summary.aws_region.to_string(),
+        country: summary.country.to_string(),
+    };
+
+    let registry = register_all_metrics_new(summary, label_set);
+
+    let mut buffer = vec![];
+    encode(&mut buffer, &registry).context("Fails to encode result into metrics")?;
+    let metrics = String::from_utf8(buffer).context("Unable to format metrics")?;
+
+    Ok(metrics)
+}
+
 fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Registry {
+    // Create a metric registry.
+    //
+    // Note the angle brackets to make sure to use the default (dynamic
+    // dispatched boxed metric) for the generic type parameter.
+    let mut registry = <Registry>::default();
+
+    let boavizta_number_of_instances_total = Family::<Labels, Gauge>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_number_of_instances_total",
+        // And the metric help text.
+        "Number of instances detected during the scan",
+        Box::new(boavizta_number_of_instances_total.clone()),
+    );
+
+    let boavizta_number_of_instances_assessed = Family::<Labels, Gauge>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_number_of_instances_assessed",
+        // And the metric help text.
+        "Number of instances that were considered in the measure",
+        Box::new(boavizta_number_of_instances_assessed.clone()),
+    );
+
+    let boavizta_duration_of_use_hours = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_duration_of_use_hours",
+        // And the metric help text.
+        "Number of instances detected during the scan",
+        Box::new(boavizta_duration_of_use_hours.clone()),
+    );
+
+    let boavizta_pe_manufacture_megajoules = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_pe_manufacture_megajoules",
+        // And the metric help text.
+        "Power consumed for manufacture",
+        Box::new(boavizta_pe_manufacture_megajoules.clone()),
+    );
+
+    let boavizta_pe_use_megajoules = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_pe_use_megajoules",
+        // And the metric help text.
+        "Power consumed during usage",
+        Box::new(boavizta_pe_use_megajoules.clone()),
+    );
+
+    let boavizta_adp_manufacture_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_adp_manufacture_kgsbeq",
+        // And the metric help text.
+        "ADP manufacture",
+        Box::new(boavizta_adp_manufacture_kgsbeq.clone()),
+    );
+
+    let boavizta_adp_use_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_adp_use_kgsbeq",
+        // And the metric help text.
+        "ADP use",
+        Box::new(boavizta_adp_use_kgsbeq.clone()),
+    );
+
+    let boavizta_gwp_manufacture_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_gwp_manufacture_kgco2eq",
+        // And the metric help text.
+        "GWP manufacture",
+        Box::new(boavizta_gwp_manufacture_kgco2eq.clone()),
+    );
+
+    let boavizta_gwp_use_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_gwp_use_kgco2eq",
+        // And the metric help text.
+        "GWP of use",
+        Box::new(boavizta_gwp_use_kgco2eq.clone()),
+    );
+
+    // Set the values
+    boavizta_number_of_instances_total
+        .get_or_create(&label_set)
+        .set(summary.number_of_instances_total.into());
+    boavizta_number_of_instances_assessed
+        .get_or_create(&label_set)
+        .set(summary.number_of_instances_assessed.into());
+
+    boavizta_duration_of_use_hours
+        .get_or_create(&label_set)
+        .set(summary.duration_of_use_hours);
+
+    boavizta_pe_manufacture_megajoules
+        .get_or_create(&label_set)
+        .set(summary.pe_manufacture_megajoules);
+
+    boavizta_pe_use_megajoules
+        .get_or_create(&label_set)
+        .set(summary.pe_use_megajoules);
+
+    boavizta_adp_manufacture_kgsbeq
+        .get_or_create(&label_set)
+        .set(summary.adp_manufacture_kgsbeq);
+
+    boavizta_adp_use_kgsbeq
+        .get_or_create(&label_set)
+        .set(summary.adp_use_kgsbeq);
+
+    boavizta_gwp_manufacture_kgco2eq
+        .get_or_create(&label_set)
+        .set(summary.gwp_manufacture_kgco2eq);
+
+    boavizta_gwp_use_kgco2eq
+        .get_or_create(&label_set)
+        .set(summary.gwp_use_kgco2eq);
+
+    registry
+}
+
+fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Registry {
     // Create a metric registry.
     //
     // Note the angle brackets to make sure to use the default (dynamic

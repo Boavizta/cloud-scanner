@@ -7,7 +7,14 @@ use crate::metric_exporter::get_metrics;
 use crate::model::AwsInstanceWithImpacts;
 use crate::model::ScanResultSummary;
 use crate::usage_location::*;
+use aws_inventory::*;
 use boavizta_api_sdk::models::UsageCloud;
+use boavizta_api_v1::*;
+use cloud_inventory::*;
+use cloud_resource::*;
+use impact_provider::ImpactProvider;
+use impact_provider::{CloudResourceWithImpacts, ImpactsSummary};
+use metric_exporter::*;
 
 #[macro_use]
 extern crate rocket;
@@ -22,6 +29,7 @@ pub mod boavizta_api_v1;
 pub mod cloud_inventory;
 pub mod cloud_resource;
 pub mod impact_provider;
+pub mod json_exporter;
 pub mod metric_exporter;
 pub mod metric_server;
 pub mod model;
@@ -70,7 +78,7 @@ pub async fn build_summary(
 }
 
 /// Standard scan (using standard/default workload)
-async fn standard_scan(
+/*async fn standard_scan(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
@@ -93,6 +101,29 @@ async fn standard_scan(
         instances_with_impacts.push(value);
     }
     Ok(instances_with_impacts)
+}*/
+
+async fn standard_scan(
+    hours_use_time: &f32,
+    tags: &Vec<String>,
+    aws_region: &str,
+    api_url: &str,
+) -> Result<Vec<CloudResourceWithImpacts>> {
+    let inventory: AwsInventory = AwsInventory::new(aws_region).await;
+    let cloud_resources: Vec<CloudResource> = inventory
+        .list_resources(tags)
+        .await
+        .context("Cannot perform standard scan")?;
+
+    let usage_location = UsageLocation::from(aws_region);
+
+    let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
+    let res = api
+        .get_impacts(cloud_resources)
+        .await
+        .context("Failure while retrieving impacts")?;
+
+    Ok(res)
 }
 
 /// CPU usage scan (using standard/default workload)
@@ -164,14 +195,10 @@ pub async fn get_default_impacts_as_json_string(
         .await
         .context("Cannot perform standard scan")?;
 
-    let summary = build_summary(
-        &instances_with_impacts,
-        aws_region,
-        hours_use_time.to_owned().into(),
-    )
-    .await;
+    //let usage_location = UsageLocation::from(aws_region);
+    //let summary : ImpactsSummary = ImpactsSummary::new(aws_region, usage_location.iso_country_code, instances_with_impacts);
 
-    debug!("Summary: {:#?}", summary);
+    //debug!("Summary: {:#?}", summary);
 
     Ok(serde_json::to_string(&instances_with_impacts)?)
 }
@@ -187,16 +214,25 @@ pub async fn get_default_impacts_as_metrics(
         .await
         .context("Cannot perform standard scan")?;
 
-    let summary = build_summary(
-        &instances_with_impacts,
-        aws_region,
-        hours_use_time.to_owned().into(),
-    )
-    .await?;
+    // let summary = build_summary(
+    //     &instances_with_impacts,
+    //     aws_region,
+    //     hours_use_time.to_owned().into(),
+    // )
+    // .await?;
+
+    //debug!("Summary: {:#?}", summary);
+
+    let usage_location = UsageLocation::from(aws_region);
+    let summary: ImpactsSummary = ImpactsSummary::new(
+        String::from(aws_region),
+        usage_location.iso_country_code,
+        instances_with_impacts,
+    );
 
     debug!("Summary: {:#?}", summary);
 
-    let metrics = get_metrics(&summary).with_context(|| {
+    let metrics = get_metrics_new(&summary).with_context(|| {
         format!(
             "Unable to get default impacts as metrics for {}",
             aws_region

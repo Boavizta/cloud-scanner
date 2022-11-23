@@ -9,7 +9,7 @@ use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::UsageCloud;
 
-/// Access data of API v1
+/// Access data of Boavizta API v1
 pub struct BoaviztaApiV1 {
     configuration: boavizta_api_sdk::apis::configuration::Configuration,
 }
@@ -23,9 +23,9 @@ impl BoaviztaApiV1 {
         }
     }
 
-    // Returns the impacts of an instance from Boavizta API
+    // Returns the raw impacts (json) of an instance from Boavizta API
     ///
-    ///  The manufacture impacts returned represent the entire lifecycle of instance (i.e. Allocation TOTAL )
+    ///  The manufacture impacts returned represent the entire lifecycle of instance (i.e. it is using the 'Allocation' TOTAL )
     async fn get_raws_impacts(&self, cr: CloudResource) -> Option<serde_json::Value> {
         let instance_type = cr.resource_type;
 
@@ -56,7 +56,7 @@ impl BoaviztaApiV1 {
         }
     }
 
-    // /// Creates a CloudResourceWithImpacts from a CloudResource
+    // /// Get the impacts a a single CloudResource
     async fn get_resource_with_impacts(
         &self,
         resource: &CloudResource,
@@ -89,22 +89,21 @@ pub struct Impacts {
 
 #[async_trait]
 impl ImpactProvider for BoaviztaApiV1 {
+    /// Get cloud resources impacts from the Boavizta API
     async fn get_impacts(
         &self,
         resources: Vec<CloudResource>,
     ) -> Result<Vec<CloudResourceWithImpacts>> {
         let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
-
         for resource in resources.iter() {
             let cri = self.get_resource_with_impacts(resource).await;
             v.push(cri.clone());
         }
-
         Ok(v)
     }
 }
 
-/// Convert
+/// Convert raw results from boavizta API into model objects
 pub fn boa_impacts_to_cloud_resource_with_impacts(
     cloud_resource: &CloudResource,
     raw_result: &Option<serde_json::Value>,
@@ -193,7 +192,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn should_retrieve_multiple_raw_default_impacts_fr() {
+    async fn should_retrieve_multiple_default_impacts_fr() {
         let instance1: CloudResource = CloudResource {
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
