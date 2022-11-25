@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use the instances workload (cpu load) to tune the results.
 
-## [0.1.0-alpha.1]- 2022-11-24
+## Unrealeased [0.1.0-alpha.1]- 2022-11-24
 
 ### Changed
 
