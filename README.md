@@ -2,15 +2,19 @@
 
 Returns Boavizta impact data corresponding to your AWS Cloud usage.
 
-As a command line or serverless application, cloud-scanner analyses your EC2 instances and returns metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
+As a command line or serverless application, cloud-scanner analyses your EC2 instances and returns impacts metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
 
-![Scanner in context](docs/out/../../out/docs/cloud-scanner-system-in-context/cloud-scanner-system-in-context.png)
+Cloud-scanner can be automated to produce metrics at regular interval and monitor your impacts in a dashboard.
 
-## Documentation
+![A example dashboard rendering cloud scanner metrics](docs/src/images/cloud-scanner-dashboard-clear.png "A example dashboard rendering cloud scanner metrics")
 
-The complete documentation can be found here: [Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/).
+Principle:
 
-This readme only provide a quick introduction.
+![System in context diagram of cloud scanner](docs/src/images/cloud-scanner-system-in-context.png "System in context diagram of cloud scanner")
+
+## Usage and documentation
+
+The complete documentation: [Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/).
 
 ## Getting started 🚀
 
@@ -20,21 +24,21 @@ Show impacts of your EC2 instances for 10 hours of use.
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 # Get default impacts of 10 hours of use (on your default account region)
-cargo run standard --hours-use-time 10 | jq
+cargo run estimate --hours-use-time 10 | jq
 
 # Get measured (considering instance average cpu load) impacts of 10 hours of use (on your default account region)
 cargo run measured --hours-use-time 10 | jq
 
 # Get default impacts but as metrics
-cargo run  -- --as-metrics standard --hours-use-time 10
+cargo run  -- --as-metrics estimate --hours-use-time 10
 
 # Same query for explicit region
-cargo run  -- --aws-region eu-west-3 standard --hours-use-time 10 | jq
+cargo run  -- --aws-region eu-west-3 estimate --hours-use-time 10 | jq
 ```
 
 ## Usage as CLI 💻
 
-### Run public docker image 🐳
+### Using  public docker image 🐳
 
 ```sh
 docker pull ghcr.io/boavizta/cloud-scanner-cli:latest
@@ -48,20 +52,23 @@ docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
 # Just list instances
 docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest list-instances
 
-# List instances and standard impacts (for 10 hours of use)
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest standard --hours-use-time 10
+# List instances and estimate impacts (for 10 hours of use)
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --hours-use-time 10
 ```
 
 ⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
 
-### Build a local docker image 🐳
+⚠ Running metric server in container require setting  extra variables:
+  - to map AWS credentials 
+  - to map SSL ca certificates
+  - and more importantly to configure rocket to listen to 0.0.0.0 instead of 127.0.0.1 (which is internal to the container): `ROCKET_ADDRESS=0.0.0.0`
 
-```sh
-# Local build of docker image
-docker build . --tag cloud-scanner-cli
-# Test run
-docker run -it cloud-scanner-cli --help
+``` sh
+# Run cli to serve metrics on http://localhost:8000
+docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE=$AWS_PROFILE ghcr.io/boavizta/cloud-scanner-cli:latest
 ```
+
+See [Run as docker - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/docker-guide.html)
 
 ### Building local executable 🦀
 
@@ -69,20 +76,20 @@ docker run -it cloud-scanner-cli --help
 cargo build --release
 ```
 
+See [Building CLI - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/building-cli.html)
+
 ### CLI options
 
 ```sh
-
-
 List aws instances and their environmental impact (from Boavizta API)
 
 Usage: cloud-scanner-cli [OPTIONS] <COMMAND>
 
 Commands:
-  standard        Get Average (standard) impacts for a given usage duration (without considering cpu use)
-  measured        Get impacts related to instances usage rate (take into account instance cpu  use)
-  list-instances  Just list instances and their metadata (without impacts)
-  help            Print this message or the help of the given subcommand(s)
+  estimate   Get estimation of impacts for a given usage duration
+  inventory  List instances and  their average cpu load for the last 5 minutes (no impact data)
+  serve      Serve metrics on http://localhost:3000/metrics
+  help       Print this message or the help of the given subcommand(s)
 
 Options:
   -a, --aws-region <AWS_REGION>
@@ -101,14 +108,7 @@ Options:
           Print version information
 ```
 
-### Get measured impacts of instances for a given period
-
-This uses the workload measured on instances to provide more realistic impacts.
-
-⚠ TODO
-
-- pass period parameter (start date / end date)
-- define a sampling rate for cloudwatch metrics retrieval?
+See [CLI options - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/cli-options.html)
 
 ### Passing AWS credentials
 
@@ -118,10 +118,15 @@ Easiest way to pass aws credential is use an environment variable to use a speci
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 ```
 
+See [AWS authentication - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/passing-aws-credentials.html)
+
 ## Usage as a serverless app (aws lambda) ⚡
 
 The serverless application for aws is deployed with the serverless framework.
 It creates a role configured to get sufficient permission to scan your resources without requesting authentication.
+
+- [Quickstart as serverless ⚡ - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-serverless.html)
+- [Serverless design - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/serverless-design.html)
 
 ### Deploy the app
 
@@ -131,139 +136,21 @@ export aws_profile = <my profile>
 serverless deploy
 ```
 
-### Serverless routes
-
-#### Scan account / region
-
-Returns results in json format (see below, same as CLI)
-
-https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1
-
-Use `hours_use_time` and `aws_region` parameters in the query
-
-#### Get Metrics
-
-https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1
-
-returns metrics for one hour of use in prometheus format.
-Use `aws_region` parameters in the query.
-
-```
-# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
-# TYPE boavizta_number_of_instances_total gauge
-boavizta_number_of_instances_total{awsregion="eu-central-1",country="DEU"} 7
-# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
-# TYPE boavizta_number_of_instances_assessed gauge
-boavizta_number_of_instances_assessed{awsregion="eu-central-1",country="DEU"} 5
-# HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
-# TYPE boavizta_duration_of_use_hours gauge
-boavizta_duration_of_use_hours{awsregion="eu-central-1",country="DEU"} 1.0
-# HELP boavizta_pe_manufacture_megajoules Power consumed for manufacture.
-# TYPE boavizta_pe_manufacture_megajoules gauge
-boavizta_pe_manufacture_megajoules{awsregion="eu-central-1",country="DEU"} 1760.0
-# HELP boavizta_pe_use_megajoules Power consumed during usage.
-# TYPE boavizta_pe_use_megajoules gauge
-boavizta_pe_use_megajoules{awsregion="eu-central-1",country="DEU"} 0.86
-# EOF
-```
-
 ## Output formats
 
-### JSON output (the default)
+Cloud scanner CLI and serverless application returns data as _json_ or _Open Metrics_ (Prometheus) format.
 
-Cloud scanner returns a json array of instances metadata (instance*id, type usage_data and and usage impacts) on \_stdout*.
-
-⚠ Returns _empty_ impacts when the _instance type_ is not known in Boavizta database
-
-```json
-[
-  {
-    "instance_id": "i-001dc0ebbf9cb25c0",
-    "instance_type": "t2.micro",
-    "usage_data": {
-      "hours_use_time": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {}
-  },
-  {
-    "instance_id": "i-004599844f7c24814",
-    "instance_type": "t2.small",
-    "usage_data": {
-      "hours_use_time": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {}
-  },
-  {
-    "instance_id": "i-075444d7293d8bd76",
-    "instance_type": "t2.micro",
-    "usage_data": {
-      "hours_use_time": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {}
-  },
-  {
-    "instance_id": "i-033df52f12f30ca66",
-    "instance_type": "m6g.xlarge",
-    "usage_data": {
-      "hours_use_time": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {
-      "adp": {
-        "manufacture": 0.0084,
-        "unit": "kgSbeq",
-        "use": 1.7e-9
-      },
-      "gwp": {
-        "manufacture": 87,
-        "unit": "kgCO2eq",
-        "use": 0.029
-      },
-      "pe": {
-        "manufacture": 1100,
-        "unit": "MJ",
-        "use": 0.82
-      }
-    }
-  }
-]
-```
-
-### OpenMetrics/Prometheus output
-
-If using `--as-metrics` or `-m` option, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json details.
-
-When using the metric output format, you cannot see the individual impacts of each instance. Instead, impacts of all instances are added to provide a global figure.
-
-```sh
-cargo run -- --as-metrics  standard -u 1
-
-# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
-# TYPE boavizta_number_of_instances_total gauge
-boavizta_number_of_instances_total{awsregion="eu-west-1",country="IRL"} 9
-# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
-# TYPE boavizta_number_of_instances_assessed gauge
-boavizta_number_of_instances_assessed{awsregion="eu-west-1",country="IRL"} 6
-# HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
-# TYPE boavizta_duration_of_use_hours gauge
-boavizta_duration_of_use_hours{awsregion="eu-west-1",country="IRL"} 1.0
-# HELP boavizta_pe_manufacture_megajoules Power consumed for manufacture.
-# TYPE boavizta_pe_manufacture_megajoules gauge
-boavizta_pe_manufacture_megajoules{awsregion="eu-west-1",country="IRL"} 2060.0
-# HELP boavizta_pe_use_megajoules Power consumed during usage.
-# TYPE boavizta_pe_use_megajoules gauge
-boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.228
-# EOF
-```
+See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/output-data.html)
 
 ## ⚠ Current limitations
 
-⚠ Work in progress ! See the [changelog](CHANGELOG.md) and issues on this repository.
+Cloud scanner is stable, but with limited functionality.
 
-- Return _empty_ impacts when the instance _type_ is not listed in Boavizta database.
-- `--aws-region` flag only supports eu-based aws region (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
-- Always returns _standard_ impacts: using instance workload to assess impact is not yet implemented (i.e. using CPU load through the `measured` command has no effect yet).
+At the moment:
+
+- Cloud scanner returns _empty_ impacts (i.e. zero values) for EC2 the instance _types_ that are not listed in Boavizta database.
+- `--aws-region` flag only supports eu-based aws regions (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
+- Returns _default_ impacts of AWS instances. It does not yet analyses instance usage (cpu workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration. (i.e. using instance CPU load through the `measured` command line flag has no effect).
 - Filtering instances by tag is not yet supported.
+
+This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository.

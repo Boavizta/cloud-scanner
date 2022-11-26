@@ -1,14 +1,15 @@
+//!  Formatting results into Prometheus metrics
 use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
 use prometheus_client::encoding::text::encode;
 use prometheus_client::encoding::text::Encode;
-//use prometheus_client::metrics::counter::{Atomic, Counter};
 use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
 
-use crate::model::ScanResultSummary;
+//use crate::impact_provider::ImpactsSummary;
+use crate::ImpactsSummary;
 
 // Define a type representing a metric label set, i.e. a key value pair.
 //
@@ -21,14 +22,14 @@ pub struct Labels {
     pub country: String,
 }
 
-/// Returns the metrics
-pub fn get_metrics(summary: &ScanResultSummary) -> Result<String> {
+/// Retursn the ImpactsSumary as metrics in the prometheus format
+pub fn get_metrics(summary: &ImpactsSummary) -> Result<String> {
     let label_set: Labels = Labels {
         awsregion: summary.aws_region.to_string(),
         country: summary.country.to_string(),
     };
 
-    let registry = register_all_metrics(summary, label_set);
+    let registry = register_all_metrics_new(summary, label_set);
 
     let mut buffer = vec![];
     encode(&mut buffer, &registry).context("Fails to encode result into metrics")?;
@@ -37,7 +38,7 @@ pub fn get_metrics(summary: &ScanResultSummary) -> Result<String> {
     Ok(metrics)
 }
 
-fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Registry {
+fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Registry {
     // Create a metric registry.
     //
     // Note the angle brackets to make sure to use the default (dynamic
@@ -50,7 +51,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_number_of_instances_total",
         // And the metric help text.
-        "Number of instances detected during the scan",
+        "Number of instances detected during the inventory",
         Box::new(boavizta_number_of_instances_total.clone()),
     );
 
@@ -60,7 +61,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_number_of_instances_assessed",
         // And the metric help text.
-        "Number of instances that were considered in the measure",
+        "Number of instances that were considered in the estimation of impacts",
         Box::new(boavizta_number_of_instances_assessed.clone()),
     );
 
@@ -70,7 +71,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_duration_of_use_hours",
         // And the metric help text.
-        "Number of instances detected during the scan",
+        "Use duration considered to estimate impacts",
         Box::new(boavizta_duration_of_use_hours.clone()),
     );
 
@@ -80,7 +81,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_pe_manufacture_megajoules",
         // And the metric help text.
-        "Power consumed for manufacture",
+        "Energy consumed for manufacture",
         Box::new(boavizta_pe_manufacture_megajoules.clone()),
     );
 
@@ -90,7 +91,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_pe_use_megajoules",
         // And the metric help text.
-        "Power consumed during usage",
+        "Energy consumed during use",
         Box::new(boavizta_pe_use_megajoules.clone()),
     );
 
@@ -100,7 +101,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_adp_manufacture_kgsbeq",
         // And the metric help text.
-        "ADP manufacture",
+        "Abiotic resources depletion potential of manufacture",
         Box::new(boavizta_adp_manufacture_kgsbeq.clone()),
     );
 
@@ -110,7 +111,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_adp_use_kgsbeq",
         // And the metric help text.
-        "ADP use",
+        "Abiotic resources depletion potential of use",
         Box::new(boavizta_adp_use_kgsbeq.clone()),
     );
 
@@ -120,7 +121,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_gwp_manufacture_kgco2eq",
         // And the metric help text.
-        "GWP manufacture",
+        "Global Warming Potential of manufacture",
         Box::new(boavizta_gwp_manufacture_kgco2eq.clone()),
     );
 
@@ -130,7 +131,7 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
         // With the metric name.
         "boavizta_gwp_use_kgco2eq",
         // And the metric help text.
-        "GWP of use",
+        "Global Warming Potential of use",
         Box::new(boavizta_gwp_use_kgco2eq.clone()),
     );
 
@@ -173,56 +174,61 @@ fn register_all_metrics(summary: &ScanResultSummary, label_set: Labels) -> Regis
     registry
 }
 
-#[tokio::test]
-async fn test_get_get_metrics() {
-    let summary: ScanResultSummary = ScanResultSummary {
-        number_of_instances_total: 5,
-        number_of_instances_assessed: 2,
-        number_of_instances_not_assessed: 3,
-        duration_of_use_hours: 1.0,
-        adp_manufacture_kgsbeq: 0.1,
-        adp_use_kgsbeq: 0.2,
-        pe_manufacture_megajoules: 0.3,
-        pe_use_megajoules: 0.4,
-        gwp_manufacture_kgco2eq: 0.5,
-        gwp_use_kgco2eq: 0.6,
-        aws_region: "eu-west-1".to_string(),
-        country: "IRL".to_string(),
-    };
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let metrics = get_metrics(&summary).unwrap();
+    #[tokio::test]
+    async fn test_get_get_metrics() {
+        let summary: ImpactsSummary = ImpactsSummary {
+            number_of_instances_total: 5,
+            number_of_instances_assessed: 2,
+            number_of_instances_not_assessed: 3,
+            duration_of_use_hours: 1.0,
+            adp_manufacture_kgsbeq: 0.1,
+            adp_use_kgsbeq: 0.2,
+            pe_manufacture_megajoules: 0.3,
+            pe_use_megajoules: 0.4,
+            gwp_manufacture_kgco2eq: 0.5,
+            gwp_use_kgco2eq: 0.6,
+            aws_region: "eu-west-1".to_string(),
+            country: "IRL".to_string(),
+        };
 
-    println!("{}", metrics);
+        let metrics = get_metrics(&summary).unwrap();
 
-    let expected = r#"# HELP boavizta_number_of_instances_total Number of instances detected during the scan.
+        println!("{}", metrics);
+
+        let expected = r#"# HELP boavizta_number_of_instances_total Number of instances detected during the inventory.
 # TYPE boavizta_number_of_instances_total gauge
 boavizta_number_of_instances_total{awsregion="eu-west-1",country="IRL"} 5
-# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
+# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the estimation of impacts.
 # TYPE boavizta_number_of_instances_assessed gauge
 boavizta_number_of_instances_assessed{awsregion="eu-west-1",country="IRL"} 2
-# HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
+# HELP boavizta_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_duration_of_use_hours gauge
 boavizta_duration_of_use_hours{awsregion="eu-west-1",country="IRL"} 1.0
-# HELP boavizta_pe_manufacture_megajoules Power consumed for manufacture.
+# HELP boavizta_pe_manufacture_megajoules Energy consumed for manufacture.
 # TYPE boavizta_pe_manufacture_megajoules gauge
 boavizta_pe_manufacture_megajoules{awsregion="eu-west-1",country="IRL"} 0.3
-# HELP boavizta_pe_use_megajoules Power consumed during usage.
+# HELP boavizta_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_pe_use_megajoules gauge
 boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.4
-# HELP boavizta_adp_manufacture_kgsbeq ADP manufacture.
+# HELP boavizta_adp_manufacture_kgsbeq Abiotic resources depletion potential of manufacture.
 # TYPE boavizta_adp_manufacture_kgsbeq gauge
 boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-1",country="IRL"} 0.1
-# HELP boavizta_adp_use_kgsbeq ADP use.
+# HELP boavizta_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_adp_use_kgsbeq gauge
 boavizta_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL"} 0.2
-# HELP boavizta_gwp_manufacture_kgco2eq GWP manufacture.
+# HELP boavizta_gwp_manufacture_kgco2eq Global Warming Potential of manufacture.
 # TYPE boavizta_gwp_manufacture_kgco2eq gauge
 boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.5
-# HELP boavizta_gwp_use_kgco2eq GWP of use.
+# HELP boavizta_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_gwp_use_kgco2eq gauge
 boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 # EOF
 "#;
 
-    assert_eq!(expected, metrics);
+        assert_eq!(expected, metrics);
+    }
 }

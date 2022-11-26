@@ -1,0 +1,50 @@
+global:
+  scrape_interval:     30s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 30s # Evaluate rules every 15 seconds.
+
+  # Attach these extra labels to all timeseries collected by this Prometheus instance.
+  external_labels:
+    monitor: 'boavizta-cloud-scanner'
+
+rule_files:
+  - 'prometheus.rules.yml'
+
+scrape_configs:
+
+  - job_name: 'cloud-scanner-metrics-fra'
+    scheme: http
+    static_configs:
+      - targets: ['cloud_scanner_boa:8000']
+        labels:
+          group: 'production'
+    metrics_path: '/metrics'
+    params:
+      aws_region: ['eu-west-3']
+
+  - job_name: 'cloud-scanner-metrics-irl'
+    scheme: http
+    static_configs:
+      - targets: ['cloud_scanner_boa:8000']
+        labels:
+          group: 'production'
+    metrics_path: '/metrics'
+    params:
+      aws_region: ['eu-west-1']
+
+  - job_name: 'cloud-scanner-metrics-de'
+    scheme: http
+    static_configs:
+      - targets: ['cloud_scanner_boa:8000']
+        labels:
+          group: 'production'
+    metrics_path: '/metrics'
+    params:
+      aws_region: ['eu-central-1']
+
+# Optional: push metics to a rem0ote prometheus instance (SAAS prometheus / grafana)
+# You get username and password from your prometheus SAAS dashboard.
+#remote_write:
+#  - url: https://prometheus-prod-01-eu-west-0.grafana.net/api/prom/push
+#    basic_auth:
+#      username: <EDITED>
+#      password: <EDITED>

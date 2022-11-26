@@ -1,0 +1,66 @@
+version: "3.8"
+services:
+  cloud_scanner:
+    container_name: "cloud_scanner_boa"
+    hostname: cloud_scanner
+    image: ghcr.io/boavizta/cloud-scanner-cli:latest
+    command: 
+      - -b http://boavizta_api:5000
+      - -vv
+      - serve
+    environment:
+      - AWS_PROFILE=${AWS_PROFILE}
+      - ROCKET_ADDRESS=0.0.0.0
+      - ROCKET_PORT=8000
+    volumes:
+      - $HOME/.aws:/root/.aws:ro
+      # - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certsca-certificates.crt
+    ports:
+      - "8000:8000"
+    networks:
+      - network_boa
+    depends_on:
+      - boavizta_api
+
+  grafana:
+    container_name: "grafana_boa"
+    hostname: grafana
+    image: docker.io/grafana/grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./dashboard-config/provisioning:/etc/grafana/provisioning
+      - ./dashboard-config/provisioning/dashboards/grafana-dashboard.template.json:/var/lib/grafana/dashboards/grafana-dashboard.template.json
+      - grafana-data:/var/lib/grafana
+    networks:
+      - network_boa
+    depends_on:
+      - prometheus
+
+  prometheus:
+    container_name: "prometheus_boa"
+    hostname: prometheus
+    image: docker.io/prom/prometheus
+    volumes:
+      - ./dashboard-config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - network_boa
+    depends_on:
+      - cloud_scanner
+
+  boavizta_api:
+    container_name: "boavizta_api"
+    hostname: boavizta
+    image: ghcr.io/boavizta/boaviztapi:latest
+    ports:
+      - "5000:5000"
+    networks:
+      - network_boa
+
+volumes:
+  grafana-data:
+
+networks:
+  network_boa:

@@ -29,20 +29,16 @@ struct Arguments {
 
 #[derive(Subcommand, Debug)]
 enum SubCommand {
-    /// Get Average (standard) impacts for a given usage duration (without considering cpu use)
-    Standard {
+    /// Get estimation of impacts for a given usage duration
+    Estimate {
         #[clap(short = 'u', long)]
         /// The number of hours of use for which we want to estimate the impacts
         hours_use_time: f32,
     },
-    ///Get impacts related to instances usage rate (take into account instance cpu  use)
-    Measured {
-        #[clap(short = 'u', long)]
-        /// The number of hours of use for which we want to estimate the impacts
-        hours_use_time: f32,
-    },
-    ///Just list instances and their metadata (without impacts)
-    ListInstances {},
+    /// List instances and  their average cpu load for the last 5 minutes (no impact data)
+    Inventory {},
+    ///  Serve metrics on http://localhost:3000/metrics
+    Serve {},
 }
 
 fn set_region(optional_region: Option<String>) -> String {
@@ -78,13 +74,17 @@ async fn main() -> Result<()> {
     let args = Arguments::parse();
 
     loggerv::init_with_verbosity(args.verbosity.into()).context("Cannot initialize logger")?;
+    info!(
+        "Starting cloud scanner {}",
+        cloud_scanner_cli::get_version()
+    );
 
     let region = set_region(args.aws_region);
 
     let api_url: String = set_api_url(args.boavizta_api_url);
 
     match args.cmd {
-        SubCommand::Standard { hours_use_time } => {
+        SubCommand::Estimate { hours_use_time } => {
             if args.as_metrics {
                 cloud_scanner_cli::print_default_impacts_as_metrics(
                     &hours_use_time,
@@ -103,28 +103,10 @@ async fn main() -> Result<()> {
                 .await?
             }
         }
-        SubCommand::Measured { hours_use_time } => {
-            if args.as_metrics {
-                cloud_scanner_cli::print_cpu_load_impacts_as_metrics(
-                    &hours_use_time,
-                    &args.filter_tags,
-                    &region,
-                    &api_url,
-                )
-                .await?
-            } else {
-                cloud_scanner_cli::print_cpu_load_impacts_as_json(
-                    &hours_use_time,
-                    &args.filter_tags,
-                    &region,
-                    &api_url,
-                )
-                .await?
-            }
+        SubCommand::Inventory {} => {
+            cloud_scanner_cli::show_inventory(&args.filter_tags, &region).await?
         }
-        SubCommand::ListInstances {} => {
-            cloud_scanner_cli::show_instances(&args.filter_tags, &region).await?
-        }
+        SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
     }
     Ok(())
 }

@@ -1,4 +1,4 @@
-# Building cloud-scanner CLI
+# Building cloud-scanner CLI with Cargo 🦀
 
 ## On Linux
 
@@ -29,3 +29,5 @@ _If you do not WSL yet, you may inspire from [Set up Node.js on WSL 2](https://d
 2. After WSL is setup, follow Linux instructions above inside the Linux VM.
 
 ## Using docker
+
+See [Build a local docker image](./docker-guide.md#build-a-local-docker-image)

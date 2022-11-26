@@ -11,6 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use the instances workload (cpu load) to tune the results.
 
+## [0.1.0-alpha.1]- 2022-11-26
+
+### Changed
+
+- Major refactoring to ease future evolution and testing.
+- Simplified CLI commands.
+
+## [0.0.9]- 2022-11-18
+
+### Added
+
+- A example of usage in a monitoring stack (including dashboard) of via docker-compose. See [Quickstart dashboard](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-dashoard-docke.html) in documentation. Many Thanks to @obinjf for his contributions.
+
+## [0.0.8] - 2022-11-13
+
+### Added
+
+- Option to returns metrics through an http endpoint (Start the CLI with `cloud-scanner serve`). Metrics are recalculated each time the endpoint is scraped for example at <http://localhost:8000/metrics?aws_region=eu-west-1>).  
+⚠ Running metric server in container require setting  extra variables:
+  - to map AWS credentials 
+  - to map SSL ca certificates 
+  - and more importantly to configure rocket to listen to 0.0.0.0 instead of 127.0.0.1 (which is internal to the container): `ROCKET_ADDRESS=0.0.0.0`
+``` sh
+docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE=$AWS_PROFILE ghcr.io/boavizta/cloud-scanner-cli:latest serve
+```
+
 ## [0.0.7] - 2022-10-06
 
 ### Changed
