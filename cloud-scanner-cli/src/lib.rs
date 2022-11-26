@@ -1,13 +1,16 @@
 //!  # cloud_scanner_cli
 //!
-//!  A command line application to combine Environmental impacts of your Cloud instances using Boavizta API.
+//!  A command line application that performs inventory of your cloud account and combines it with Boavizta API  to return an estimation of its environmental impact.
 //!
 
-use crate::countries::*;
-use crate::metrics::get_metrics;
-use crate::model::AwsInstanceWithImpacts;
-use crate::model::ScanResultSummary;
-use boavizta_api_sdk::models::UsageCloud;
+use crate::usage_location::*;
+use aws_inventory::*;
+use boavizta_api_v1::*;
+use cloud_inventory::*;
+use cloud_resource::*;
+use impact_provider::ImpactProvider;
+use impact_provider::{CloudResourceWithImpacts, ImpactsSummary};
+use metric_exporter::*;
 
 #[macro_use]
 extern crate rocket;
@@ -15,80 +18,40 @@ extern crate rocket;
 #[macro_use]
 extern crate log;
 use pkg_version::*;
-pub mod aws_api;
-pub mod boavizta_api;
-pub mod countries;
+pub mod aws_inventory;
+pub mod boavizta_api_v1;
+pub mod cloud_inventory;
+pub mod cloud_resource;
+pub mod impact_provider;
+pub mod metric_exporter;
 pub mod metric_server;
-pub mod metrics;
-pub mod model;
+pub mod usage_location;
 
 use anyhow::{Context, Result};
 
-/// Returns a summary (summing/aggregating data where possible) of the scan results.
-pub async fn build_summary(
-    instances_with_impacts: &Vec<AwsInstanceWithImpacts>,
-    aws_region: &str,
-    duration_of_use_hours: f64,
-) -> Result<ScanResultSummary> {
-    let number_of_instances_total = u32::try_from(instances_with_impacts.len())?;
-
-    let mut summary = ScanResultSummary {
-        number_of_instances_total,
-        aws_region: aws_region.to_owned(),
-        country: countries::get_iso_country(aws_region).to_owned(),
-        duration_of_use_hours,
-        ..Default::default()
-    };
-
-    for instance in instances_with_impacts {
-        // Only consider the instances for which we have impact data
-        if let Some(impacts) = &instance.impacts {
-            debug!("This instance has impacts data: {}", impacts);
-            summary.number_of_instances_assessed += 1;
-            summary.adp_manufacture_kgsbeq += impacts["adp"]["manufacture"].as_f64().unwrap();
-            summary.adp_use_kgsbeq += impacts["adp"]["use"].as_f64().unwrap();
-            summary.pe_manufacture_megajoules += impacts["pe"]["manufacture"].as_f64().unwrap();
-            summary.pe_use_megajoules += impacts["pe"]["use"].as_f64().unwrap();
-            summary.gwp_manufacture_kgco2eq += impacts["gwp"]["manufacture"].as_f64().unwrap();
-            summary.gwp_use_kgco2eq += impacts["gwp"]["use"].as_f64().unwrap();
-        } else {
-            debug!("Skipped instance: {:#?} while building summary because instance has no impact data", instance);
-        }
-    }
-
-    summary.number_of_instances_not_assessed =
-        summary.number_of_instances_total - summary.number_of_instances_assessed;
-
-    Ok(summary)
-}
-
-/// Standard scan (using standard/default workload)
 async fn standard_scan(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
     api_url: &str,
-) -> Result<Vec<AwsInstanceWithImpacts>> {
-    let instances = aws_api::list_instances(tags, aws_region)
+) -> Result<Vec<CloudResourceWithImpacts>> {
+    let inventory: AwsInventory = AwsInventory::new(aws_region).await;
+    let cloud_resources: Vec<CloudResource> = inventory
+        .list_resources(tags)
         .await
-        .context("Cannot perform standard scan")?;
-    let country_code = get_iso_country(aws_region);
+        .context("Cannot perform resouces inventory")?;
 
-    let mut instances_with_impacts: Vec<AwsInstanceWithImpacts> = Vec::new();
+    let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
+    let res = api
+        .get_impacts(cloud_resources, hours_use_time)
+        .await
+        .context("Failure while retrieving impacts")?;
 
-    for instance in &instances {
-        let mut usage_cloud: UsageCloud = UsageCloud::new();
-        usage_cloud.usage_location = Some(String::from(country_code));
-        usage_cloud.hours_use_time = Some(hours_use_time.to_owned());
-
-        let value = boavizta_api::get_instance_impacts(instance, usage_cloud, api_url).await;
-        instances_with_impacts.push(value);
-    }
-    Ok(instances_with_impacts)
+    Ok(res)
 }
 
 /// Returns default impacts as json
-pub async fn get_default_impacts(
+pub async fn get_default_impacts_as_json_string(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
@@ -98,19 +61,10 @@ pub async fn get_default_impacts(
         .await
         .context("Cannot perform standard scan")?;
 
-    let summary = build_summary(
-        &instances_with_impacts,
-        aws_region,
-        hours_use_time.to_owned().into(),
-    )
-    .await;
-
-    debug!("Summary: {:#?}", summary);
-
     Ok(serde_json::to_string(&instances_with_impacts)?)
 }
 
-/// Returns default impacts as metrics
+/// Returns  impacts as metrics
 pub async fn get_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -121,12 +75,12 @@ pub async fn get_default_impacts_as_metrics(
         .await
         .context("Cannot perform standard scan")?;
 
-    let summary = build_summary(
-        &instances_with_impacts,
-        aws_region,
-        hours_use_time.to_owned().into(),
-    )
-    .await?;
+    let usage_location = UsageLocation::from(aws_region);
+    let summary: ImpactsSummary = ImpactsSummary::new(
+        String::from(aws_region),
+        usage_location.iso_country_code,
+        instances_with_impacts,
+    );
 
     debug!("Summary: {:#?}", summary);
 
@@ -140,19 +94,19 @@ pub async fn get_default_impacts_as_metrics(
     Ok(metrics)
 }
 
-/// Prints default impacts  to standard output in json format
+/// Prints  impacts  to standard output in json format
 pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
     tags: &Vec<String>,
     aws_region: &str,
     api_url: &str,
 ) -> Result<()> {
-    let j = get_default_impacts(hours_use_time, tags, aws_region, api_url).await?;
+    let j = get_default_impacts_as_json_string(hours_use_time, tags, aws_region, api_url).await?;
     println!("{}", j);
     Ok(())
 }
 
-/// Prints default impacts  to standard output as metrics in prometheus format
+/// Prints impacts  to standard output as metrics in prometheus format
 pub async fn print_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &Vec<String>,
@@ -164,39 +118,16 @@ pub async fn print_default_impacts_as_metrics(
     Ok(())
 }
 
-/// Prints impacts considering the instance workload / CPU load
-pub async fn print_cpu_load_impacts_as_json(
-    tags: &Vec<String>,
-    aws_region: &str,
-    api_url: &str,
-) -> Result<()> {
-    warn!("Warning: getting impacts of precise CPU load is not yet implemented, will just display instances and average load of 24 hours");
-    let instances = aws_api::list_instances(tags, aws_region)
-        .await
-        .context("Failed to list instances")?;
-
-    for instance in &instances {
-        let instance_id: &str = instance.instance_id.as_ref().unwrap();
-        let cpu_load = aws_api::get_average_cpu_load_24hrs(instance_id)
-            .await
-            .context("Failed to get average cpu load")?;
-        println!("Instance ID: {}", instance.instance_id().unwrap());
-        println!("Type:       {:?}", instance.instance_type().unwrap());
-        println!(
-            "AZ of use:  {:?}",
-            instance.placement().unwrap().availability_zone().unwrap()
-        );
-        println!("Tags:  {:?}", instance.tags().unwrap());
-        println!("Average CPU load:  {}", cpu_load);
-        println!("Not implemented: query  API at {}", api_url);
-        println!();
-    }
-    Ok(())
-}
-
 /// List instances and metadata to standard output
-pub async fn show_instances(tags: &Vec<String>, aws_region: &str) -> Result<()> {
-    aws_api::display_instances_as_text(tags, aws_region).await?;
+pub async fn show_inventory(tags: &Vec<String>, aws_region: &str) -> Result<()> {
+    let inventory: AwsInventory = AwsInventory::new(aws_region).await;
+    let cloud_resources: Vec<CloudResource> = inventory
+        .list_resources(tags)
+        .await
+        .context("Cannot perform inventory.")?;
+    let json_inventory: String =
+        serde_json::to_string(&cloud_resources).context("Cannot format inventory as json")?;
+    println!("{}", json_inventory);
     Ok(())
 }
 
