@@ -198,6 +198,8 @@ impl CloudInventory for AwsInventory {
 mod tests {
     use super::*;
 
+    static RUNNING_INSTANCE_ID: &str = "i-03c8f84a6318a8186";
+
     #[tokio::test]
     #[ignore]
     async fn test_list_resources() {
@@ -229,10 +231,8 @@ mod tests {
     async fn test_get_instance_usage_metrics_of_running_instance() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
 
-        // This instance  needs to be running
-        let instance_id = "i-0a3e6b8cdb50c49b8";
         let res = inventory
-            .get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .get_average_cpu_usage_of_last_5_minutes(&RUNNING_INSTANCE_ID)
             .await
             .unwrap();
         let datapoints = res.datapoints.unwrap();
@@ -271,8 +271,10 @@ mod tests {
         // This instance  needs to be running for the test to pass
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
 
-        let instance_id = "i-03c8f84a6318a8186";
-        let avg_cpu_load = inventory.get_average_cpu(instance_id).await.unwrap();
+        let avg_cpu_load = inventory
+            .get_average_cpu(&RUNNING_INSTANCE_ID)
+            .await
+            .unwrap();
         assert_ne!(0 as f64, avg_cpu_load);
         println!("{:#?}", avg_cpu_load);
         assert!((0 as f64) < avg_cpu_load);
