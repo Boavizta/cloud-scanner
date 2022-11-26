@@ -6,7 +6,7 @@ use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
-use boavizta_api_sdk::models::UsageCloud;
+use boavizta_api_sdk::models::{Allocation, UsageCloud};
 
 /// Access data of Boavizta API v1
 pub struct BoaviztaApiV1 {
@@ -39,11 +39,15 @@ impl BoaviztaApiV1 {
         //usage_cloud.hours_use_time = Some((cru.usage_duration_seconds / 3600) as f32);
         usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
         usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
+        if let Some(usage) = cr.usage {
+            usage_cloud.time_workload = Some(usage.average_cpu_load as f32);
+        }
 
         let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
             &self.configuration,
             Some(instance_type.as_str()),
             verbose,
+            Some(Allocation::Total),
             Some(usage_cloud),
         )
         .await;
@@ -151,7 +155,7 @@ mod tests {
     use super::*;
     use crate::UsageLocation;
 
-    const TEST_API_URL: &str = "https://api.boavizta.org";
+    const TEST_API_URL: &str = "https://dev.api.boavizta.org";
 
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str = r#"   
     {
@@ -206,6 +210,43 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn should_retrieve_impacts_using_different_cpu_load() {
+        let instance1: CloudResource = CloudResource {
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_type: "m6g.xlarge".to_string(),
+            usage: Some(CloudResourceUsage {
+                average_cpu_load: 100.0, // Will not be considered in v1
+                usage_duration_seconds: 3600,
+            }),
+        };
+
+        let instance1_50percent: CloudResource = CloudResource {
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_type: "m6g.xlarge".to_string(),
+            usage: Some(CloudResourceUsage {
+                average_cpu_load: 50.0, // Will not be considered in v1
+                usage_duration_seconds: 3600,
+            }),
+        };
+
+        let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
+        let one_hour = 1.0 as f32;
+
+        let mut instances: Vec<CloudResource> = Vec::new();
+        instances.push(instance1);
+        instances.push(instance1_50percent);
+
+        let res = api.get_impacts(instances, &one_hour).await.unwrap();
+
+        let r0 = res[0].resource_impacts.clone().unwrap();
+        let r1 = res[1].resource_impacts.clone().unwrap();
+        assert_eq!(0.2, r0.pe_use_megajoules);
+        assert_eq!(0.17, r1.pe_use_megajoules);
+    }
+
+    #[tokio::test]
     async fn should_retrieve_multiple_default_impacts_fr() {
         let instance1: CloudResource = CloudResource {
             id: "inst-1".to_string(),
@@ -254,8 +295,8 @@ mod tests {
         let r1 = res[1].resource_impacts.clone().unwrap();
         let r2 = res[2].resource_impacts.clone().is_none();
 
-        assert_eq!(0.17, r0.pe_use_megajoules);
-        assert_eq!(0.17, r1.pe_use_megajoules);
+        assert_eq!(0.2, r0.pe_use_megajoules);
+        assert_eq!(0.2, r1.pe_use_megajoules);
         assert_eq!(true, r2);
     }
 
