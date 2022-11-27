@@ -118,7 +118,7 @@ impl AwsInventory {
     ) -> Result<GetMetricStatisticsOutput, aws_sdk_cloudwatch::Error> {
         // We want statistics about the last 5 minutes using 60 sec sample
         let measure_duration = Duration::minutes(5);
-        let sample_period_seconds = 60;
+        let sample_period_seconds = 300; // 5*60
         let now: chrono::DateTime<Utc> = Utc::now();
         let start_time: chrono::DateTime<Utc> = now - measure_duration;
 
@@ -237,7 +237,7 @@ mod tests {
             .unwrap();
         let datapoints = res.datapoints.unwrap();
         println!("{:#?}", datapoints);
-        assert_eq!(1, datapoints.len());
+        assert_eq!(1, datapoints.len(), "Wrong number of datapoint returned");
     }
 
     #[tokio::test]
@@ -250,7 +250,7 @@ mod tests {
             .await
             .unwrap();
         let datapoints = res.datapoints.unwrap();
-        assert_eq!(0, datapoints.len());
+        assert_eq!(0, datapoints.len(), "Wrong number of datapoint returned");
     }
 
     #[tokio::test]
