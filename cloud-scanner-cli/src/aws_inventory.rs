@@ -85,7 +85,7 @@ impl AwsInventory {
     ///
     async fn get_average_cpu(self, instance_id: &str) -> Result<f64> {
         let res = self
-            .get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .get_average_cpu_usage_of_last_10_minutes(instance_id)
             .await
             .with_context(|| {
                 format!(
@@ -94,31 +94,31 @@ impl AwsInventory {
                 )
             })?;
         if let Some(points) = res.datapoints {
-            //  dbg!(points.clone());
             if !points.is_empty() {
-                if points.len() > 1 {
-                    warn!("Some datapoints were skipped when getting instance CPU usage, whe expected a single result but received {}. Only the first was considered", points.len());
+                debug!("Averaging cpu load datapoint: {:#?}", points);
+                let mut sum: f64 = 0.0;
+                for x in &points {
+                    sum = sum + x.average().unwrap();
                 }
-                let first_point = &points[0];
-                return Ok(first_point.average.unwrap());
+                let avg = sum / points.len() as f64;
+                return Ok(avg);
             }
         }
         warn!(
-            "No CPU load data was returned for instance {}, it is likely stopped, using 0 as load",
+            "Unable to get CPU load of  instance {}, it is likely stopped, using 0 as load",
             instance_id
         );
         Ok(0 as f64)
     }
 
-    /// Returns the instance CPU utilization usage on the last 24 hours
-    /// duration seconds seems to be the sampling period
-    async fn get_average_cpu_usage_of_last_5_minutes(
+    /// Returns the instance CPU utilization usage on the last 10 minutes
+    async fn get_average_cpu_usage_of_last_10_minutes(
         self,
         instance_id: &str,
     ) -> Result<GetMetricStatisticsOutput, aws_sdk_cloudwatch::Error> {
-        // We want statistics about the last 5 minutes using 60 sec sample
-        let measure_duration = Duration::minutes(5);
-        let sample_period_seconds = 300; // 5*60
+        // We want statistics about the last 10 minutes using  5min  sample
+        let measure_duration = Duration::minutes(10);
+        let sample_period_seconds = 300; // 5*60 (the default granularity of cloudwatch standard CPU metris)
         let now: chrono::DateTime<Utc> = Utc::now();
         let start_time: chrono::DateTime<Utc> = now - measure_duration;
 
@@ -228,16 +228,19 @@ mod tests {
     // Verify tests from here
     #[tokio::test]
     #[ignore]
-    async fn test_get_instance_usage_metrics_of_running_instance() {
+    async fn get_cpu_usage_metrics_of_running_instance_should_return_right_number_of_data_points() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
-
         let res = inventory
-            .get_average_cpu_usage_of_last_5_minutes(&RUNNING_INSTANCE_ID)
+            .get_average_cpu_usage_of_last_10_minutes(&RUNNING_INSTANCE_ID)
             .await
             .unwrap();
         let datapoints = res.datapoints.unwrap();
-        println!("{:#?}", datapoints);
-        assert_eq!(1, datapoints.len(), "Wrong number of datapoint returned");
+        assert!(
+            0 < datapoints.len() && datapoints.len() < 3,
+            "Stange number of datapoint returned. I was expecting 1 or 2  but got {} .\n {:#?}",
+            datapoints.len(),
+            datapoints
+        )
     }
 
     #[tokio::test]
@@ -246,7 +249,7 @@ mod tests {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let instance_id = "i-03e0b3b1246001382";
         let res = inventory
-            .get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .get_average_cpu_usage_of_last_10_minutes(instance_id)
             .await
             .unwrap();
         let datapoints = res.datapoints.unwrap();
@@ -258,7 +261,7 @@ mod tests {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let instance_id = "IDONOTEXISTS";
         let res = inventory
-            .get_average_cpu_usage_of_last_5_minutes(instance_id)
+            .get_average_cpu_usage_of_last_10_minutes(instance_id)
             .await
             .unwrap();
         let datapoints = res.datapoints.unwrap();
