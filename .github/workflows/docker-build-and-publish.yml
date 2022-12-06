@@ -30,7 +30,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-          ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli
+            ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli
           tags: |
             type=ref,event=branch
             type=ref,event=pr
