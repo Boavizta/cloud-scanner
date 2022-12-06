@@ -1,10 +1,16 @@
 name: Build and Publish docker image
 
-on:
-  push:
-    branches: [main]
-  # pull_request:
-  #   branches: [main]
+  on:
+    push:
+      branches:
+        - 'main'
+        - 'dev'
+      tags:
+        - 'v*'
+    pull_request:
+      branches:
+        - 'main'
+        - 'dev'
 
 env:
   REGISTRY: ghcr.io
@@ -15,21 +21,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Log in to the Container registry
+      - 
+        name: Checkout code
+      uses: actions/checkout@v3
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+          ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      - 
+        name: Log in to the Container registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+     
+    #  - name: Build Docker image
+    #     run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:latest
       
-      - name: Build Docker image
-        run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:latest
-      
-      - name : Tag Docker image
-        run: docker tag ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:latest ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:$(date +%s)
+    #   - name : Tag Docker image
+    #     run: docker tag ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:latest ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli:$(date +%s)
 
-      - name: Push image
-        run: docker push -a ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli
+    #   - name: Push image
+    #     run: docker push -a ${{ env.REGISTRY }}/boavizta/cloud-scanner-cli
