@@ -1,16 +1,16 @@
 name: Build and Publish docker image
 
-  on:
-    push:
-      branches:
-        - 'main'
-        - 'dev'
-      tags:
-        - 'v*'
-    pull_request:
-      branches:
-        - 'main'
-        - 'dev'
+on:
+  push:
+    branches:
+      - 'main'
+      - 'dev'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - 'main'
+      - 'dev'
 
 env:
   REGISTRY: ghcr.io
