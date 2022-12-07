@@ -31,7 +31,6 @@ impl BoaviztaApiV1 {
         cr: CloudResource,
         usage_duration_hours: &f32,
     ) -> Option<serde_json::Value> {
-        warn!("Getting impacts of a measured CPU load is unsupported with Boavizta API v0.1.x, returning default impacts.");
         let instance_type = cr.resource_type;
         let verbose = Some(false);
         let mut usage_cloud: UsageCloud = UsageCloud::new();
@@ -177,7 +176,7 @@ mod tests {
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
             usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
+                average_cpu_load: 100.0,
                 usage_duration_seconds: 3600,
             }),
         };
@@ -197,7 +196,7 @@ mod tests {
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
             usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
+                average_cpu_load: 100.0,
                 usage_duration_seconds: 3600,
             }),
         };
@@ -207,7 +206,7 @@ mod tests {
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
             usage: Some(CloudResourceUsage {
-                average_cpu_load: 1.0, // Will not be considered in v1
+                average_cpu_load: 1.0,
                 usage_duration_seconds: 3600,
             }),
         };
