@@ -5,11 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0-alpha.1]-2022-12-07
 
 ### Changed
 
-- Use the instances workload (cpu load) to tune the results.
+- Use Boavizta API v0.2.x.
+- Take in consideration the instances workload (cpu load) to calculate the impacts.
+
+## [0.1.1]- 2022-12-07
+
+### Added
+
+- display scanner version on metrics server status route https://github.com/Boavizta/cloud-scanner/issues/179
+
+## [0.1.0-alpha.2]- 2022-12-07
+
+### Changed
+
+- pin docker image versions in docker compose, see https://github.com/Boavizta/cloud-scanner/issues/175
 
 ## [0.1.0-alpha.1]- 2022-11-26
 
