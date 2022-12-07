@@ -150,7 +150,6 @@ At the moment:
 
 - Cloud scanner returns _empty_ impacts (i.e. zero values) for EC2 the instance _types_ that are not listed in Boavizta database.
 - `--aws-region` flag only supports eu-based aws regions (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
-- Returns _default_ impacts of AWS instances. It does not yet analyses instance usage (cpu workload) to calculate the impacts, but rather returns the _default_ impact data provided by Boavizta API for each instance type for a given use duration. (i.e. using instance CPU load through the `measured` command line flag has no effect).
 - Filtering instances by tag is not yet supported.
 
 This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository.

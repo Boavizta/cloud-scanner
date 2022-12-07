@@ -5,6 +5,6 @@ multilingual = false
 src = "src"
 title = "Boavizta cloud scanner 📡"
 
-# Deacivate link checker by default
+# Deactivate link checker by default
 # cargo install mdbook-linkcheck
 # [output.linkcheck]

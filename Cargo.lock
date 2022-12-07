@@ -494,15 +494,16 @@ dependencies = [
 
 [[package]]
 name = "boavizta_api_sdk"
-version = "0.1.2"
+version = "0.2.0-alpha.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f744d2ef9af3bca02537b5f73e8261f6e918055f0899836cf5d2ed37de888aa1"
+checksum = "5879f50b84ae02f28158af5e612cd08886cf25ef422064837c3802f4ad8178c8"
 dependencies = [
  "reqwest",
  "serde",
  "serde_derive",
  "serde_json",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -607,7 +608,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-cli"
-version = "0.1.1"
+version = "0.2.0-alpha.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -633,7 +634,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "0.1.1"
+version = "0.2.0-alpha.1"
 dependencies = [
  "cloud-scanner-cli",
  "envy",
@@ -2665,6 +2666,15 @@ name = "urlencoding"
 version = "2.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8db7427f936968176eaa7cdf81b7f98b980b18495ec28f1b5791ac3bfe3eea9"
+
+[[package]]
+name = "uuid"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "422ee0de9031b5b948b97a8fc04e3aa35230001a722ddd27943e0be31564ce4c"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "valuable"
