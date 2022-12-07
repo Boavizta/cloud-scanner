@@ -20,8 +20,9 @@ pub async fn run(config: Config) -> Result<(), rocket::Error> {
 /// Just display help
 #[get("/")]
 fn index(config: &State<Config>) -> String {
-    warn!("Getting something on /");
-    format!("Cloud scanner metric server is running.\n\nUsing boavizta API at: {}.\nValues are exposed on /metrics path and require passing a **region** in query string.\n e.g.  http://localhost:8000/metrics?aws_region=eu-west-3", config.boavizta_url)
+    warn!("Getting request on /");
+    let version: String = crate::get_version();
+    format!("Cloud scanner metric server  {} is running.\n\nUsing Boavizta API at: {}.\nMetrics are exposed on /metrics path and require passing a **region** in query string.\n e.g.  http://localhost:8000/metrics?aws_region=eu-west-3", version, config.boavizta_url)
 }
 
 /// Returns the metrics
