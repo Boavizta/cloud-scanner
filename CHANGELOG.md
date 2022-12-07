@@ -16,13 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- display scanner version on metrics server status route https://github.com/Boavizta/cloud-scanner/issues/179
+- Display scanner version on metrics server status route https://github.com/Boavizta/cloud-scanner/issues/179
 
 ## [0.1.0-alpha.2]- 2022-12-07
 
 ### Changed
 
-- pin docker image versions in docker compose, see https://github.com/Boavizta/cloud-scanner/issues/175
+- Pin docker image versions in docker compose, see https://github.com/Boavizta/cloud-scanner/issues/175
 
 ## [0.1.0-alpha.1]- 2022-11-26
 
@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- A example of usage in a monitoring stack (including dashboard) of via docker-compose. See [Quickstart dashboard](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-dashoard-docke.html) in documentation. Many Thanks to @obinjf for his contributions.
+- An example of usage in a monitoring stack (including dashboard) of via docker-compose. See [Quickstart dashboard](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-dashoard-docke.html) in documentation. Many Thanks to @obinjf for his contributions.
 
 ## [0.0.8] - 2022-11-13
 
