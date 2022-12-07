@@ -60,7 +60,7 @@ impl AwsInventory {
     /// List all ec2 instances of the current account.
     ///
     /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
-    async fn list_instances(self, tags: &Vec<String>) -> Result<Vec<Instance>> {
+    async fn list_instances(self, tags: &[String]) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
         let client = &self.ec2_client;
@@ -98,7 +98,7 @@ impl AwsInventory {
                 debug!("Averaging cpu load datapoint: {:#?}", points);
                 let mut sum: f64 = 0.0;
                 for x in &points {
-                    sum = sum + x.average().unwrap();
+                    sum += x.average().unwrap();
                 }
                 let avg = sum / points.len() as f64;
                 return Ok(avg);
@@ -156,7 +156,7 @@ impl AwsInventory {
 #[async_trait]
 impl CloudInventory for AwsInventory {
     /// list resources
-    async fn list_resources(&self, tags: &Vec<String>) -> Result<Vec<CloudResource>> {
+    async fn list_resources(&self, tags: &[String]) -> Result<Vec<CloudResource>> {
         let instances: Vec<Instance> = self
             .clone()
             .list_instances(tags)

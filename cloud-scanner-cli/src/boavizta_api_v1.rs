@@ -1,5 +1,4 @@
 //!  Provide access to Boavizta API cloud impacts functions
-//use crate::model::AwsInstanceWithImpacts;
 use crate::cloud_resource::*;
 use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ResourceImpacts};
 use anyhow::Result;
@@ -8,7 +7,7 @@ use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::{Allocation, UsageCloud};
 
-/// Access data of Boavizta API v1
+/// Access data of Boavizta API
 pub struct BoaviztaApiV1 {
     configuration: boavizta_api_sdk::apis::configuration::Configuration,
 }
@@ -17,14 +16,11 @@ impl BoaviztaApiV1 {
     pub fn new(api_url: &str) -> Self {
         let mut configuration = configuration::Configuration::new();
         configuration.base_path = api_url.to_string();
-        BoaviztaApiV1 {
-            configuration: configuration,
-        }
+        BoaviztaApiV1 { configuration }
     }
 
     // Returns the raw impacts (json) of an instance from Boavizta API
     ///
-    ///  The usage impacts are calculated for the given usage duration (` usage_duration_hours` ) without considering the load of te resource or the time during wich this load is measured.
     /// The manufacture impacts returned represent the entire lifecycle of instance (i.e. it is using the 'Allocation' TOTAL )
     async fn get_raws_impacts(
         &self,
@@ -60,7 +56,7 @@ impl BoaviztaApiV1 {
         }
     }
 
-    // /// Get the impacts a a single CloudResource
+    // /// Get the impacts of a single CloudResource
     async fn get_resource_with_impacts(
         &self,
         resource: &CloudResource,
@@ -76,7 +72,7 @@ impl BoaviztaApiV1 {
 #[async_trait]
 impl ImpactProvider for BoaviztaApiV1 {
     /// Get cloud resources impacts from the Boavizta API
-    /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration (i.e. project impacts for a specific duration).
+    /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration.
     async fn get_impacts(
         &self,
         resources: Vec<CloudResource>,
@@ -120,7 +116,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
     };
     CloudResourceWithImpacts {
         cloud_resource: cloud_resource.clone(),
-        resource_impacts: resource_impacts,
+        resource_impacts,
         impacts_duration_hours: impacts_duration_hours.to_owned(),
     }
 }

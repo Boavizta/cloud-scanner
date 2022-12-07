@@ -12,5 +12,5 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait CloudInventory {
     /// Returns a list list of cloud resources
-    async fn list_resources(&self, tags: &Vec<String>) -> Result<Vec<CloudResource>>;
+    async fn list_resources(&self, tags: &[String]) -> Result<Vec<CloudResource>>;
 }
