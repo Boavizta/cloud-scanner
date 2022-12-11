@@ -8,7 +8,6 @@ use anyhow::{Context, Result};
 use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
 use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 use aws_sdk_ec2::model::Instance;
-use aws_sdk_ec2::model::Tag;
 use aws_sdk_ec2::Region;
 use chrono::Duration;
 use chrono::Utc;
@@ -182,8 +181,9 @@ impl CloudInventory for AwsInventory {
                 usage_duration_seconds: 300,
             };
 
-            let t = instance.tags();
-            let ttt = match t {
+            let aws_tags = instance.tags();
+            // Convert AWS tags into  vendor agnostic model tags
+            let cloud_resource_tags = match aws_tags {
                 Some(tags) => {
                     let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
                     for nt in tags.iter() {
@@ -198,16 +198,13 @@ impl CloudInventory for AwsInventory {
                     empty
                 }
             };
-            let aa: CloudResourceTags = CloudResourceTags { tags: ttt };
-            //let tags_list: Option<CloudResourceTags> =  instance.tags();
-            //let tags_list: CloudResourceTags = None;
 
             let cs = CloudResource {
                 id: instance_id,
                 location: location.clone(),
                 resource_type: instance.instance_type().unwrap().as_str().to_owned(),
                 usage: Some(usage),
-                tags: Some(aa),
+                tags: cloud_resource_tags,
             };
             res.push(cs);
         }

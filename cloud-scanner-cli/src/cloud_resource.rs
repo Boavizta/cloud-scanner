@@ -9,7 +9,7 @@ pub struct CloudResource {
     pub location: UsageLocation,
     pub resource_type: String,
     pub usage: Option<CloudResourceUsage>,
-    pub tags: Option<CloudResourceTags>,
+    pub tags: Vec<CloudResourceTag>,
 }
 
 impl fmt::Display for CloudResource {
@@ -30,22 +30,7 @@ pub struct CloudResourceUsage {
     pub usage_duration_seconds: u32,
 }
 
-/// Tags associated with the cloud resource
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct CloudResourceTags {
-    pub tags: Vec<CloudResourceTag>,
-}
-
-// impl Clone for CloudResourceTags {
-//     fn clone(&self) -> Self {
-//       CloudResourceTags {
-//         tags: self.tags.clone(),
-
-//       }
-//     }
-//   }
-
-/// A tag (jst a mandatory key + optional value)
+/// A tag (just a mandatory key + optional value)
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CloudResourceTag {
     pub key: String,
@@ -72,7 +57,7 @@ mod tests {
             location: UsageLocation::from("eu-west-1"),
             resource_type: "t2.fictive".to_string(),
             usage: None,
-            tags: None,
+            tags: vec![],
         };
 
         assert_eq!("CloudResource { id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None }", format!("{:?}", instance1));
@@ -85,7 +70,7 @@ mod tests {
             location: UsageLocation::from("eu-west-1"),
             resource_type: "t2.fictive".to_string(),
             usage: None,
-            tags: None,
+            tags: vec![],
         };
         assert_eq!(None, instance1.usage);
     }
