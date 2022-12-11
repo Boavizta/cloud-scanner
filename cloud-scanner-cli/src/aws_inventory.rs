@@ -8,6 +8,7 @@ use anyhow::{Context, Result};
 use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
 use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
 use aws_sdk_ec2::model::Instance;
+use aws_sdk_ec2::model::Tag;
 use aws_sdk_ec2::Region;
 use chrono::Duration;
 use chrono::Utc;
@@ -95,7 +96,7 @@ impl AwsInventory {
             })?;
         if let Some(points) = res.datapoints {
             if !points.is_empty() {
-                debug!("Averaging cpu load datapoint: {:#?}", points);
+                debug!("Averaging cpu load data point: {:#?}", points);
                 let mut sum: f64 = 0.0;
                 for x in &points {
                     sum += x.average().unwrap();
@@ -181,11 +182,32 @@ impl CloudInventory for AwsInventory {
                 usage_duration_seconds: 300,
             };
 
+            let t = instance.tags();
+            let ttt = match t {
+                Some(tags) => {
+                    let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
+                    for nt in tags.iter() {
+                        let k = nt.key.to_owned().unwrap();
+                        let v = nt.value.to_owned();
+                        cs_tags.push(CloudResourceTag { key: k, value: v });
+                    }
+                    cs_tags
+                }
+                None => {
+                    let empty: Vec<CloudResourceTag> = Vec::new();
+                    empty
+                }
+            };
+            let aa: CloudResourceTags = CloudResourceTags { tags: ttt };
+            //let tags_list: Option<CloudResourceTags> =  instance.tags();
+            //let tags_list: CloudResourceTags = None;
+
             let cs = CloudResource {
                 id: instance_id,
                 location: location.clone(),
                 resource_type: instance.instance_type().unwrap().as_str().to_owned(),
                 usage: Some(usage),
+                tags: Some(aa),
             };
             res.push(cs);
         }
