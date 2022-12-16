@@ -1,17 +1,15 @@
 # CLI options
 
 ```sh
-
 List aws instances and their environmental impact (from Boavizta API)
 
 Usage: cloud-scanner-cli [OPTIONS] <COMMAND>
 
 Commands:
-  standard        Get Average (standard) impacts for a given usage duration (without considering cpu use)
-  measured        Get impacts related to instances usage rate (take into account instance cpu  use)
-  list-instances  Just list instances and their metadata (without impacts)
-  serve           Serve metrics on http://localhost:3000/metrics
-  help            Print this message or the help of the given subcommand(s)
+  estimate   Get estimation of impacts for a given usage duration
+  inventory  List instances and  their average cpu load for the last 5 minutes (no impact data)
+  serve      Serve metrics on http://localhost:3000/metrics
+  help       Print this message or the help of the given subcommand(s)
 
 Options:
   -a, --aws-region <AWS_REGION>

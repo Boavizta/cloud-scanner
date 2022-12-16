@@ -127,11 +127,11 @@ mod tests {
     use super::*;
     use crate::UsageLocation;
 
-    //  const TEST_API_URL: &str = "https://api.boavizta.org";
+    const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API
     // const TEST_API_URL: &str = "http:/localhost:5000";
     // Test against dev version of Boavizta API
-    const TEST_API_URL: &str = "https://dev.api.boavizta.org";
+    // const TEST_API_URL: &str = "https://dev.api.boavizta.org";
 
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str = r#"   
     {

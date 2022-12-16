@@ -3,4 +3,4 @@ target/
 node_modules
 .serverless
 .env
-.vscode/settings.json
+.vscode

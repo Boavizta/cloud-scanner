@@ -20,10 +20,10 @@ docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
 # - the -it flag is optional, only purpose is to get colored output if any
 
 # Just list instances
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest list-instances
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest inventory
 
 # List instances and standard impacts (for 10 hours of use)
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest standard --hours-use-time 10
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --hours-use-time 10
 
 # Serve metrics
 ``` sh
