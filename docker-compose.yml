@@ -3,7 +3,7 @@ services:
   cloud_scanner:
     container_name: "cloud_scanner_boa"
     hostname: cloud_scanner
-    image: ghcr.io/boavizta/cloud-scanner-cli:0.2.0-alpha.1
+    image: ghcr.io/boavizta/cloud-scanner-cli:0.2.0
     command: 
       - -b http://boavizta_api:5000
       - -vv
@@ -14,7 +14,7 @@ services:
       - ROCKET_PORT=8000
     volumes:
       - $HOME/.aws:/root/.aws:ro
-      # - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certsca-certificates.crt
+      # - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
     ports:
       - "8000:8000"
     networks:
