@@ -5,11 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0]-2022-12-16
 
 ### Changed
 
-- Use the instances workload (cpu load) to tune the results.
+- Clean up code to get rid of clippy warnings
+- Update dependencies
+- Use publicly published Boavizta API v0.2.x in tests.
+- Doc updates.
+
+## [0.2.0-alpha.1]-2022-12-07
+
+### Changed
+
+- Use Boavizta API v0.2.x.
+- Take in consideration the instances workload (cpu load) to calculate the impacts.
 
 ## [0.1.1]- 2022-12-07
 
