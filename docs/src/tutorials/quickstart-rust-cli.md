@@ -18,11 +18,11 @@ This quick start will show the impacts of your EC2 instances for 10 hours of use
 export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
 # Get impacts of 10 hours of use (on your default account region)
-cargo run standard --hours-use-time 10 | jq
+cargo run estimate --hours-use-time 10 | jq
 
 # Same thing but as metrics
-cargo run -- --as-metrics standard --hours-use-time 10
+cargo run -- --as-metrics estimate --hours-use-time 10
 
 # Same query for explicit region
-cargo run -- --aws-region eu-west-3 standard --hours-use-time 10 | jq
+cargo run -- --aws-region eu-west-3 estimate --hours-use-time 10 | jq
 ```
