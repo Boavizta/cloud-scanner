@@ -1,5 +1,4 @@
 //!  Provide access to Boavizta API cloud impacts functions
-//use crate::model::AwsInstanceWithImpacts;
 use crate::cloud_resource::*;
 use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ResourceImpacts};
 use anyhow::Result;
@@ -8,7 +7,7 @@ use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
 use boavizta_api_sdk::models::{Allocation, UsageCloud};
 
-/// Access data of Boavizta API v1
+/// Access data of Boavizta API
 pub struct BoaviztaApiV1 {
     configuration: boavizta_api_sdk::apis::configuration::Configuration,
 }
@@ -17,21 +16,17 @@ impl BoaviztaApiV1 {
     pub fn new(api_url: &str) -> Self {
         let mut configuration = configuration::Configuration::new();
         configuration.base_path = api_url.to_string();
-        BoaviztaApiV1 {
-            configuration: configuration,
-        }
+        BoaviztaApiV1 { configuration }
     }
 
     // Returns the raw impacts (json) of an instance from Boavizta API
     ///
-    ///  The usage impacts are calculated for the given usage duration (` usage_duration_hours` ) without considering the load of te resource or the time during wich this load is measured.
     /// The manufacture impacts returned represent the entire lifecycle of instance (i.e. it is using the 'Allocation' TOTAL )
     async fn get_raws_impacts(
         &self,
         cr: CloudResource,
         usage_duration_hours: &f32,
     ) -> Option<serde_json::Value> {
-        warn!("Getting impacts of a measured CPU load is unsupported with Boavizta API v0.1.x, returning default impacts.");
         let instance_type = cr.resource_type;
         let verbose = Some(false);
         let mut usage_cloud: UsageCloud = UsageCloud::new();
@@ -61,7 +56,7 @@ impl BoaviztaApiV1 {
         }
     }
 
-    // /// Get the impacts a a single CloudResource
+    // /// Get the impacts of a single CloudResource
     async fn get_resource_with_impacts(
         &self,
         resource: &CloudResource,
@@ -77,7 +72,7 @@ impl BoaviztaApiV1 {
 #[async_trait]
 impl ImpactProvider for BoaviztaApiV1 {
     /// Get cloud resources impacts from the Boavizta API
-    /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration (i.e. project impacts for a specific duration).
+    /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration.
     async fn get_impacts(
         &self,
         resources: Vec<CloudResource>,
@@ -121,7 +116,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
     };
     CloudResourceWithImpacts {
         cloud_resource: cloud_resource.clone(),
-        resource_impacts: resource_impacts,
+        resource_impacts,
         impacts_duration_hours: impacts_duration_hours.to_owned(),
     }
 }
@@ -177,7 +172,7 @@ mod tests {
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
             usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
+                average_cpu_load: 100.0,
                 usage_duration_seconds: 3600,
             }),
         };
@@ -197,7 +192,7 @@ mod tests {
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
             usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
+                average_cpu_load: 100.0,
                 usage_duration_seconds: 3600,
             }),
         };
@@ -207,7 +202,7 @@ mod tests {
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
             usage: Some(CloudResourceUsage {
-                average_cpu_load: 1.0, // Will not be considered in v1
+                average_cpu_load: 1.0,
                 usage_duration_seconds: 3600,
             }),
         };

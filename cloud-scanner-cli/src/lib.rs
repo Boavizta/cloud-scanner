@@ -31,7 +31,7 @@ use anyhow::{Context, Result};
 
 async fn standard_scan(
     hours_use_time: &f32,
-    tags: &Vec<String>,
+    tags: &[String],
     aws_region: &str,
     api_url: &str,
 ) -> Result<Vec<CloudResourceWithImpacts>> {
@@ -53,7 +53,7 @@ async fn standard_scan(
 /// Returns default impacts as json
 pub async fn get_default_impacts_as_json_string(
     hours_use_time: &f32,
-    tags: &Vec<String>,
+    tags: &[String],
     aws_region: &str,
     api_url: &str,
 ) -> Result<String> {
@@ -67,7 +67,7 @@ pub async fn get_default_impacts_as_json_string(
 /// Returns  impacts as metrics
 pub async fn get_default_impacts_as_metrics(
     hours_use_time: &f32,
-    tags: &Vec<String>,
+    tags: &[String],
     aws_region: &str,
     api_url: &str,
 ) -> Result<String> {
@@ -97,7 +97,7 @@ pub async fn get_default_impacts_as_metrics(
 /// Prints  impacts  to standard output in json format
 pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
-    tags: &Vec<String>,
+    tags: &[String],
     aws_region: &str,
     api_url: &str,
 ) -> Result<()> {
@@ -109,7 +109,7 @@ pub async fn print_default_impacts_as_json(
 /// Prints impacts  to standard output as metrics in prometheus format
 pub async fn print_default_impacts_as_metrics(
     hours_use_time: &f32,
-    tags: &Vec<String>,
+    tags: &[String],
     aws_region: &str,
     api_url: &str,
 ) -> Result<()> {
@@ -119,7 +119,7 @@ pub async fn print_default_impacts_as_metrics(
 }
 
 /// List instances and metadata to standard output
-pub async fn show_inventory(tags: &Vec<String>, aws_region: &str) -> Result<()> {
+pub async fn show_inventory(tags: &[String], aws_region: &str) -> Result<()> {
     let inventory: AwsInventory = AwsInventory::new(aws_region).await;
     let cloud_resources: Vec<CloudResource> = inventory
         .list_resources(tags)
