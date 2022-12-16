@@ -1,10 +1,11 @@
 # Boavizta cloud-scanner 📡
 
-Returns Boavizta impact data corresponding to your AWS Cloud usage.
+Cloud-scanner returns Boavizta environmental impact data of your cloud account.
 
-As a command line or serverless application, cloud-scanner analyses your EC2 instances and returns impacts metrics using the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
+It automates the inventory and usage of your ressources and combines it with the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
 
-Cloud-scanner can be automated to produce metrics at regular interval and monitor your impacts in a dashboard.
+- Cloud-scanner produces metrics. You can use it to monitor and display real time impacts in a dashboard.
+- Cloud-scanner can also be used as a command line application to get an immediate snapshot of your impacts.
 
 ![A example dashboard rendering cloud scanner metrics](docs/src/images/cloud-scanner-dashboard-clear.png "A example dashboard rendering cloud scanner metrics")
 
@@ -18,124 +19,22 @@ The complete documentation: [Introduction - Boavizta cloud scanner 📡](https:/
 
 ## Getting started 🚀
 
-Show impacts of your EC2 instances for 10 hours of use.
+- [Quickstart - dashboard using docker 🐳 - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-dashboard-docker.html)
+- [Quickstart - using CLI docker 🐳 - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-docker.html)
 
-```sh
-export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 
-# Get default impacts of 10 hours of use (on your default account region)
-cargo run estimate --hours-use-time 10 | jq
+## Usage and documentation
 
-# Get measured (considering instance average cpu load) impacts of 10 hours of use (on your default account region)
-cargo run measured --hours-use-time 10 | jq
+The complete documentation: [Introduction - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/).
 
-# Get default impacts but as metrics
-cargo run  -- --as-metrics estimate --hours-use-time 10
 
-# Same query for explicit region
-cargo run  -- --aws-region eu-west-3 estimate --hours-use-time 10 | jq
-```
+## Deployment  as a serverless app (aws lambda) ⚡
 
-## Usage as CLI 💻
-
-### Using  public docker image 🐳
-
-```sh
-docker pull ghcr.io/boavizta/cloud-scanner-cli:latest
-docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
-
-# Note
-# - we map local credentials on the container (-v)
-# - we force a using 'myprofile' profile by setting the AWS_PROFILE environment variable with -e flag
-# - the -it flag is optional, only purpose is to get colored output if any
-
-# Just list instances
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest list-instances
-
-# List instances and estimate impacts (for 10 hours of use)
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --hours-use-time 10
-```
-
-⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
-
-⚠ Running metric server in container require setting  extra variables:
-  - to map AWS credentials 
-  - to map SSL ca certificates
-  - and more importantly to configure rocket to listen to 0.0.0.0 instead of 127.0.0.1 (which is internal to the container): `ROCKET_ADDRESS=0.0.0.0`
-
-``` sh
-# Run cli to serve metrics on http://localhost:8000
-docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE=$AWS_PROFILE ghcr.io/boavizta/cloud-scanner-cli:latest
-```
-
-See [Run as docker - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/docker-guide.html)
-
-### Building local executable 🦀
-
-```sh
-cargo build --release
-```
-
-See [Building CLI - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/building-cli.html)
-
-### CLI options
-
-```sh
-List aws instances and their environmental impact (from Boavizta API)
-
-Usage: cloud-scanner-cli [OPTIONS] <COMMAND>
-
-Commands:
-  estimate   Get estimation of impacts for a given usage duration
-  inventory  List instances and  their average cpu load for the last 5 minutes (no impact data)
-  serve      Serve metrics on http://localhost:3000/metrics
-  help       Print this message or the help of the given subcommand(s)
-
-Options:
-  -a, --aws-region <AWS_REGION>
-          AWS region (The default aws profile region is used if not provided)
-  -b, --boavizta-api-url <BOAVIZTA_API_URL>
-          Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. https://api.boavizta.org)
-  -t, --filter-tags <FILTER_TAGS>
-          Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
-  -v, --verbosity...
-          Enable logging, use multiple `v`s to increase verbosity
-  -m, --as-metrics
-          Returns OpenMetrics (Prometheus) instead of json output
-  -h, --help
-          Print help information
-  -V, --version
-          Print version information
-```
-
-See [CLI options - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/cli-options.html)
-
-### Passing AWS credentials
-
-Easiest way to pass aws credential is use an environment variable to use a specific aws profile.
-
-```sh
-export AWS_PROFILE='<YOUR_PROFILE_NAME>'
-```
-
-See [AWS authentication - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/how-to/passing-aws-credentials.html)
-
-## Usage as a serverless app (aws lambda) ⚡
-
-The serverless application for aws is deployed with the serverless framework.
-It creates a role configured to get sufficient permission to scan your resources without requesting authentication.
+Cloud scanner can also be deployed as a serverless application for aws.
 
 - [Quickstart as serverless ⚡ - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/tutorials/quickstart-serverless.html)
 - [Serverless design - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/serverless-design.html)
-
-### Deploy the app
-
-```sh
-npm i
-export aws_profile = <my profile>
-serverless deploy
-```
-
+ 
 ## Output formats
 
 Cloud scanner CLI and serverless application returns data as _json_ or _Open Metrics_ (Prometheus) format.
@@ -146,10 +45,8 @@ See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud
 
 Cloud scanner is stable, but with limited functionality.
 
-At the moment:
-
-- Cloud scanner returns _empty_ impacts (i.e. zero values) for EC2 the instance _types_ that are not listed in Boavizta database.
-- `--aws-region` flag only supports eu-based aws regions (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
+- Only EU region are supported: `--aws-region` flag only supports eu-based aws regions for the time being (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3)
+- Cloud-scanner return empty impacts if the instance _type_ is not listed in Boavizta database.
 - Filtering instances by tag is not yet supported.
 
-This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository.
+This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository or check the content of the `dev` branch.
