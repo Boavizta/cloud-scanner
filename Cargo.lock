@@ -608,7 +608,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-cli"
-version = "0.2.0"
+version = "0.2.1-alpha1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -634,7 +634,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "0.2.0"
+version = "0.2.1-alpha1"
 dependencies = [
  "cloud-scanner-cli",
  "envy",
