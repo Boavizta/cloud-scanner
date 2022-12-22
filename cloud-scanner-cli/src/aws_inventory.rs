@@ -223,14 +223,19 @@ mod tests {
     #[ignore]
     async fn test_list_resources() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
-        let tags: Vec<String> = vec!["".to_string()];
+        let filtertags: Vec<String> = vec!["".to_string()];
         let res: Vec<CloudResource> = inventory
-            .list_resources(&tags)
+            .list_resources(&filtertags)
             .await
             .context("Failed to list")
             .unwrap();
-
         assert_eq!(4, res.len());
+
+        let inst = res.first().unwrap();
+        assert_eq!(3, inst.tags.len(), "Wrong number of tags");
+        let t = inst.tags.first().unwrap();
+        assert_eq!("Name", &t.key, "Wrong tag tey");
+        assert_eq!("test-boapi", t.value.clone().unwrap(), "Wrong tag value");
     }
 
     #[tokio::test]
@@ -244,7 +249,6 @@ mod tests {
         assert_eq!(wrong_region, config.region().unwrap().to_string())
     }
 
-    // Verify tests from here
     #[tokio::test]
     #[ignore]
     async fn get_cpu_usage_metrics_of_running_instance_should_return_right_number_of_data_points() {
@@ -276,6 +280,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn test_get_instance_usage_metrics_of_non_existing_instance() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let instance_id = "IDONOTEXISTS";
@@ -304,6 +309,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn test_average_cpu_load_of_non_existing_instance_is_zero() {
         let instance_id = "IDONOTEXISTS";
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
@@ -312,6 +318,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn test_average_cpu_load_of_shutdown_instance_is_zero() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let instance_id = "i-03e0b3b1246001382";
