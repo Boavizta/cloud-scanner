@@ -1,6 +1,8 @@
 //! A module to perform inventory of  AWS cloud resources.
 //!
 //!  ⚠ Only ec2 instances are supported  today.
+use std::collections::HashMap;
+
 use crate::cloud_inventory::CloudInventory;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
@@ -67,9 +69,10 @@ impl AwsInventory {
         let mut instances: Vec<Instance> = Vec::new();
         // Filter: AND on name, OR on values
         //let filters :std::vec::Vec<aws_sdk_ec2::model::Filter>;
+
         let resp = client
             .describe_instances()
-            //.set_filters() // Use filters for tags
+            //set_filters() // Use filters for tags
             .send()
             .await?;
 
@@ -185,16 +188,16 @@ impl CloudInventory for AwsInventory {
             // Convert AWS tags into  vendor agnostic model tags
             let cloud_resource_tags = match aws_tags {
                 Some(tags) => {
-                    let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
+                    let mut cs_tags: HashMap<String, CloudResourceTag> = HashMap::new();
                     for nt in tags.iter() {
                         let k = nt.key.to_owned().unwrap();
                         let v = nt.value.to_owned();
-                        cs_tags.push(CloudResourceTag { key: k, value: v });
+                        cs_tags.insert(k.clone(), CloudResourceTag { key: k, value: v });
                     }
                     cs_tags
                 }
                 None => {
-                    let empty: Vec<CloudResourceTag> = Vec::new();
+                    let empty: HashMap<String, CloudResourceTag> = HashMap::new();
                     empty
                 }
             };
@@ -206,7 +209,14 @@ impl CloudInventory for AwsInventory {
                 usage: Some(usage),
                 tags: cloud_resource_tags,
             };
-            res.push(cs);
+
+            if cs.has_matching_tags(tags) {
+                info!("Resource matched on tags: {:?}", cs.id);
+                res.push(cs);
+            } else {
+                warn!("Filtered instance (tags do not match: {:?}", cs);
+            }
+            //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
         }
 
         Ok(res)
@@ -233,8 +243,8 @@ mod tests {
 
         let inst = res.first().unwrap();
         assert_eq!(3, inst.tags.len(), "Wrong number of tags");
-        let t = inst.tags.first().unwrap();
-        assert_eq!("Name", &t.key, "Wrong tag tey");
+        let t = inst.tags.get("Name").unwrap();
+        assert_eq!("Name", t.key, "Wrong tag tey");
         assert_eq!("test-boapi", t.value.clone().unwrap(), "Wrong tag value");
     }
 

@@ -104,6 +104,7 @@ async fn main() -> Result<()> {
             }
         }
         SubCommand::Inventory {} => {
+            info!("Using filter tags {:?}", &args.filter_tags);
             cloud_scanner_cli::show_inventory(&args.filter_tags, &region).await?
         }
         SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
