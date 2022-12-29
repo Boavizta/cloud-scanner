@@ -104,7 +104,7 @@ mod tests {
             tags: HashMap::new(),
         };
 
-        assert_eq!("CloudResource { id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: [] }", format!("{:?}", instance1));
+        assert_eq!("CloudResource { id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: {} }", format!("{:?}", instance1));
     }
 
     #[test]
