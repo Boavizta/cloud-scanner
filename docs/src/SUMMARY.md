@@ -14,8 +14,7 @@
 - [Deploy serverless](how-to/deploy-sls.md)
 - [AWS authentication](how-to/passing-aws-credentials.md)
 - [Setup monitoring dashboard](how-to/set-up-dashboard.md)
-
-# Explanations
+- [Filtering with tags] (how-to/filtering-with-tags.md)
 
 - [Source of data](explanations/source-of-data.md)
 - [How we process workload](explanations/processing-workload.md)
