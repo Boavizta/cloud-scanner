@@ -1,4 +1,4 @@
-# Filtering results using resource tags
+# Filter by tags
 
 You can limit cloud-scanner results (metriccs or json) to the cloud resources that match specific tags.
 
