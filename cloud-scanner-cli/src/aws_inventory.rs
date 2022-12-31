@@ -59,7 +59,7 @@ impl AwsInventory {
 
     /// List all ec2 instances of the current account.
     ///
-    /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
+    /// ⚠  Filtering instance on tags is not yet imlemented. All instances (running or stopped) are returned.
     async fn list_instances(self, tags: &[String]) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
@@ -67,9 +67,10 @@ impl AwsInventory {
         let mut instances: Vec<Instance> = Vec::new();
         // Filter: AND on name, OR on values
         //let filters :std::vec::Vec<aws_sdk_ec2::model::Filter>;
+
         let resp = client
             .describe_instances()
-            //.set_filters() // Use filters for tags
+            //set_filters() // Use filters for tags
             .send()
             .await?;
 
@@ -206,7 +207,14 @@ impl CloudInventory for AwsInventory {
                 usage: Some(usage),
                 tags: cloud_resource_tags,
             };
-            res.push(cs);
+
+            if cs.has_matching_tags(tags) {
+                info!("Resource matched on tags: {:?}", cs.id);
+                res.push(cs);
+            } else {
+                warn!("Filtered instance (tags do not match: {:?}", cs);
+            }
+            //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
         }
 
         Ok(res)
@@ -233,9 +241,13 @@ mod tests {
 
         let inst = res.first().unwrap();
         assert_eq!(3, inst.tags.len(), "Wrong number of tags");
-        let t = inst.tags.first().unwrap();
-        assert_eq!("Name", &t.key, "Wrong tag tey");
-        assert_eq!("test-boapi", t.value.clone().unwrap(), "Wrong tag value");
+        let tag_map = vec_to_map(inst.tags.clone());
+        let v = tag_map.get("Name").unwrap();
+        assert_eq!(
+            Some("test-boapi".to_string()),
+            v.to_owned(),
+            "Wrong tag value"
+        );
     }
 
     #[tokio::test]

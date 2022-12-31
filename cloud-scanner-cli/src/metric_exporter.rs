@@ -3,7 +3,7 @@ use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
 use prometheus_client::encoding::text::encode;
-use prometheus_client::encoding::text::Encode;
+use prometheus_client::encoding::EncodeLabelSet;
 use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
@@ -15,7 +15,7 @@ use crate::ImpactsSummary;
 //
 // You could as well use `(String, String)` to represent a label set,
 // instead of the custom type below.
-#[derive(Clone, Hash, PartialEq, Eq, Encode)]
+#[derive(Clone, Hash, PartialEq, Eq, EncodeLabelSet, Debug)]
 pub struct Labels {
     pub awsregion: String,
     // Or just a plain string.
@@ -31,9 +31,9 @@ pub fn get_metrics(summary: &ImpactsSummary) -> Result<String> {
 
     let registry = register_all_metrics_new(summary, label_set);
 
-    let mut buffer = vec![];
+    let mut buffer = String::new();
     encode(&mut buffer, &registry).context("Fails to encode result into metrics")?;
-    let metrics = String::from_utf8(buffer).context("Unable to format metrics")?;
+    let metrics = String::from(buffer);
 
     Ok(metrics)
 }
@@ -52,7 +52,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_number_of_instances_total",
         // And the metric help text.
         "Number of instances detected during the inventory",
-        Box::new(boavizta_number_of_instances_total.clone()),
+        boavizta_number_of_instances_total.clone(),
     );
 
     let boavizta_number_of_instances_assessed = Family::<Labels, Gauge>::default();
@@ -62,7 +62,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_number_of_instances_assessed",
         // And the metric help text.
         "Number of instances that were considered in the estimation of impacts",
-        Box::new(boavizta_number_of_instances_assessed.clone()),
+        boavizta_number_of_instances_assessed.clone(),
     );
 
     let boavizta_duration_of_use_hours = Family::<Labels, Gauge<f64, AtomicU64>>::default();
@@ -72,7 +72,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_duration_of_use_hours",
         // And the metric help text.
         "Use duration considered to estimate impacts",
-        Box::new(boavizta_duration_of_use_hours.clone()),
+        boavizta_duration_of_use_hours.clone(),
     );
 
     let boavizta_pe_manufacture_megajoules = Family::<Labels, Gauge<f64, AtomicU64>>::default();
@@ -82,7 +82,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_pe_manufacture_megajoules",
         // And the metric help text.
         "Energy consumed for manufacture",
-        Box::new(boavizta_pe_manufacture_megajoules.clone()),
+        boavizta_pe_manufacture_megajoules.clone(),
     );
 
     let boavizta_pe_use_megajoules = Family::<Labels, Gauge<f64, AtomicU64>>::default();
@@ -92,7 +92,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_pe_use_megajoules",
         // And the metric help text.
         "Energy consumed during use",
-        Box::new(boavizta_pe_use_megajoules.clone()),
+        boavizta_pe_use_megajoules.clone(),
     );
 
     let boavizta_adp_manufacture_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
@@ -102,7 +102,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_adp_manufacture_kgsbeq",
         // And the metric help text.
         "Abiotic resources depletion potential of manufacture",
-        Box::new(boavizta_adp_manufacture_kgsbeq.clone()),
+        boavizta_adp_manufacture_kgsbeq.clone(),
     );
 
     let boavizta_adp_use_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
@@ -112,7 +112,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_adp_use_kgsbeq",
         // And the metric help text.
         "Abiotic resources depletion potential of use",
-        Box::new(boavizta_adp_use_kgsbeq.clone()),
+        boavizta_adp_use_kgsbeq.clone(),
     );
 
     let boavizta_gwp_manufacture_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
@@ -122,7 +122,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_gwp_manufacture_kgco2eq",
         // And the metric help text.
         "Global Warming Potential of manufacture",
-        Box::new(boavizta_gwp_manufacture_kgco2eq.clone()),
+        boavizta_gwp_manufacture_kgco2eq.clone(),
     );
 
     let boavizta_gwp_use_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
@@ -132,7 +132,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         "boavizta_gwp_use_kgco2eq",
         // And the metric help text.
         "Global Warming Potential of use",
-        Box::new(boavizta_gwp_use_kgco2eq.clone()),
+        boavizta_gwp_use_kgco2eq.clone(),
     );
 
     // Set the values
