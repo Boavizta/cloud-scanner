@@ -124,8 +124,6 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 #[cfg(test)]
 mod tests {
 
-    use std::collections::HashMap;
-
     use super::*;
     use crate::UsageLocation;
 
@@ -177,7 +175,7 @@ mod tests {
                 average_cpu_load: 100.0,
                 usage_duration_seconds: 3600,
             }),
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
@@ -190,15 +188,12 @@ mod tests {
 
     #[tokio::test]
     async fn should_retrieve_different_pe_impacts_for_different_cpu_load() {
-        let mut tags = HashMap::new();
+        let mut tags = Vec::new();
 
-        tags.insert(
-            "appName".to_string(),
-            CloudResourceTag {
-                key: "appName".to_string(),
-                value: Some("myApp".to_string()),
-            },
-        );
+        tags.push(CloudResourceTag {
+            key: "appName".to_string(),
+            value: Some("myApp".to_string()),
+        });
         let instance1: CloudResource = CloudResource {
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
@@ -218,7 +213,7 @@ mod tests {
                 average_cpu_load: 1.0,
                 usage_duration_seconds: 3600,
             }),
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
@@ -246,7 +241,7 @@ mod tests {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
             }),
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
 
         let instance2: CloudResource = CloudResource {
@@ -257,7 +252,7 @@ mod tests {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
             }),
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
 
         let instance3: CloudResource = CloudResource {
@@ -268,7 +263,7 @@ mod tests {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
             }),
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
 
         let mut instances: Vec<CloudResource> = Vec::new();
@@ -303,7 +298,7 @@ mod tests {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
             }),
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
 
         let raw_impacts =

@@ -1,8 +1,6 @@
 //! A module to perform inventory of  AWS cloud resources.
 //!
 //!  ⚠ Only ec2 instances are supported  today.
-use std::collections::HashMap;
-
 use crate::cloud_inventory::CloudInventory;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
@@ -61,7 +59,7 @@ impl AwsInventory {
 
     /// List all ec2 instances of the current account.
     ///
-    /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
+    /// ⚠  Filtering instance on tags is not yet imlemented. All instances (running or stopped) are returned.
     async fn list_instances(self, tags: &[String]) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
@@ -188,16 +186,16 @@ impl CloudInventory for AwsInventory {
             // Convert AWS tags into  vendor agnostic model tags
             let cloud_resource_tags = match aws_tags {
                 Some(tags) => {
-                    let mut cs_tags: HashMap<String, CloudResourceTag> = HashMap::new();
+                    let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
                     for nt in tags.iter() {
                         let k = nt.key.to_owned().unwrap();
                         let v = nt.value.to_owned();
-                        cs_tags.insert(k.clone(), CloudResourceTag { key: k, value: v });
+                        cs_tags.push(CloudResourceTag { key: k, value: v });
                     }
                     cs_tags
                 }
                 None => {
-                    let empty: HashMap<String, CloudResourceTag> = HashMap::new();
+                    let empty: Vec<CloudResourceTag> = Vec::new();
                     empty
                 }
             };
@@ -243,9 +241,13 @@ mod tests {
 
         let inst = res.first().unwrap();
         assert_eq!(3, inst.tags.len(), "Wrong number of tags");
-        let t = inst.tags.get("Name").unwrap();
-        assert_eq!("Name", t.key, "Wrong tag tey");
-        assert_eq!("test-boapi", t.value.clone().unwrap(), "Wrong tag value");
+        let tag_map = vec_to_map(inst.tags.clone());
+        let v = tag_map.get("Name").unwrap();
+        assert_eq!(
+            Some("test-boapi".to_string()),
+            v.to_owned(),
+            "Wrong tag value"
+        );
     }
 
     #[tokio::test]

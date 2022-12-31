@@ -10,16 +10,12 @@ pub struct CloudResource {
     pub location: UsageLocation,
     pub resource_type: String,
     pub usage: Option<CloudResourceUsage>,
-    pub tags: HashMap<String, CloudResourceTag>,
+    pub tags: Vec<CloudResourceTag>,
+    //pub tags: HashMap<String, CloudResourceTag>,
 }
 
 impl fmt::Display for CloudResource {
-    // This trait requires `fmt` with this exact signature.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // Write strictly the first element into the supplied output
-        // stream: `f`. Returns `fmt::Result` which indicates whether the
-        // operation succeeded or failed. Note that `write!` uses syntax which
-        // is very similar to `println!`.
         write!(f, "{:?}", self)
     }
 }
@@ -38,11 +34,13 @@ pub struct CloudResourceTag {
     pub value: Option<String>,
 }
 
+///  Parse the tags from Striing (coming from CLI or query strings) .
+///  Tags are expected to be int the form "Tag name=Tag value"
 impl TryFrom<String> for CloudResourceTag {
     type Error = &'static str;
 
     fn try_from(key_value: String) -> Result<Self, Self::Error> {
-        let t: Vec<&str> = key_value.split("=").collect();
+        let t: Vec<&str> = key_value.split('=').collect();
         if t.len() < 1 {
             Err("Cannot split the tag")
         } else {
@@ -62,13 +60,15 @@ impl TryFrom<String> for CloudResourceTag {
 impl CloudResource {
     /// Returns true it _all_ the tags passed in argument are defined and have the same values on the cloud resource
     fn has_matching_tagmap(&self, tags: &HashMap<String, CloudResourceTag>) -> bool {
-        tags.iter()
-            .all(|(filter_key, filter_tag)| self.tags.get(filter_key) == Some(filter_tag))
+        tags.iter().all(|(filter_key, filter_tag)| {
+            let tag_map: HashMap<String, Option<String>> = vec_to_map(self.tags.clone());
+            tag_map.get(filter_key) == Some(&filter_tag.value)
+        })
     }
 
-    pub fn has_matching_tags(&self, tags: &[String]) -> bool {
+    pub fn has_matching_tags(&self, filter_tags: &[String]) -> bool {
         let mut filter = HashMap::new();
-        tags.into_iter().for_each(|f| {
+        filter_tags.into_iter().for_each(|f| {
             let res = CloudResourceTag::try_from(f.to_owned());
             if res.is_ok() {
                 let crt = res.unwrap();
@@ -79,6 +79,14 @@ impl CloudResource {
         });
         self.has_matching_tagmap(&filter)
     }
+}
+
+pub fn vec_to_map(tagv: Vec<CloudResourceTag>) -> HashMap<String, Option<String>> {
+    let mut tagh: HashMap<String, Option<String>> = HashMap::new();
+    tagv.iter().for_each(|t| {
+        tagh.insert(t.key.clone(), t.value.clone());
+    });
+    tagh
 }
 
 /// Define how to allocate the manufacturing impacts of a resource
@@ -101,10 +109,10 @@ mod tests {
             location: UsageLocation::from("eu-west-1"),
             resource_type: "t2.fictive".to_string(),
             usage: None,
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
 
-        assert_eq!("CloudResource { id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: {} }", format!("{:?}", instance1));
+        assert_eq!("CloudResource { id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: [] }", format!("{:?}", instance1));
     }
 
     #[test]
@@ -114,7 +122,7 @@ mod tests {
             location: UsageLocation::from("eu-west-1"),
             resource_type: "t2.fictive".to_string(),
             usage: None,
-            tags: HashMap::new(),
+            tags: Vec::new(),
         };
         assert_eq!(None, instance1.usage);
     }
@@ -142,7 +150,12 @@ mod tests {
             },
         );
 
-        let instance1tags = filtertags.clone();
+        let mut instance1tags: Vec<CloudResourceTag> = Vec::new();
+        instance1tags.push(CloudResourceTag {
+            key: "Name".to_string(),
+            value: Some("App1".to_string()),
+        });
+
         let instance1: CloudResource = CloudResource {
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
