@@ -33,7 +33,7 @@ pub fn get_metrics(summary: &ImpactsSummary) -> Result<String> {
 
     let mut buffer = String::new();
     encode(&mut buffer, &registry).context("Fails to encode result into metrics")?;
-    let metrics = String::from(buffer);
+    let metrics = buffer;
 
     Ok(metrics)
 }

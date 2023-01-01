@@ -41,10 +41,10 @@ impl TryFrom<String> for CloudResourceTag {
 
     fn try_from(key_value: String) -> Result<Self, Self::Error> {
         let t: Vec<&str> = key_value.split('=').collect();
-        if t.len() < 1 {
-            Err("Cannot split the tag")
+        if t.is_empty() {
+            Err("Cannot split the tag name from value (missing equal sign?)")
         } else {
-            let key = t.get(0).unwrap().to_string();
+            let key = t.first().unwrap().to_string();
             if let Some(val) = t.get(1) {
                 Ok(CloudResourceTag {
                     key,
@@ -68,11 +68,10 @@ impl CloudResource {
 
     pub fn has_matching_tags(&self, filter_tags: &[String]) -> bool {
         let mut filter = HashMap::new();
-        filter_tags.into_iter().for_each(|f| {
+        filter_tags.iter().for_each(|f| {
             let res = CloudResourceTag::try_from(f.to_owned());
-            if res.is_ok() {
-                let crt = res.unwrap();
-                filter.insert(crt.key.clone(), crt.clone());
+            if let Ok(crt) = res {
+                filter.insert(crt.key.clone(), crt);
             } else {
                 error!("Skipped filter");
             }
