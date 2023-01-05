@@ -660,7 +660,7 @@ dependencies = [
  "cloud-scanner-cli",
  "envy",
  "lambda_http",
- "lambda_runtime 0.6.1",
+ "lambda_runtime",
  "log",
  "pkg-version",
  "serde",
@@ -1306,33 +1306,13 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
- "lambda_runtime 0.7.2",
+ "lambda_runtime",
  "mime",
  "percent-encoding",
  "serde",
  "serde_json",
  "serde_urlencoded",
  "url",
-]
-
-[[package]]
-name = "lambda_runtime"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37a81840726d481d20b99a9ce87430f644e9590cb77715e1e66c5f4432c9b586"
-dependencies = [
- "async-stream",
- "bytes",
- "futures",
- "http",
- "hyper",
- "lambda_runtime_api_client 0.6.0",
- "serde",
- "serde_json",
- "tokio",
- "tokio-stream",
- "tower",
- "tracing",
 ]
 
 [[package]]
@@ -1346,25 +1326,13 @@ dependencies = [
  "futures",
  "http",
  "hyper",
- "lambda_runtime_api_client 0.7.0",
+ "lambda_runtime_api_client",
  "serde",
  "serde_json",
  "tokio",
  "tokio-stream",
  "tower",
  "tracing",
-]
-
-[[package]]
-name = "lambda_runtime_api_client"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b54698c666ffe503cb51fa66e4567e53e806128a10359de7095999d925a771ed"
-dependencies = [
- "http",
- "hyper",
- "tokio",
- "tower-service",
 ]
 
 [[package]]
