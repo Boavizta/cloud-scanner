@@ -13,7 +13,6 @@ Works with inventory or estimates.
 #  CustomTagNameForDebug=olivierdemeringoadm
 #     and 
 #  Name=test-boavizta
-https://<EDITED>.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1&filter_tag=CustomTagNameForDebug=olivierdemeringoadm&filter_tag=Name=test-boavizta
 cargo run -- -t Name=test-boavizta-2 -t CreatorName=olivierdemeringoadm  inventory| jq
 ```
 
