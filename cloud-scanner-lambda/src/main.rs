@@ -51,14 +51,23 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         Some(aws_region) => aws_region,
         None => {
             println!("No 'aws_region' parameter in path, will fallback to default");
-            //"eu-west-1"
             ""
+        }
+    };
+
+    let filter_tags = match query_string_parameters.all("filter_tag") {
+        Some(filter_tags) => filter_tags.iter().map(|t| t.to_string()).collect(),
+        None => {
+            let filter_tags: Vec<String> = Vec::new();
+            println!("No 'filter_tag' parameter in path, will fallback to default");
+            filter_tags
         }
     };
 
     println!("Using use time of {}", hours_use_time);
     println!("Using aws_region {}", aws_region);
-    let filter_tags: Vec<String> = Vec::new();
+    println!("Using tag filers {:?}", filter_tags);
+
     let impacts: String = cloud_scanner_cli::get_default_impacts_as_json_string(
         &hours_use_time,
         &filter_tags,

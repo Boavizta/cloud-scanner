@@ -59,7 +59,7 @@ impl AwsInventory {
 
     /// List all ec2 instances of the current account.
     ///
-    /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
+    /// ⚠  Filtering instance on tags is not yet imlemented. All instances (running or stopped) are returned.
     async fn list_instances(self, tags: &[String]) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
@@ -67,9 +67,10 @@ impl AwsInventory {
         let mut instances: Vec<Instance> = Vec::new();
         // Filter: AND on name, OR on values
         //let filters :std::vec::Vec<aws_sdk_ec2::model::Filter>;
+
         let resp = client
             .describe_instances()
-            //.set_filters() // Use filters for tags
+            //set_filters() // Use filters for tags
             .send()
             .await?;
 
@@ -95,7 +96,7 @@ impl AwsInventory {
             })?;
         if let Some(points) = res.datapoints {
             if !points.is_empty() {
-                debug!("Averaging cpu load datapoint: {:#?}", points);
+                debug!("Averaging cpu load data point: {:#?}", points);
                 let mut sum: f64 = 0.0;
                 for x in &points {
                     sum += x.average().unwrap();
@@ -181,13 +182,39 @@ impl CloudInventory for AwsInventory {
                 usage_duration_seconds: 300,
             };
 
+            let aws_tags = instance.tags();
+            // Convert AWS tags into  vendor agnostic model tags
+            let cloud_resource_tags = match aws_tags {
+                Some(tags) => {
+                    let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
+                    for nt in tags.iter() {
+                        let k = nt.key.to_owned().unwrap();
+                        let v = nt.value.to_owned();
+                        cs_tags.push(CloudResourceTag { key: k, value: v });
+                    }
+                    cs_tags
+                }
+                None => {
+                    let empty: Vec<CloudResourceTag> = Vec::new();
+                    empty
+                }
+            };
+
             let cs = CloudResource {
                 id: instance_id,
                 location: location.clone(),
                 resource_type: instance.instance_type().unwrap().as_str().to_owned(),
                 usage: Some(usage),
+                tags: cloud_resource_tags,
             };
-            res.push(cs);
+
+            if cs.has_matching_tags(tags) {
+                info!("Resource matched on tags: {:?}", cs.id);
+                res.push(cs);
+            } else {
+                warn!("Filtered instance (tags do not match: {:?}", cs);
+            }
+            //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
         }
 
         Ok(res)
@@ -204,14 +231,23 @@ mod tests {
     #[ignore]
     async fn test_list_resources() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
-        let tags: Vec<String> = vec!["".to_string()];
+        let filtertags: Vec<String> = vec!["".to_string()];
         let res: Vec<CloudResource> = inventory
-            .list_resources(&tags)
+            .list_resources(&filtertags)
             .await
             .context("Failed to list")
             .unwrap();
-
         assert_eq!(4, res.len());
+
+        let inst = res.first().unwrap();
+        assert_eq!(3, inst.tags.len(), "Wrong number of tags");
+        let tag_map = vec_to_map(inst.tags.clone());
+        let v = tag_map.get("Name").unwrap();
+        assert_eq!(
+            Some("test-boapi".to_string()),
+            v.to_owned(),
+            "Wrong tag value"
+        );
     }
 
     #[tokio::test]
@@ -225,7 +261,6 @@ mod tests {
         assert_eq!(wrong_region, config.region().unwrap().to_string())
     }
 
-    // Verify tests from here
     #[tokio::test]
     #[ignore]
     async fn get_cpu_usage_metrics_of_running_instance_should_return_right_number_of_data_points() {
@@ -257,6 +292,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn test_get_instance_usage_metrics_of_non_existing_instance() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let instance_id = "IDONOTEXISTS";
@@ -285,6 +321,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn test_average_cpu_load_of_non_existing_instance_is_zero() {
         let instance_id = "IDONOTEXISTS";
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
@@ -293,6 +330,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn test_average_cpu_load_of_shutdown_instance_is_zero() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let instance_id = "i-03e0b3b1246001382";
