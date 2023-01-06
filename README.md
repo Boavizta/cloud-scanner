@@ -35,11 +35,23 @@ Cloud scanner CLI and serverless application returns data as _json_ or _Open Met
 
 See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/output-data.html)
 
-## ⚠ Current limitations
+## ⚠  Perimeter / scope and limits
 
-Cloud scanner is stable, but with limited functionality.
+Cloud scanner provides impacts _only_ related to _compute_  resources (the Virtual Machines).
 
-- Only EU region are supported: `--aws-region` flag only supports eu-based aws regions for the time being (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3)
-- Cloud-scanner return empty impacts if the instance _type_ is not listed in Boavizta database.
+The limitations of cloud-scanner are documented in [Limitations - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/limits.html)
+
+Several significant aspectof the cloud provider are **excluded** :
+
+- only measure _compute_ instances (VM's), considering that
+- do not account for the surrounding cloud infrastructure (network, control plan)
+- do not account for storage
+- do not take into account the _overcommit_ (mutualization) or _overprovisionning_ that cloud provider may apply to provide the service.
+- do not account managed services (like DB as a service or Containers as a service).
+- do not account serverless (lambda) compute.
+- supported regions (EU only for the time being)
+- unsupported instance types returns zero for their impacts.
+- we do not provide (yet) error margins https://github.com/Boavizta/boaviztapi/issues/147
+- The manufacturing impacts are not amortized (i.e. value returned for manuffacturiing imacts does not consider usage duration).
 
 This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository or check the content of the `dev` branch.
