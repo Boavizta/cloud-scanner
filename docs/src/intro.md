@@ -15,7 +15,7 @@ Cloud-scanner can be automated to produce metrics at regular interval and monito
 
 Cloud-scanner is an Open Source application maintained here: <https://github.com/Boavizta/cloud-scanner>.
 
-## Principle
+## How it works
 
 ![System in context diagram of cloud scanner](images/cloud-scanner-system-in-context.png "System in context diagram of cloud scanner")
 
