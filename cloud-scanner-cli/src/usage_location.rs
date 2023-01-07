@@ -28,6 +28,10 @@ fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
         "eu-west-1" => CountryCode::IRL,
         "eu-west-2" => CountryCode::GBR,
         "eu-west-3" => CountryCode::FRA,
+        "us-east-1" => CountryCode::USA,
+        "us-east-2" => CountryCode::USA,
+        "us-west-1" => CountryCode::USA,
+        "us-west-2" => CountryCode::USA,
         _ => {
             error!("Unable to match aws region to country code, defaulting to FRA !");
             CountryCode::FRA
@@ -55,7 +59,7 @@ mod tests {
 
     #[test]
     fn test_get_country_code_of_unsupported_aws_region_returns_fra() {
-        let location = UsageLocation::from("us-east-1");
+        let location = UsageLocation::from("ap-south-1");
         assert_eq!("FRA", location.iso_country_code);
 
         let location = UsageLocation::from("");
