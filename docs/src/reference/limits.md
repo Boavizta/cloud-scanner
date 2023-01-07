@@ -19,7 +19,7 @@ Several significant aspectof the cloud provider are **excluded**:
 - do not take into account the _overcommit_ (mutualization) or _overprovisionning_ that cloud provider may apply to provide the service.
 - do not account managed services (like DB as a service or Containers as a service).
 - do not account serverless (lambda) compute.
-- supported regions (EU only for the time being)
+- supported regions (EU and US only for the time being)
 - unsupported instance types returns zero for their impacts.
 - we do not provide (yet) error margins https://github.com/Boavizta/boaviztapi/issues/147
 - The manufacturing impacts are not amortized (i.e. value returned for manuffacturiing imacts does not consider usage duration).
@@ -29,7 +29,7 @@ Several significant aspectof the cloud provider are **excluded**:
 ### Not all Regions are supported
 
 Only a subset of AWS regions are supported.
-When performing inventory, he **only the EU-based** aws regions are supported for the time being (eu-east-1,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3).
+When performing inventory, he **only the EU-based or US-based** aws regions are supported for the time being (eu-east-1,,eu-central-1,eu-north-1,eu-south-1,eu-west-1,eu-west-2,eu-west-3,us-east-1,us-east-2,us-west-1,us-west-2).
 
 When a region is not recognized by Cloud-scanner, it defaults to using the Carbon intensty factor of France.
 This is particularly relevant when considering CoEq indicator because the carbon intensity factor varies greatly between regions.
