@@ -49,7 +49,7 @@ Several significant aspectof the cloud provider are **excluded** :
 - do not take into account the _overcommit_ (mutualization) or _overprovisionning_ that cloud provider may apply to provide the service.
 - do not account managed services (like DB as a service or Containers as a service).
 - do not account serverless (lambda) compute.
-- supported regions (EU only for the time being)
+- supported regions (EU and US only for the time being)
 - unsupported instance types returns zero for their impacts.
 - we do not provide (yet) error margins https://github.com/Boavizta/boaviztapi/issues/147
 - The manufacturing impacts are not amortized (i.e. value returned for manuffacturiing imacts does not consider usage duration).
