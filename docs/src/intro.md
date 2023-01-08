@@ -2,14 +2,12 @@
 
 [Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances (EC2) usage.
 
-It combines real time _inventory_ and _usage_ data from your AWS account with [Boavizta API](https://github.com/Boavizta/boaviztapi/) to offer a global view of your impacts on a given region.
+It combines real time _inventory_ and _usage_ data from your AWS account with [Boavizta API](https://github.com/Boavizta/boaviztapi/) to offer a  view of your impacts on a given region.
 
-It leverages Boavizta data and methology  to provide:
+- multi criteria: Primary Energy consumption (PE), Abiotic resource depletion potential (ADP), and Global Warming Potential (GWP)
+- multi stage: separate impacts of ressources Usage and Manufacture
 
-- multi criteria impacts (Energy consumption, Abiotic resource depletion potential, and Global Warming Potential)
-- multi stage (Ressources Usage and Manufacture)
-
-The estimations can be filtered by tags. It eases attribution to a specific server, application or service.
+Estimations can be filtered by tags. It eases attribution to a specific server, environment, application or service.
 
 Cloud-scanner can be used:
 
