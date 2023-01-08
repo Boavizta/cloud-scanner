@@ -1,11 +1,20 @@
 # Boavizta cloud-scanner 📡
 
-Cloud-scanner returns Boavizta environmental impact data of your cloud account.
+[Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances (EC2) usage.
 
-It automates the inventory and usage of your ressources and combines it with the [Boavizta API](https://github.com/Boavizta/boaviztapi/).
+It combines real time _inventory_ and _usage_ data from your AWS account with [Boavizta API](https://github.com/Boavizta/boaviztapi/) to offer a global view of your impacts on a given region.
 
-- Cloud-scanner produces metrics. You can use it to monitor and display real time impacts in a dashboard.
-- Cloud-scanner can also be used as a command line application to get an immediate view of your impacts.
+It leverages Boavizta data and methology  to provide:
+
+- multi criteria impacts (Energy consumption, Abiotic resource depletion potential, and Global Warming Potential)
+- multi stage (Ressources Usage and Manufacture)
+
+The estimations can be filtered by tags. It eases attribution to a specific server, application or service.
+
+Cloud-scanner can be used:
+
+- from command line, to get an immediate view of your impacts 💻
+- as a metric server . You can use it to monitor and display real time impacts in a dashboard 📊
 
 ![A example dashboard rendering cloud scanner metrics](docs/src/images/cloud-scanner-dashboard-clear.png "A example dashboard rendering cloud scanner metrics in Grafana")
 
@@ -37,13 +46,13 @@ See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud
 
 ## ⚠  Perimeter / scope and limits
 
-Cloud scanner provides impacts _only_ related to _compute_  resources (the Virtual Machines).
+Cloud scanner provides impacts _only_ related to _compute_  resources. It only estimates the impacts of your AWS EC2  instances.
 
 The limitations of cloud-scanner are documented in [Limitations - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/limits.html)
 
 Several significant aspectof the cloud provider are **excluded** :
 
-- only measure _compute_ instances (VM's), considering that
+- only measure _compute_ instances (EC2 VM's)
 - do not account for the surrounding cloud infrastructure (network, control plan)
 - do not account for storage
 - do not take into account the _overcommit_ (mutualization) or _overprovisionning_ that cloud provider may apply to provide the service.
@@ -52,6 +61,6 @@ Several significant aspectof the cloud provider are **excluded** :
 - supported regions (EU and US only for the time being)
 - unsupported instance types returns zero for their impacts.
 - we do not provide (yet) error margins https://github.com/Boavizta/boaviztapi/issues/147
-- The manufacturing impacts are not amortized (i.e. value returned for manuffacturiing imacts does not consider usage duration).
+- The manufacturing impacts are not amortized (i.e. values returned for manufacturing impacts do not consider usage duration).
 
 This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository or check the content of the `dev` branch.

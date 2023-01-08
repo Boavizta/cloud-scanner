@@ -13,7 +13,7 @@ Cloud scanner only provides impacts related to Compute resources (the Virtual Ma
 
 Several significant aspectof the cloud provider are **excluded**:
 
-- only measure _compute_ instances (VM's), considering that
+- only measure _compute_ instances (EC2 VM's)
 - do not account for the surrounding cloud infrastructure (network, control plan)
 - do not account for storage
 - do not take into account the _overcommit_ (mutualization) or _overprovisionning_ that cloud provider may apply to provide the service.
@@ -22,7 +22,7 @@ Several significant aspectof the cloud provider are **excluded**:
 - supported regions (EU and US only for the time being)
 - unsupported instance types returns zero for their impacts.
 - we do not provide (yet) error margins https://github.com/Boavizta/boaviztapi/issues/147
-- The manufacturing impacts are not amortized (i.e. value returned for manuffacturiing imacts does not consider usage duration).
+- The manufacturing impacts are not amortized (i.e. values returned for manufacturing impacts do not consider usage duration).
 
 ## Other limits
 
