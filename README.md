@@ -46,11 +46,11 @@ See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud
 
 ## ⚠  Perimeter / scope and limits
 
-Cloud scanner provides impacts _only_ related to _compute_  resources. It only estimates the impacts of your AWS EC2  instances.
+Cloud scanner _only_ estimates the impacts of your AWS EC2  instances.
 
 The limitations of cloud-scanner are documented in [Limitations - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/limits.html)
 
-Several significant aspectof the cloud provider are **excluded** :
+Several significant aspects of the global impacts of cloud usage are **excluded**:
 
 - only measure _compute_ instances (EC2 VM's)
 - do not account for the surrounding cloud infrastructure (network, control plan)

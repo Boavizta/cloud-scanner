@@ -9,9 +9,9 @@ The Boavizta impact data result from a modelling effort. It is important to cons
 
 ## Perimeter / scope
 
-Cloud scanner only provides impacts related to Compute resources (the Virtual Machines).
+Cloud scanner _only_ estimates the impacts of your AWS EC2  instances.
 
-Several significant aspectof the cloud provider are **excluded**:
+Several significant aspects of the global impacts of cloud usage are **excluded**:
 
 - only measure _compute_ instances (EC2 VM's)
 - do not account for the surrounding cloud infrastructure (network, control plan)
