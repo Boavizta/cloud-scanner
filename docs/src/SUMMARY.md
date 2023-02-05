@@ -15,6 +15,7 @@
 - [AWS authentication](how-to/passing-aws-credentials.md)
 - [Setup monitoring dashboard](how-to/set-up-dashboard.md)
 - [Filtering by tags](how-to/filter-by-tags.md)
+- [Using a private instance of Boavizta API](how-to/using-private-boaviztapi.md)
 - [Source of data](explanations/source-of-data.md)
 - [How we process workload](explanations/processing-workload.md)
 

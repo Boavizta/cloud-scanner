@@ -2,6 +2,8 @@
 
 You can deploy cloud scanner as a serverless application (AWS lambda).
 
+The application is build and deployed using the serverless framework (see [serverless-design](../reference/serverless-design.md)).
+
 ## Using Linux
 
 1. Install Rust

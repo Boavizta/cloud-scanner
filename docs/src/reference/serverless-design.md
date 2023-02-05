@@ -6,6 +6,19 @@ The cloud-scanner-cli is wrapped into a set of lambdas functions exposed behind 
 
 _This is certainly not the only way to deploy the application. If you want more control, you could compile, package and deploy the application with Terraform or CDK, but this is not documented yet._
 
+## Serverless deployment
+
+When deploying as serverless, **you** have to provide and configure Grafana and Prometheus seprately. This repository _only_ wrapps the cloud-scanner in a lambda.
+
+The recommended serveless deployment is the following.
+
+![Where to deploy the scanner as lambda](../images/cloud-scanner-lambda-deployment.excalidraw.png)
+
+The scanner is deployed as a lambda inside a first region of your account. It performs inventory of other regions. 
+
+- You may restrict to specifc regions by tuning the role of the lambda defined in `serverless.yml`
+- You can (and should) also deploy Boaviztapi as a lambda or other in your account. This allow to perform scans and evaluate impacts without any inventory data leaking outside your account. Once you have deployed your own instance of BoaviztAPI, tune the `BOAVIZTA_API_URL` in the `serverless.yml` file to ensure that cloud-scanner points to your private instance of API. See  [using private Boavizta API](../tutorials/../how-to/using-private-boaviztapi.md).
+
 ## Serverless routes
 
 ### Instance impacts as JSON
