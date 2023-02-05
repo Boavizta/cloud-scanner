@@ -17,7 +17,7 @@ The recommended serveless deployment is the following.
 The scanner is deployed as a lambda inside a first region of your account. It performs inventory of other regions. 
 
 - You may restrict to specifc regions by tuning the role of the lambda defined in `serverless.yml`
-- You can (and should) also deploy Boaviztapi as a lambda or other in your account. This allow to perform scans and evaluate impacts without any inventory data leaking outside your account. Once you have deployed your own instance of BoaviztAPI, tune the `BOAVIZTA_API_URL` in the `serverless.yml` file to ensure that cloud-scanner points to your private instance of API.
+- You can (and should) also deploy Boaviztapi as a lambda or other in your account. This allow to perform scans and evaluate impacts without any inventory data leaking outside your account. Once you have deployed your own instance of BoaviztAPI, tune the `BOAVIZTA_API_URL` in the `serverless.yml` file to ensure that cloud-scanner points to your private instance of API. See  [using private Boavizta API](../tutorials/../how-to/using-private-boaviztapi.md).
 
 ## Serverless routes
 
