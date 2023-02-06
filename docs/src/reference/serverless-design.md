@@ -19,6 +19,8 @@ The scanner is deployed as a lambda inside a first region of your account. It pe
 - You may restrict to specifc regions by tuning the role of the lambda defined in `serverless.yml`
 - You can (and should) also deploy Boaviztapi as a lambda or other in your account. This allow to perform scans and evaluate impacts without any inventory data leaking outside your account. Once you have deployed your own instance of BoaviztAPI, tune the `BOAVIZTA_API_URL` in the `serverless.yml` file to ensure that cloud-scanner points to your private instance of API. See  [using private Boavizta API](../tutorials/../how-to/using-private-boaviztapi.md).
 
+⚠ Open issue prevents Boavizta API deployment as Lambda (https://github.com/Boavizta/boaviztapi/issues/153). As a workaround we recommend deploying Boavizta API as a docker container  (for example using AWS ECS) . You can still use cloud-scanner itself as serverless application deployed with Lambda.
+
 ## Serverless routes
 
 ### Instance impacts as JSON
