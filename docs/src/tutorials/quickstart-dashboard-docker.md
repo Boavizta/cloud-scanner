@@ -11,7 +11,6 @@ All data remain local (this docker-compose stack uses a _private instance_ of Bo
 
 ![components of monitoring stack in docker compose](../images/cloud-scanner-metrics-compose.excalidraw.png)
 
-
 ## Run the demo dashboard
 
 ```sh
@@ -34,4 +33,4 @@ docker-compose up
   - Grafana is served on http with default login.
 - You may have to update the line mapping your AWS profile (Replace `AWS_PROFILE=${AWS_PROFILE}` by `AWS_PROFILE=the-real-name-of-your-profile`).
 - In corporate environments, you may need to provide your certificates authorities certificates (`ca-certificates`) to the cloud-scanner container (uncomment the mapping line in the docker-compose file).
-- For te demo, we deliberately set a short metrics scrapping interval (30 seconds in this demo). In production deloymnent, you may want to increase this metric scraping interval in the prometheus configuration file.
+- For the demo, we deliberately set a short metrics scrapping interval (30 seconds in this demo). In production deloymnent, you may want to increase this metric scraping interval in the prometheus configuration file.
