@@ -45,7 +45,7 @@ pub struct ResourceImpacts {
 }
 
 /// The aggregated impacts and meta data about the scan results
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ImpactsSummary {
     pub number_of_instances_total: u32,
     pub number_of_instances_assessed: u32,
@@ -67,12 +67,21 @@ impl ImpactsSummary {
         aws_region: String,
         country: String,
         resources: Vec<CloudResourceWithImpacts>,
+        duration_of_use_hours: f64,
     ) -> Self {
         let mut summary = ImpactsSummary {
             number_of_instances_total: u32::try_from(resources.len()).unwrap(),
+            number_of_instances_assessed: 0,
+            number_of_instances_not_assessed: 0,
             aws_region,
             country,
-            ..Default::default()
+            duration_of_use_hours,
+            adp_manufacture_kgsbeq: 0.0,
+            adp_use_kgsbeq: 0.0,
+            pe_manufacture_megajoules: 0.0,
+            pe_use_megajoules: 0.0,
+            gwp_manufacture_kgco2eq: 0.0,
+            gwp_use_kgco2eq: 0.0,
         };
 
         for resource in resources {

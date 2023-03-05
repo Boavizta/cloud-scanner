@@ -80,8 +80,8 @@ pub async fn get_default_impacts_as_metrics(
         String::from(aws_region),
         usage_location.iso_country_code,
         instances_with_impacts,
+        (*hours_use_time).into(),
     );
-
     debug!("Summary: {:#?}", summary);
 
     let metrics = get_metrics(&summary).with_context(|| {
