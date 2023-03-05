@@ -147,3 +147,18 @@ pub fn get_version() -> String {
     const PATCH: u32 = pkg_version_patch!();
     format!("{}.{}.{}", MAJOR, MINOR, PATCH)
 }
+
+#[tokio::test]
+async fn summary_has_to_contain_a_usage_duration() {
+    let resources: Vec<CloudResourceWithImpacts> = Vec::new();
+
+    let usage_duration_hours = 1.5;
+
+    let summary: ImpactsSummary =
+        ImpactsSummary::new(String::from("eu-west-1"), String::from("IRL"), resources);
+
+    assert_eq!(
+        summary.duration_of_use_hours, usage_duration_hours,
+        "Duration of summary should match"
+    );
+}
