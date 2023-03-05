@@ -80,8 +80,8 @@ pub async fn get_default_impacts_as_metrics(
         String::from(aws_region),
         usage_location.iso_country_code,
         instances_with_impacts,
+        (*hours_use_time).into(),
     );
-
     debug!("Summary: {:#?}", summary);
 
     let metrics = get_metrics(&summary).with_context(|| {
@@ -154,8 +154,12 @@ async fn summary_has_to_contain_a_usage_duration() {
 
     let usage_duration_hours = 1.5;
 
-    let summary: ImpactsSummary =
-        ImpactsSummary::new(String::from("eu-west-1"), String::from("IRL"), resources);
+    let summary: ImpactsSummary = ImpactsSummary::new(
+        String::from("eu-west-1"),
+        String::from("IRL"),
+        resources,
+        usage_duration_hours,
+    );
 
     assert_eq!(
         summary.duration_of_use_hours, usage_duration_hours,
