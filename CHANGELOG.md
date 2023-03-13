@@ -7,16 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased (DEV branch)
 
-- WIP: dependencies updates
+N/A
 
-
-## [0.2.3]-2023-03-06 - Douala release 🌴
+## [0.2.3]-2023-03-13 - Douala release 🌴
 
 ### Changed
 
 - Fix: use duration metric does not return zero anymore [Value returned for boavizta_duration_of_use_hours metric is always zero · Issue #206 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/206)
 - Docs: [Add link and icon to github repo in the published documentation  · Issue #223 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/223) + several schematics
 - Docs: [Add Link to boavizta cloud impact  · Issue #222 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/222)
+- Dependencies updates and use Rust 1.68.
 
 ## [0.2.2]-2023-01-07
 
