@@ -7,6 +7,8 @@ It combines real time _inventory_ and _usage_ data from your AWS account with [B
 - multi criteria: Primary Energy consumption (PE), Abiotic resource depletion potential (ADP), and Global Warming Potential (GWP)
 - multi stage: separate impacts of ressources Usage and Manufacture
 
+This is similar to what you can get from [Datavizta](http://datavizta.boavizta.org/cloudimpact) but with automated inventory.
+
 Estimations can be filtered by tags. It eases attribution to a specific server, environment, application or service.
 
 Cloud-scanner can be used:
