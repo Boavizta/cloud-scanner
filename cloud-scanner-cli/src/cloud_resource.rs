@@ -34,7 +34,7 @@ pub struct CloudResourceTag {
     pub value: Option<String>,
 }
 
-///  Parse the tags from Striing (coming from CLI or query strings) .
+///  Parse a  tag kay and value from a String (coming from CLI or query strings) .
 ///  Tags are expected to be int the form "Tag name=Tag value"
 impl TryFrom<String> for CloudResourceTag {
     type Error = &'static str;

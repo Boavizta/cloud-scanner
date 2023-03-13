@@ -231,7 +231,7 @@ mod tests {
     #[ignore]
     async fn test_list_resources() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
-        let filtertags: Vec<String> = vec!["".to_string()];
+        let filtertags: Vec<String> = Vec::new();
         let res: Vec<CloudResource> = inventory
             .list_resources(&filtertags)
             .await
