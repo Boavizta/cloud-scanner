@@ -26,3 +26,4 @@
 - [Output data](reference/output-data.md)
 - [Serverless design](reference/serverless-design.md)
 - [Limitations](reference/limits.md)
+- [Unit tests](reference/testing.md)

@@ -5,7 +5,7 @@ use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
-use boavizta_api_sdk::models::{Allocation, UsageCloud};
+use boavizta_api_sdk::models::{Allocation, Cloud, UsageCloud};
 
 /// Access data of Boavizta API
 pub struct BoaviztaApiV1 {
@@ -36,14 +36,19 @@ impl BoaviztaApiV1 {
             usage_cloud.time_workload = Some(usage.average_cpu_load as f32);
         }
 
-        let res = cloud_api::instance_cloud_impact_v1_cloud_aws_post(
+        let mut cloud: Cloud = Cloud::new();
+        cloud.provider = Some(String::from("aws"));
+        cloud.instance_type = Some(instance_type.clone());
+        cloud.usage = Some(Box::new(usage_cloud));
+
+        let res = cloud_api::instance_cloud_impact_v1_cloud_post(
             &self.configuration,
-            Some(instance_type.as_str()),
             verbose,
             Some(Allocation::Total),
-            Some(usage_cloud),
+            Some(cloud),
         )
         .await;
+
         match res {
             Ok(res) => Some(res),
             Err(e) => {
@@ -156,9 +161,11 @@ mod tests {
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
+        let provider = Some("aws");
 
-        let res = cloud_api::server_get_all_archetype_name_v1_cloud_aws_all_instances_get(
+        let res = cloud_api::server_get_all_archetype_name_v1_cloud_all_instances_get(
             &api.configuration,
+            provider,
         )
         .await
         .unwrap();
@@ -166,8 +173,9 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn should_retrieve_raw_default_impacts_fr() {
+    async fn should_retrieve_raw_default_impacts_aws_fr() {
         let instance1: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
@@ -195,6 +203,7 @@ mod tests {
             value: Some("myApp".to_string()),
         });
         let instance1: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
@@ -206,6 +215,8 @@ mod tests {
         };
 
         let instance1_1percent: CloudResource = CloudResource {
+            provider: String::from("aws"),
+
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
@@ -234,6 +245,7 @@ mod tests {
     #[tokio::test]
     async fn should_retrieve_multiple_default_impacts_fr() {
         let instance1: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
@@ -245,6 +257,7 @@ mod tests {
         };
 
         let instance2: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),
@@ -256,6 +269,7 @@ mod tests {
         };
 
         let instance3: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-3".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_type: "type-not-in-boa".to_string(),
@@ -291,6 +305,7 @@ mod tests {
     #[test]
     fn should_convert_results_to_impacts() {
         let instance1: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_type: "m6g.xlarge".to_string(),

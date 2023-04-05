@@ -201,6 +201,7 @@ impl CloudInventory for AwsInventory {
             };
 
             let cs = CloudResource {
+                provider: String::from("aws"),
                 id: instance_id,
                 location: location.clone(),
                 resource_type: instance.instance_type().unwrap().as_str().to_owned(),
@@ -272,7 +273,8 @@ mod tests {
         let datapoints = res.datapoints.unwrap();
         assert!(
             0 < datapoints.len() && datapoints.len() < 3,
-            "Stange number of datapoint returned. I was expecting 1 or 2  but got {} .\n {:#?}",
+            "Strange number of datapoint returned for instance {}, is it really up ?. I was expecting 1 or 2  but got {} .\n {:#?}",
+            &RUNNING_INSTANCE_ID,
             datapoints.len(),
             datapoints
         )
@@ -314,7 +316,11 @@ mod tests {
             .get_average_cpu(&RUNNING_INSTANCE_ID)
             .await
             .unwrap();
-        assert_ne!(0 as f64, avg_cpu_load);
+        assert_ne!(
+            0 as f64, avg_cpu_load,
+            "CPU load of instance {} is zero, is it really running ?",
+            &RUNNING_INSTANCE_ID
+        );
         println!("{:#?}", avg_cpu_load);
         assert!((0 as f64) < avg_cpu_load);
         assert!((100 as f64) > avg_cpu_load);

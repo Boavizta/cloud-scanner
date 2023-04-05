@@ -6,6 +6,7 @@ use std::{collections::HashMap, fmt};
 ///  A cloud resource (could be an instance, function or any other resource)
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CloudResource {
+    pub provider: String,
     pub id: String,
     pub location: UsageLocation,
     pub resource_type: String,
@@ -104,6 +105,7 @@ mod tests {
     #[test]
     pub fn a_cloud_resource_can_be_displayed() {
         let instance1: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
             resource_type: "t2.fictive".to_string(),
@@ -111,12 +113,13 @@ mod tests {
             tags: Vec::new(),
         };
 
-        assert_eq!("CloudResource { id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: [] }", format!("{:?}", instance1));
+        assert_eq!("CloudResource { provider: \"aws\", id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: [] }", format!("{:?}", instance1));
     }
 
     #[test]
     pub fn a_cloud_resource_without_usage_data_is_allowed() {
         let instance1: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
             resource_type: "t2.fictive".to_string(),
@@ -156,6 +159,7 @@ mod tests {
         });
 
         let instance1: CloudResource = CloudResource {
+            provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
             resource_type: "t2.fictive".to_string(),
