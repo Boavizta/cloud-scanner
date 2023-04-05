@@ -2,9 +2,9 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
-version = "0.2.3"
+version = "0.2.4"
 [dependencies]
-boavizta_api_sdk = "0.2.0-alpha.2"
+boavizta_api_sdk = "0.2.2-alpha2.openapi-generator"
 aws-types = "0.54.1"
 chrono = "^0.4"
 isocountry = "^0.3"
