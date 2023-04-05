@@ -550,9 +550,9 @@ dependencies = [
 
 [[package]]
 name = "boavizta_api_sdk"
-version = "0.2.2-alpha2.openapi-generator"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "696e7992c59a1c2657188cf9e5f4dd0c0608c5731ec03d8c310f1e2566c08671"
+checksum = "c0bf0babad628d97e393c6ae1907d446e1140f1826e4c447b022578c16766955"
 dependencies = [
  "reqwest",
  "serde",

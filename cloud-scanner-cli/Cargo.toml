@@ -4,7 +4,7 @@ edition = "2021"
 name = "cloud-scanner-cli"
 version = "0.2.4"
 [dependencies]
-boavizta_api_sdk = "0.2.2-alpha2.openapi-generator"
+boavizta_api_sdk = "0.2.2"
 aws-types = "0.54.1"
 chrono = "^0.4"
 isocountry = "^0.3"
