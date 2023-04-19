@@ -8,8 +8,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
-          with:
-            components:  clippy
+        with:
+          components:  clippy
       - run: cargo clippy
       - run: cargo test --all-features
 
