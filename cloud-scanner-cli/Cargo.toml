@@ -37,7 +37,7 @@ version = "0.54"
 
 [dependencies.clap]
 features = ["derive"]
-version = "=4.0.10"
+version = "=4.2.3"
 
 [dependencies.tokio]
 features = ["full"]
