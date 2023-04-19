@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Use new Boavizta API SDK for API v0.2.2 and use new API routes (following deprecation of AWS specific URLs). [Upgrade  to stable Boavizta API v0.2.x SDK · Issue #243 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/243) and [Update SDK for boaviztapi v2.x · Issue #4 · Boavizta/boaviztapi-sdk-rust](https://github.com/Boavizta/boaviztapi-sdk-rust/issues/4)
+- [Use Boavizta API v0.2.2 in the example docker-compose · Issue #208 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/208))
 - Doc: add aws command to list/start/stop instances in the _testing_ chapter of the doc.
 
 ## [0.2.3]-2023-03-13 - Douala release 🌴
