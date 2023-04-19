@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased (DEV branch)
 
+## [0.2.4]-2023-04-19
+
 ### Changed
 
 - Use new Boavizta API SDK for API v0.2.2 and use new API routes (following deprecation of AWS specific URLs). [Upgrade  to stable Boavizta API v0.2.x SDK · Issue #243 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/243) and [Update SDK for boaviztapi v2.x · Issue #4 · Boavizta/boaviztapi-sdk-rust](https://github.com/Boavizta/boaviztapi-sdk-rust/issues/4)
