@@ -41,10 +41,15 @@ impl BoaviztaApiV1 {
         cloud.instance_type = Some(instance_type.clone());
         cloud.usage = Some(Box::new(usage_cloud));
 
+        let mut criteria = Vec::new();
+        criteria.push("adp".to_owned());
+        criteria.push("gdp".to_owned());
+
         let res = cloud_api::instance_cloud_impact_v1_cloud_post(
             &self.configuration,
             verbose,
             Some(Allocation::Total),
+            Some(criteria),
             Some(cloud),
         )
         .await;
