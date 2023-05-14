@@ -42,8 +42,9 @@ impl BoaviztaApiV1 {
         cloud.usage = Some(Box::new(usage_cloud));
 
         let mut criteria = Vec::new();
+        criteria.push("gwp".to_owned());
         criteria.push("adp".to_owned());
-        criteria.push("gdp".to_owned());
+        criteria.push("pe".to_owned());
 
         let res = cloud_api::instance_cloud_impact_v1_cloud_post(
             &self.configuration,
@@ -110,12 +111,12 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
         debug!("This cloud resource has impacts data: {}", results);
 
         resource_impacts = Some(ResourceImpacts {
-            adp_manufacture_kgsbeq: results["adp"]["manufacture"].as_f64().unwrap(),
-            adp_use_kgsbeq: results["adp"]["use"].as_f64().unwrap(),
-            pe_manufacture_megajoules: results["pe"]["manufacture"].as_f64().unwrap(),
-            pe_use_megajoules: results["pe"]["use"].as_f64().unwrap(),
-            gwp_manufacture_kgco2eq: results["gwp"]["manufacture"].as_f64().unwrap(),
-            gwp_use_kgco2eq: results["gwp"]["use"].as_f64().unwrap(),
+            adp_manufacture_kgsbeq: results["adp"]["embedded"]["value"].as_f64().unwrap(),
+            adp_use_kgsbeq: results["adp"]["use"]["value"].as_f64().unwrap(),
+            pe_manufacture_megajoules: results["pe"]["embedded"]["value"].as_f64().unwrap(),
+            pe_use_megajoules: results["pe"]["use"]["value"].as_f64().unwrap(),
+            gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
+            gwp_use_kgco2eq: results["gwp"]["use"]["value"].as_f64().unwrap(),
         });
     } else {
         debug!(
@@ -137,11 +138,11 @@ mod tests {
     use super::*;
     use crate::UsageLocation;
 
-    const TEST_API_URL: &str = "https://api.boavizta.org";
+    // const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API
     // const TEST_API_URL: &str = "http:/localhost:5000";
     // Test against dev version of Boavizta API
-    // const TEST_API_URL: &str = "https://dev.api.boavizta.org";
+    const TEST_API_URL: &str = "https://dev.api.boavizta.org";
 
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str = r#"   
     {

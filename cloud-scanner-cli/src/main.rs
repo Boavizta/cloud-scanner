@@ -62,7 +62,7 @@ fn set_api_url(optional_url: Option<String>) -> String {
             url_arg
         }
         None => {
-            let default_url = "https://api.boavizta.org".to_string();
+            let default_url = "https://dev.api.boavizta.org".to_string();
             warn!("Using default API at:  {}", default_url);
             default_url
         }
