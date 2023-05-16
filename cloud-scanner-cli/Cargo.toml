@@ -20,7 +20,6 @@ async-trait = "0.1.58"
 assert-json-diff = "2.0.2"
 
 [dependencies.boavizta_api_sdk]
-path = "../../boaviztapi-sdk-rust"
 version = "0.3.0-alpha-openapigenerator"
 
 
