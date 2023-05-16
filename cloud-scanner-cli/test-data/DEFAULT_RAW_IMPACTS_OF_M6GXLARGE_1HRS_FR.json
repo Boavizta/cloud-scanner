@@ -1,10 +1,10 @@
 {
     "gwp": {
       "embedded": {
-        "value": 55,
+        "value": 55.0,
         "significant_figures": 2,
-        "min": 500,
-        "max": 1400,
+        "min": 500.0,
+        "max": 1400.0,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -39,10 +39,10 @@
     },
     "pe": {
       "embedded": {
-        "value": 720,
+        "value": 720.0,
         "significant_figures": 2,
-        "min": 6600,
-        "max": 19000,
+        "min": 6600.0,
+        "max": 19000.0,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -50,8 +50,8 @@
       "use": {
         "value": 0.2,
         "significant_figures": 1,
-        "min": 3,
-        "max": 4
+        "min": 3.0,
+        "max": 4.0
       },
       "unit": "MJ",
       "description": "Consumption of primary energy"
