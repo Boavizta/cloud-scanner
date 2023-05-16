@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased (DEV branch)
 
+_This paragraph may describe WIP/unreleased features_
+
+## [0.3.0-alpha]-2023-05-16
+
+This alpha release contains changes to integrate with the new version of Boavizta API (v0.3.0).
+
+It does not bring any new feature but allow retrieving the latest data set.
+
 ## [0.2.4]-2023-04-19
 
 ### Changed
