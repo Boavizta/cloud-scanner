@@ -41,10 +41,13 @@ impl BoaviztaApiV1 {
         cloud.instance_type = Some(instance_type.clone());
         cloud.usage = Some(Box::new(usage_cloud));
 
+        let criteria = vec!["gwp".to_owned(), "adp".to_owned(), "pe".to_owned()];
+
         let res = cloud_api::instance_cloud_impact_v1_cloud_post(
             &self.configuration,
             verbose,
             Some(Allocation::Total),
+            Some(criteria),
             Some(cloud),
         )
         .await;
@@ -105,12 +108,12 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
         debug!("This cloud resource has impacts data: {}", results);
 
         resource_impacts = Some(ResourceImpacts {
-            adp_manufacture_kgsbeq: results["adp"]["manufacture"].as_f64().unwrap(),
-            adp_use_kgsbeq: results["adp"]["use"].as_f64().unwrap(),
-            pe_manufacture_megajoules: results["pe"]["manufacture"].as_f64().unwrap(),
-            pe_use_megajoules: results["pe"]["use"].as_f64().unwrap(),
-            gwp_manufacture_kgco2eq: results["gwp"]["manufacture"].as_f64().unwrap(),
-            gwp_use_kgco2eq: results["gwp"]["use"].as_f64().unwrap(),
+            adp_manufacture_kgsbeq: results["adp"]["embedded"]["value"].as_f64().unwrap(),
+            adp_use_kgsbeq: results["adp"]["use"]["value"].as_f64().unwrap(),
+            pe_manufacture_megajoules: results["pe"]["embedded"]["value"].as_f64().unwrap(),
+            pe_use_megajoules: results["pe"]["use"]["value"].as_f64().unwrap(),
+            gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
+            gwp_use_kgco2eq: results["gwp"]["use"]["value"].as_f64().unwrap(),
         });
     } else {
         debug!(
@@ -131,32 +134,16 @@ mod tests {
 
     use super::*;
     use crate::UsageLocation;
+    use assert_json_diff::assert_json_include;
 
-    const TEST_API_URL: &str = "https://api.boavizta.org";
+    // const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API
     // const TEST_API_URL: &str = "http:/localhost:5000";
     // Test against dev version of Boavizta API
-    // const TEST_API_URL: &str = "https://dev.api.boavizta.org";
+    const TEST_API_URL: &str = "https://dev.api.boavizta.org";
 
-    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str = r#"   
-    {
-        "adp": {
-            "manufacture": 0.0083, 
-            "unit":"kgSbeq", 
-            "use": 9e-10
-        }, 
-        "gwp": {
-            "manufacture": 83.0,
-            "unit": "kgCO2eq", 
-            "use": 0.002
-            },
-        "pe": {
-            "manufacture": 1100.0,
-            "unit": "MJ",
-            "use": 0.2
-            }
-    }
-    "#;
+    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR.json");
 
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
@@ -191,7 +178,7 @@ mod tests {
 
         let expected: serde_json::Value =
             serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap();
-        assert_eq!(expected, res);
+        assert_json_include!(actual: res, expected: expected);
     }
 
     #[tokio::test]
@@ -323,6 +310,11 @@ mod tests {
 
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
+
+        assert!(
+            cloud_resource_with_impacts.resource_impacts.is_some(),
+            "Emtpy impacts"
+        );
 
         assert_eq!(
             0.2,
