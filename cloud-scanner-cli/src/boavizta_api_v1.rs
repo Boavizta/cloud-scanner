@@ -5,7 +5,7 @@ use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::configuration;
-use boavizta_api_sdk::models::{Allocation, Cloud, UsageCloud};
+use boavizta_api_sdk::models::{Cloud, UsageCloud};
 
 /// Access data of Boavizta API
 pub struct BoaviztaApiV1 {
@@ -30,7 +30,7 @@ impl BoaviztaApiV1 {
         let instance_type = cr.resource_type;
         let verbose = Some(false);
         let mut usage_cloud: UsageCloud = UsageCloud::new();
-        usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
+        //usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
         usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
         if let Some(usage) = cr.usage {
             usage_cloud.time_workload = Some(usage.average_cpu_load as f32);
@@ -43,7 +43,28 @@ impl BoaviztaApiV1 {
 
         let criteria = vec!["gwp".to_owned(), "adp".to_owned(), "pe".to_owned()];
 
-        let res = cloud_api::instance_cloud_impact_v1_cloud_post(
+        let res = cloud_api::instance_cloud_impact_v1_cloud_instance_post(
+            &self.configuration,
+            verbose,
+            Some(usage_duration_hours.to_owned()),
+            Some(criteria),
+            Some(cloud),
+        )
+        .await;
+
+        /*
+        pub async fn instance_cloud_impact_v1_cloud_instance_post(
+            configuration: &Configuration,
+            verbose: Option<bool>,
+            duration: Option<f32>,
+            criteria: Option<Vec<String>>,
+            cloud: Option<Cloud>
+        ) -> Result<Value, Error<InstanceCloudImpactV1CloudInstancePostError>>
+
+         */
+
+        // let res: cloud_api::instance_cloud_impact_v1_cloud_instance_post(configuration, verbose,  Some(usage_duration_hours.to_owned()), Some(criteria), Some(cloud)).await;
+        /*let res = cloud_api::instance_cloud_impact_v1_cloud_post(
             &self.configuration,
             verbose,
             Some(Allocation::Total),
@@ -51,7 +72,7 @@ impl BoaviztaApiV1 {
             Some(cloud),
         )
         .await;
-
+            */
         match res {
             Ok(res) => Some(res),
             Err(e) => {
@@ -150,7 +171,7 @@ mod tests {
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let provider = Some("aws");
 
-        let res = cloud_api::server_get_all_archetype_name_v1_cloud_all_instances_get(
+        let res = cloud_api::server_get_all_archetype_name_v1_cloud_instance_all_instances_get(
             &api.configuration,
             provider,
         )

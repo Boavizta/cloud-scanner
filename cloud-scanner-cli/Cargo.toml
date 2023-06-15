@@ -20,7 +20,10 @@ async-trait = "0.1.58"
 assert-json-diff = "2.0.2"
 
 [dependencies.boavizta_api_sdk]
-version = "0.3.0-alpha-openapigenerator"
+#version = "0.3.0-alpha-openapigenerator"
+version = "0.3.0-alpha2"
+path = "../../boaviztapi-sdk-rust"
+
 
 
 [dependencies.aws-config]
