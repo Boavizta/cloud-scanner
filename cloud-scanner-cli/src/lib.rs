@@ -50,6 +50,16 @@ async fn standard_scan(
     Ok(res)
 }
 
+/// Retuns inventory with impacts
+pub async fn get_impacts(
+    hours_use_time: &f32,
+    tags: &[String],
+    aws_region: &str,
+    api_url: &str,
+) -> Result<Vec<CloudResourceWithImpacts>> {
+    standard_scan(hours_use_time, tags, aws_region, api_url).await
+}
+
 /// Returns default impacts as json
 pub async fn get_default_impacts_as_json_string(
     hours_use_time: &f32,
