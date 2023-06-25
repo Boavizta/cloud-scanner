@@ -159,9 +159,9 @@ mod tests {
 
     // const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API
-    const TEST_API_URL: &str = "http:/localhost:5000";
+    // const TEST_API_URL: &str = "http:/localhost:5000";
     // Test against dev version of Boavizta API
-    //const TEST_API_URL: &str = "https://dev.api.boavizta.org";
+    const TEST_API_URL: &str = "https://dev.api.boavizta.org";
 
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR.json");
@@ -246,8 +246,8 @@ mod tests {
 
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
-        assert_eq!(0.2, r0.pe_use_megajoules);
-        assert_eq!(0.09, r1.pe_use_megajoules);
+        assert_eq!(0.21321, r0.pe_use_megajoules);
+        assert_eq!(0.08903, r1.pe_use_megajoules);
     }
 
     #[tokio::test]
@@ -305,8 +305,8 @@ mod tests {
         let r1 = res[1].resource_impacts.clone().unwrap();
         let r2 = res[2].resource_impacts.clone().is_none();
 
-        assert_eq!(0.2, r0.pe_use_megajoules);
-        assert_eq!(0.2, r1.pe_use_megajoules);
+        assert_eq!(0.21321, r0.pe_use_megajoules);
+        assert_eq!(0.21321, r1.pe_use_megajoules);
         assert_eq!(true, r2);
     }
 
@@ -338,7 +338,7 @@ mod tests {
         );
 
         assert_eq!(
-            0.2,
+            0.21321,
             cloud_resource_with_impacts
                 .resource_impacts
                 .unwrap()
