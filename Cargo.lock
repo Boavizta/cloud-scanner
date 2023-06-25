@@ -571,9 +571,9 @@ dependencies = [
 
 [[package]]
 name = "boavizta_api_sdk"
-version = "0.3.0-alpha-openapigenerator"
+version = "0.3.0-alpha2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9926b81a097b46177b2ae6f635815d41b62ca5f22ee5d57edd2f9e91d5fdff7"
+checksum = "b1d72be37bc5a692cc9d111b2ae222adfaa9f4feea9b382872d258ea9b515c76"
 dependencies = [
  "reqwest",
  "serde",
@@ -680,7 +680,7 @@ checksum = "8a2dd5a6fe8c6e3502f568a6353e5273bbb15193ad9a89e457b9970798efbea1"
 
 [[package]]
 name = "cloud-scanner-cli"
-version = "0.3.0-alpha"
+version = "0.3.0-alpha2"
 dependencies = [
  "anyhow",
  "assert-json-diff",

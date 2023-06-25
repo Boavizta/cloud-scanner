@@ -2,7 +2,7 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
-version = "0.3.0-alpha"
+version = "0.3.0-alpha2"
 [dependencies]
 aws-types = "0.54.1"
 chrono = "^0.4"
@@ -20,7 +20,9 @@ async-trait = "0.1.58"
 assert-json-diff = "2.0.2"
 
 [dependencies.boavizta_api_sdk]
-version = "0.3.0-alpha-openapigenerator"
+version = "0.3.0-alpha2"
+# path = "../../boaviztapi-sdk-rust"
+
 
 
 [dependencies.aws-config]
