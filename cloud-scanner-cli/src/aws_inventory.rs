@@ -7,10 +7,10 @@ use crate::cloud_inventory::CloudInventory;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
 use anyhow::{Context, Result};
-use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
-use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
-use aws_sdk_ec2::model::Instance;
-use aws_sdk_ec2::Region;
+use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
+use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
+use aws_sdk_ec2::config::Region;
+use aws_sdk_ec2::types::Instance;
 use chrono::Duration;
 use chrono::Utc;
 
@@ -133,12 +133,12 @@ impl AwsInventory {
             .value(instance_id)
             .build()];
 
-        let end_time_aws: aws_sdk_cloudwatch::types::DateTime =
-            aws_sdk_cloudwatch::types::DateTime::from_secs(now.timestamp());
-        let start_time_aws: aws_sdk_cloudwatch::types::DateTime =
-            aws_sdk_cloudwatch::types::DateTime::from_secs(start_time.timestamp());
+        let end_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
+            aws_sdk_cloudwatch::primitives::DateTime::from_secs(now.timestamp());
+        let start_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
+            aws_sdk_cloudwatch::primitives::DateTime::from_secs(start_time.timestamp());
 
-        let resp = self
+        let resp: GetMetricStatisticsOutput = self
             .cloudwatch_client
             .get_metric_statistics()
             .end_time(end_time_aws)
