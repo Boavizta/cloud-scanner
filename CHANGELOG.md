@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features_
 
+### Added
+
+- [Log time spend on actions · Issue #289 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/289)
+
+## [0.3.0-alpha2]-2023-06-26
+
+Minor adaptations to the not yet released Boavizta API V1.0alpha.
+
 ## [0.3.0-alpha]-2023-05-16
 
 This alpha release contains changes to integrate with the new version of Boavizta API (v0.3.0).

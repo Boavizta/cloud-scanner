@@ -1,6 +1,8 @@
 //! A module to perform inventory of  AWS cloud resources.
 //!
 //!  ⚠ Only ec2 instances are supported  today.
+use std::time::Instant;
+
 use crate::cloud_inventory::CloudInventory;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
@@ -167,6 +169,9 @@ impl CloudInventory for AwsInventory {
         // let usages = instances.iter().map(|i| self.get_average_cpu( i.instance_id().unwrap()).unwrap()).collect();
         let location = UsageLocation::from(self.aws_region.as_str());
 
+        // Just to display statitstics
+        let cpu_info_timer = Instant::now();
+
         let mut res: Vec<CloudResource> = Vec::new();
         for instance in instances {
             let instance_id = instance.instance_id().unwrap().to_string();
@@ -200,6 +205,11 @@ impl CloudInventory for AwsInventory {
                 }
             };
 
+            info!(
+                "Total time spend querying CPU load of instances: {:?}",
+                cpu_info_timer.elapsed()
+            );
+
             let cs = CloudResource {
                 provider: String::from("aws"),
                 id: instance_id,
@@ -210,10 +220,10 @@ impl CloudInventory for AwsInventory {
             };
 
             if cs.has_matching_tags(tags) {
-                info!("Resource matched on tags: {:?}", cs.id);
+                debug!("Resource matched on tags: {:?}", cs.id);
                 res.push(cs);
             } else {
-                warn!("Filtered instance (tags do not match: {:?}", cs);
+                debug!("Filtered instance (tags do not match: {:?}", cs);
             }
             //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
         }

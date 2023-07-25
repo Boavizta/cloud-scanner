@@ -19,7 +19,7 @@ extern crate rocket;
 #[macro_use]
 extern crate log;
 use pkg_version::*;
-use std::time::{Instant, Duration};
+use std::time::{Duration, Instant};
 pub mod aws_inventory;
 pub mod boavizta_api_v1;
 pub mod cloud_inventory;
@@ -27,8 +27,8 @@ pub mod cloud_resource;
 pub mod impact_provider;
 pub mod metric_exporter;
 pub mod metric_server;
-pub mod usage_location;
 pub mod model;
+pub mod usage_location;
 
 use anyhow::{Context, Result};
 
@@ -38,8 +38,6 @@ async fn standard_scan(
     aws_region: &str,
     api_url: &str,
 ) -> Result<Vec<CloudResourceWithImpacts>> {
-
-
     let start = Instant::now();
 
     let inventory: AwsInventory = AwsInventory::new(aws_region).await;
@@ -58,15 +56,15 @@ async fn standard_scan(
         .context("Failure while retrieving impacts")?;
     let impact_duration = impact_start.elapsed();
 
-    let total_duration =  start.elapsed();
+    let total_duration = start.elapsed();
 
     let stats = ExecutionStatistics {
         inventory_duration,
         impact_duration,
-        total_duration
+        total_duration,
     };
 
-    info!("{}",stats);
+    info!("{}", stats);
 
     Ok(res)
 }
@@ -151,12 +149,12 @@ pub async fn show_inventory(tags: &[String], aws_region: &str) -> Result<()> {
     let json_inventory: String =
         serde_json::to_string(&cloud_resources).context("Cannot format inventory as json")?;
 
-    let stats = ExecutionStatistics{
-        inventory_duration : start.elapsed(),
-        impact_duration : Duration::from_millis(0),
-        total_duration : start.elapsed(),
+    let stats = ExecutionStatistics {
+        inventory_duration: start.elapsed(),
+        impact_duration: Duration::from_millis(0),
+        total_duration: start.elapsed(),
     };
-    warn!("{:?}",stats);
+    warn!("{:?}", stats);
     println!("{}", json_inventory);
     Ok(())
 }
