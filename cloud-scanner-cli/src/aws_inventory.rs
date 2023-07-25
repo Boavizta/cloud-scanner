@@ -59,7 +59,7 @@ impl AwsInventory {
 
     /// List all ec2 instances of the current account.
     ///
-    /// ⚠  Filtering instance on tags is not yet imlemented. All instances (running or stopped) are returned.
+    /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
     async fn list_instances(self, tags: &[String]) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
