@@ -16,6 +16,7 @@ _This paragraph may describe WIP/unreleased features_
 ### Changed
 
 - [Update to latest AWS SDK · Issue #308 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/308)
+- Serverless: update `lambda_runtime` and `lambda_http` crates to v 0.8.1, bump version of cloud_scanner_lambda package to `0.3.0-alpha2`.
 
 ## [0.3.0-alpha2]-2023-06-26
 
