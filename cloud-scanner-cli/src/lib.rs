@@ -118,15 +118,18 @@ pub async fn print_default_impacts_as_metrics(
     Ok(())
 }
 
-/// List instances and metadata to standard output
-pub async fn show_inventory(tags: &[String], aws_region: &str) -> Result<()> {
+pub async fn get_inventory_as_json(tags: &[String], aws_region: &str) -> Result<String> {
     let inventory: AwsInventory = AwsInventory::new(aws_region).await;
     let cloud_resources: Vec<CloudResource> = inventory
         .list_resources(tags)
         .await
         .context("Cannot perform inventory.")?;
-    let json_inventory: String =
-        serde_json::to_string(&cloud_resources).context("Cannot format inventory as json")?;
+    serde_json::to_string(&cloud_resources).context("Cannot format inventory as json")
+}
+
+/// List instances and metadata to standard output
+pub async fn show_inventory(tags: &[String], aws_region: &str) -> Result<()> {
+    let json_inventory: String = get_inventory_as_json(tags, aws_region).await?;
     println!("{}", json_inventory);
     Ok(())
 }

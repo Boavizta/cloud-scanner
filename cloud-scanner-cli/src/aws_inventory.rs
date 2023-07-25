@@ -43,7 +43,7 @@ impl AwsInventory {
             // Use default region (from env)
             let sdk_config = aws_config::from_env().load().await;
             warn!(
-                "Cannot initialize from empty region, fallng back to using default region from environement [{}]",
+                "Cannot initialize from empty region, falling back to using default region from environement [{}]",
                 sdk_config.region().unwrap()
             );
             sdk_config
