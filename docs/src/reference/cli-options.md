@@ -27,3 +27,16 @@ Options:
   -V, --version
           Print version information
 ```
+
+## Display statistics
+
+Use `-v` will display statitstics (inventory duration, impact retrieval duration and total execution duration) on std error.
+
+```sh
+cloud-scanner-cli -v estimate -u 1
+# use -- -v with cargo
+# cargo  run -- -v estimate -u 1
+[...]
+cloud_scanner_cli: ExecutionStatistics { inventory_duration: 780.912283ms, impact_duration: 392.298973ms, total_duration: 1.17321208s }
+[...]
+```

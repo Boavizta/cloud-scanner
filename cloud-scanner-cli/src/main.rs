@@ -20,7 +20,7 @@ struct Arguments {
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
     filter_tags: Vec<String>,
     #[clap(short, long,  action = clap::ArgAction::Count)]
-    /// Enable logging, use multiple `v`s to increase verbosity
+    /// Enable logging and show execution duration, use multiple `v`s to increase logging level warning to debug
     verbosity: u8,
     /// Returns OpenMetrics (Prometheus) instead of json output
     #[clap(short = 'm', long)]
