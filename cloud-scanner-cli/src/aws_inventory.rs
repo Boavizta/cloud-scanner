@@ -1,14 +1,16 @@
 //! A module to perform inventory of  AWS cloud resources.
 //!
 //!  ⚠ Only ec2 instances are supported  today.
+use std::time::Instant;
+
 use crate::cloud_inventory::CloudInventory;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
 use anyhow::{Context, Result};
-use aws_sdk_cloudwatch::model::{Dimension, StandardUnit, Statistic};
-use aws_sdk_cloudwatch::output::GetMetricStatisticsOutput;
-use aws_sdk_ec2::model::Instance;
-use aws_sdk_ec2::Region;
+use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
+use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
+use aws_sdk_ec2::config::Region;
+use aws_sdk_ec2::types::Instance;
 use chrono::Duration;
 use chrono::Utc;
 
@@ -59,7 +61,7 @@ impl AwsInventory {
 
     /// List all ec2 instances of the current account.
     ///
-    /// ⚠  Filtering instance on tags is not yet imlemented. All instances (running or stopped) are returned.
+    /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
     async fn list_instances(self, tags: &[String]) -> Result<Vec<Instance>> {
         warn!("Warning: filtering on tags is not implemented {:?}", tags);
 
@@ -131,12 +133,12 @@ impl AwsInventory {
             .value(instance_id)
             .build()];
 
-        let end_time_aws: aws_sdk_cloudwatch::types::DateTime =
-            aws_sdk_cloudwatch::types::DateTime::from_secs(now.timestamp());
-        let start_time_aws: aws_sdk_cloudwatch::types::DateTime =
-            aws_sdk_cloudwatch::types::DateTime::from_secs(start_time.timestamp());
+        let end_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
+            aws_sdk_cloudwatch::primitives::DateTime::from_secs(now.timestamp());
+        let start_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
+            aws_sdk_cloudwatch::primitives::DateTime::from_secs(start_time.timestamp());
 
-        let resp = self
+        let resp: GetMetricStatisticsOutput = self
             .cloudwatch_client
             .get_metric_statistics()
             .end_time(end_time_aws)
@@ -166,6 +168,9 @@ impl CloudInventory for AwsInventory {
             .unwrap();
         // let usages = instances.iter().map(|i| self.get_average_cpu( i.instance_id().unwrap()).unwrap()).collect();
         let location = UsageLocation::from(self.aws_region.as_str());
+
+        // Just to display statitstics
+        let cpu_info_timer = Instant::now();
 
         let mut res: Vec<CloudResource> = Vec::new();
         for instance in instances {
@@ -200,6 +205,11 @@ impl CloudInventory for AwsInventory {
                 }
             };
 
+            info!(
+                "Total time spend querying CPU load of instances: {:?}",
+                cpu_info_timer.elapsed()
+            );
+
             let cs = CloudResource {
                 provider: String::from("aws"),
                 id: instance_id,
@@ -210,10 +220,10 @@ impl CloudInventory for AwsInventory {
             };
 
             if cs.has_matching_tags(tags) {
-                info!("Resource matched on tags: {:?}", cs.id);
+                debug!("Resource matched on tags: {:?}", cs.id);
                 res.push(cs);
             } else {
-                warn!("Filtered instance (tags do not match: {:?}", cs);
+                debug!("Filtered instance (tags do not match: {:?}", cs);
             }
             //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
         }

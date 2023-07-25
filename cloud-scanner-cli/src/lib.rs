@@ -3,6 +3,7 @@
 //!  A command line application that performs inventory of your cloud account and combines it with Boavizta API  to return an estimation of its environmental impact.
 //!
 
+use crate::model::ExecutionStatistics;
 use crate::usage_location::*;
 use aws_inventory::*;
 use boavizta_api_v1::*;
@@ -18,6 +19,7 @@ extern crate rocket;
 #[macro_use]
 extern crate log;
 use pkg_version::*;
+use std::time::{Duration, Instant};
 pub mod aws_inventory;
 pub mod boavizta_api_v1;
 pub mod cloud_inventory;
@@ -25,6 +27,7 @@ pub mod cloud_resource;
 pub mod impact_provider;
 pub mod metric_exporter;
 pub mod metric_server;
+pub mod model;
 pub mod usage_location;
 
 use anyhow::{Context, Result};
@@ -35,17 +38,33 @@ async fn standard_scan(
     aws_region: &str,
     api_url: &str,
 ) -> Result<Vec<CloudResourceWithImpacts>> {
+    let start = Instant::now();
+
     let inventory: AwsInventory = AwsInventory::new(aws_region).await;
     let cloud_resources: Vec<CloudResource> = inventory
         .list_resources(tags)
         .await
         .context("Cannot perform resouces inventory")?;
 
+    let inventory_duration = start.elapsed();
+
+    let impact_start = Instant::now();
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let res = api
         .get_impacts(cloud_resources, hours_use_time)
         .await
         .context("Failure while retrieving impacts")?;
+    let impact_duration = impact_start.elapsed();
+
+    let total_duration = start.elapsed();
+
+    let stats = ExecutionStatistics {
+        inventory_duration,
+        impact_duration,
+        total_duration,
+    };
+
+    info!("{}", stats);
 
     Ok(res)
 }
@@ -119,11 +138,18 @@ pub async fn print_default_impacts_as_metrics(
 }
 
 pub async fn get_inventory_as_json(tags: &[String], aws_region: &str) -> Result<String> {
+    let start = Instant::now();
     let inventory: AwsInventory = AwsInventory::new(aws_region).await;
     let cloud_resources: Vec<CloudResource> = inventory
         .list_resources(tags)
         .await
         .context("Cannot perform inventory.")?;
+    let stats = ExecutionStatistics {
+        inventory_duration: start.elapsed(),
+        impact_duration: Duration::from_millis(0),
+        total_duration: start.elapsed(),
+    };
+    warn!("{:?}", stats);
     serde_json::to_string(&cloud_resources).context("Cannot format inventory as json")
 }
 
