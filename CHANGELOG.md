@@ -13,6 +13,10 @@ _This paragraph may describe WIP/unreleased features_
 
 - [Log time spend on actions · Issue #289 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/289)
 
+### Changed
+
+- [Update to latest AWS SDK · Issue #308 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/308)
+
 ## [0.3.0-alpha2]-2023-06-26
 
 Minor adaptations to the not yet released Boavizta API V1.0alpha.
