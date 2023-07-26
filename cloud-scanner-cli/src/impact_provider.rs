@@ -8,6 +8,8 @@
 use crate::cloud_resource::*;
 use anyhow::Result;
 use async_trait::async_trait;
+use rocket_okapi::okapi::schemars;
+use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// A ImpactProvider trait that yu should implement for a specific impact API
@@ -24,7 +26,7 @@ pub trait ImpactProvider {
     ) -> Result<Vec<CloudResourceWithImpacts>>;
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResourceWithImpacts {
     pub cloud_resource: CloudResource,
     /// The impacts
@@ -34,7 +36,7 @@ pub struct CloudResourceWithImpacts {
 }
 
 /// Impacts of an individual resource
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct ResourceImpacts {
     pub adp_manufacture_kgsbeq: f64,
     pub adp_use_kgsbeq: f64,
@@ -45,7 +47,7 @@ pub struct ResourceImpacts {
 }
 
 /// The aggregated impacts and meta data about the scan results
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ImpactsSummary {
     pub number_of_instances_total: u32,
     pub number_of_instances_assessed: u32,

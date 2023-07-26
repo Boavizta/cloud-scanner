@@ -3,6 +3,7 @@ authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
 version = "0.3.0-alpha3"
+
 [dependencies]
 aws-types = "0.55.3"
 chrono = "^0.4"
@@ -15,9 +16,19 @@ serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
 anyhow = "1.0.65"
-rocket = "0.5.0-rc.2"
+
 async-trait = "0.1.58"
 assert-json-diff = "2.0.2"
+
+rocket =  { version ="0.5.0-rc.3", default-features = false, features = ["json"]}
+rocket_okapi = { version="0.8.0-rc.3",  features = ["swagger", "rapidoc"]} 
+
+# schemars = { version = "0.8.10" }
+# okapi = { version = "0.7", features = ["derive_json_schema"] }
+
+
+# okapi = { version = "0.4", features = ["derive_json_schema"] }
+
 
 [dependencies.boavizta_api_sdk]
 version = "0.3.0-alpha2"

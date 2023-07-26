@@ -1,10 +1,12 @@
 use crate::UsageLocation;
 //use anyhow::{Context, Result};
+use rocket_okapi::okapi::schemars;
+use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
 
 ///  A cloud resource (could be an instance, function or any other resource)
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResource {
     pub provider: String,
     pub id: String,
@@ -22,14 +24,14 @@ impl fmt::Display for CloudResource {
 }
 
 /// Usage of a cloud resource
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResourceUsage {
     pub average_cpu_load: f64,
     pub usage_duration_seconds: u32,
 }
 
 /// A tag (just a mandatory key + optional value)
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResourceTag {
     pub key: String,
     pub value: Option<String>,
