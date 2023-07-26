@@ -10,7 +10,7 @@ use boavizta_api_v1::*;
 use cloud_inventory::*;
 use cloud_resource::*;
 use impact_provider::ImpactProvider;
-use impact_provider::{CloudResourceWithImpacts, ImpactsSummary};
+use impact_provider::ImpactsSummary;
 use metric_exporter::*;
 
 #[macro_use]
