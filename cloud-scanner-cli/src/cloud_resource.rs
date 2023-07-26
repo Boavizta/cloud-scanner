@@ -216,7 +216,7 @@ mod tests {
         assert_eq!(
             false,
             instance1.has_matching_tagmap(&tag_without_val),
-            "Tags should not match"
+            "Tag without a value should not match"
         );
 
         // Trying an empty filter
@@ -224,7 +224,24 @@ mod tests {
         assert_eq!(
             true,
             instance1.has_matching_tagmap(&empty_filter),
-            "Tags should not match"
+            "Tags should match"
+        );
+
+        // When the name of tag used to filter is an empty string....
+        let mut empty_tag_name_in_filter = HashMap::new();
+
+        let empty_key: String = "".to_string();
+        empty_tag_name_in_filter.insert(
+            empty_key.clone(),
+            CloudResourceTag {
+                key: empty_key,
+                value: Some("whatever".to_string()),
+            },
+        );
+        assert_eq!(
+            true,
+            instance1.has_matching_tagmap(&empty_filter),
+            "Tags should match (i.e. we should ignore this invalid filter"
         );
     }
 }

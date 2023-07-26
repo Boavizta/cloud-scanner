@@ -206,6 +206,8 @@ pub fn get_version() -> String {
 
 #[tokio::test]
 async fn summary_has_to_contain_a_usage_duration() {
+    use crate::impact_provider::CloudResourceWithImpacts;
+
     let resources: Vec<CloudResourceWithImpacts> = Vec::new();
 
     let usage_duration_hours = 1.5;

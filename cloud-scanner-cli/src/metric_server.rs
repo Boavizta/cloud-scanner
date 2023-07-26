@@ -16,10 +16,7 @@ pub struct Config {
 /// Start the metric server
 pub async fn run(config: Config) -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
-        .mount(
-            "/",
-            openapi_get_routes![index, metrics, inventory, inventorynew, impacts],
-        )
+        .mount("/", openapi_get_routes![index, metrics, inventory, impacts])
         .mount(
             "/swagger-ui/",
             make_swagger_ui(&SwaggerUIConfig {
@@ -64,23 +61,10 @@ async fn metrics(config: &State<Config>, aws_region: &str, filter_tags: Vec<Stri
 
 /// Returns the inventory as json
 /// Region is mandatory, tags are optional
-/// Example query: http://localhost:8000/inventory?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
-#[openapi(skip)]
-#[get("/inventory?<aws_region>&<filter_tags>")]
-async fn inventory(_config: &State<Config>, aws_region: &str, filter_tags: Vec<String>) -> String {
-    warn!("Getting something on /inventory");
-    warn!("Filtering on tags {:?}", filter_tags);
-    crate::get_inventory_as_json(&filter_tags, aws_region)
-        .await
-        .unwrap()
-}
-
-/// Returns the inventory as json
-/// Region is mandatory, tags are optional
 /// Example query: http://localhost:8000/inventorynew?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
 #[openapi(tag = "inventory")]
-#[get("/inventorynew?<aws_region>&<filter_tags>")]
-async fn inventorynew(
+#[get("/inventory?<aws_region>&<filter_tags>")]
+async fn inventory(
     _config: &State<Config>,
     aws_region: &str,
     filter_tags: Vec<String>,
