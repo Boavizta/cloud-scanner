@@ -23,6 +23,7 @@
 
 - [CLI options](reference/cli-options.md)
 - [Environment variables](reference/env-vars.md)
+- [OpenAPI specification in server mode](reference/openapi-server-mode.md)
 - [Output data](reference/output-data.md)
 - [Serverless design](reference/serverless-design.md)
 - [Limitations](reference/limits.md)

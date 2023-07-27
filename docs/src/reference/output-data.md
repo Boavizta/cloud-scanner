@@ -2,7 +2,7 @@
 
 Cloud scanner CLI and serverless application return data as _json_ or _Open Metrics_ (Prometheus) format.
 
-## JSON output (the default)
+## JSON CLI output (the default)
 
 Cloud scanner returns a json array of instances metadata.
 
@@ -64,6 +64,15 @@ Cloud scanner returns a json array of instances metadata.
   }
 ]
 ```
+
+## Server mode json results
+
+The format of the json results is slightly more complex in server mode.
+
+When run in server mode, the server exposes an OpenAPI specification at <http://127.0.0.1:8000/openapi.json> and a swagger-ui:
+<http://127.0.0.1:8000/swagger-ui/>
+
+See  [OpenAPI specification in server mode](./openapi-server-mode.md)
 
 ## OpenMetrics/Prometheus output
 
