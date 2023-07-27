@@ -1,10 +1,12 @@
 use crate::UsageLocation;
 //use anyhow::{Context, Result};
+use rocket_okapi::okapi::schemars;
+use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
 
 ///  A cloud resource (could be an instance, function or any other resource)
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResource {
     pub provider: String,
     pub id: String,
@@ -22,14 +24,14 @@ impl fmt::Display for CloudResource {
 }
 
 /// Usage of a cloud resource
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResourceUsage {
     pub average_cpu_load: f64,
     pub usage_duration_seconds: u32,
 }
 
 /// A tag (just a mandatory key + optional value)
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResourceTag {
     pub key: String,
     pub value: Option<String>,
@@ -214,7 +216,7 @@ mod tests {
         assert_eq!(
             false,
             instance1.has_matching_tagmap(&tag_without_val),
-            "Tags should not match"
+            "Tag without a value should not match"
         );
 
         // Trying an empty filter
@@ -222,7 +224,24 @@ mod tests {
         assert_eq!(
             true,
             instance1.has_matching_tagmap(&empty_filter),
-            "Tags should not match"
+            "Tags should match"
+        );
+
+        // When the name of tag used to filter is an empty string....
+        let mut empty_tag_name_in_filter = HashMap::new();
+
+        let empty_key: String = "".to_string();
+        empty_tag_name_in_filter.insert(
+            empty_key.clone(),
+            CloudResourceTag {
+                key: empty_key,
+                value: Some("whatever".to_string()),
+            },
+        );
+        assert_eq!(
+            true,
+            instance1.has_matching_tagmap(&empty_filter),
+            "Tags should match (i.e. we should ignore this invalid filter"
         );
     }
 }

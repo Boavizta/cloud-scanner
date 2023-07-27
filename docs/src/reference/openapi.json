@@ -1,0 +1,329 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "cloud-scanner-cli",
+    "version": "0.3.0-alpha3"
+  },
+  "paths": {
+    "/inventory": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "description": "Returns the inventory as json Region is mandatory, tags are optional Example query: http://localhost:8000/inventorynew?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value",
+        "operationId": "inventory",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impacts": {
+      "get": {
+        "tags": [
+          "impacts"
+        ],
+        "description": "Returns the impacts as json Region is mandatory, tags are optional Example query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value",
+        "operationId": "impacts",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourcesWithImpacts"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Inventory": {
+        "description": "Inventory",
+        "type": "object",
+        "required": [
+          "executionStatistics",
+          "resources"
+        ],
+        "properties": {
+          "resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResource"
+            }
+          },
+          "executionStatistics": {
+            "$ref": "#/components/schemas/ExecutionStatistics"
+          }
+        }
+      },
+      "CloudResource": {
+        "description": "A cloud resource (could be an instance, function or any other resource)",
+        "type": "object",
+        "required": [
+          "id",
+          "location",
+          "provider",
+          "resource_type",
+          "tags"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/UsageLocation"
+          },
+          "resource_type": {
+            "type": "string"
+          },
+          "usage": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CloudResourceUsage"
+              }
+            ],
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResourceTag"
+            }
+          }
+        }
+      },
+      "UsageLocation": {
+        "description": "TODO! the usage location should be part of the cloud_inventory model (region names are tied to a specific cloud provider)",
+        "type": "object",
+        "required": [
+          "aws_region",
+          "iso_country_code"
+        ],
+        "properties": {
+          "aws_region": {
+            "type": "string"
+          },
+          "iso_country_code": {
+            "description": "The 3-letters ISO country code corresponding to the country of the aws_region",
+            "type": "string"
+          }
+        }
+      },
+      "CloudResourceUsage": {
+        "description": "Usage of a cloud resource",
+        "type": "object",
+        "required": [
+          "average_cpu_load",
+          "usage_duration_seconds"
+        ],
+        "properties": {
+          "average_cpu_load": {
+            "type": "number",
+            "format": "double"
+          },
+          "usage_duration_seconds": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
+      "CloudResourceTag": {
+        "description": "A tag (just a mandatory key + optional value)",
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ExecutionStatistics": {
+        "description": "Statistics about program execution",
+        "type": "object",
+        "required": [
+          "impact_duration",
+          "inventory_duration",
+          "total_duration"
+        ],
+        "properties": {
+          "inventory_duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "impact_duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "total_duration": {
+            "$ref": "#/components/schemas/Duration"
+          }
+        }
+      },
+      "Duration": {
+        "type": "object",
+        "required": [
+          "nanos",
+          "secs"
+        ],
+        "properties": {
+          "secs": {
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
+          },
+          "nanos": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
+      "ResourcesWithImpacts": {
+        "description": "Impacts results",
+        "type": "object",
+        "required": [
+          "executionStatistics",
+          "impacts"
+        ],
+        "properties": {
+          "impacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResourceWithImpacts"
+            }
+          },
+          "executionStatistics": {
+            "$ref": "#/components/schemas/ExecutionStatistics"
+          }
+        }
+      },
+      "CloudResourceWithImpacts": {
+        "type": "object",
+        "required": [
+          "cloud_resource",
+          "impacts_duration_hours"
+        ],
+        "properties": {
+          "cloud_resource": {
+            "$ref": "#/components/schemas/CloudResource"
+          },
+          "resource_impacts": {
+            "description": "The impacts",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ResourceImpacts"
+              }
+            ],
+            "nullable": true
+          },
+          "impacts_duration_hours": {
+            "description": "The duration for which impacts are calculated",
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ResourceImpacts": {
+        "description": "Impacts of an individual resource",
+        "type": "object",
+        "required": [
+          "adp_manufacture_kgsbeq",
+          "adp_use_kgsbeq",
+          "gwp_manufacture_kgco2eq",
+          "gwp_use_kgco2eq",
+          "pe_manufacture_megajoules",
+          "pe_use_megajoules"
+        ],
+        "properties": {
+          "adp_manufacture_kgsbeq": {
+            "type": "number",
+            "format": "double"
+          },
+          "adp_use_kgsbeq": {
+            "type": "number",
+            "format": "double"
+          },
+          "pe_manufacture_megajoules": {
+            "type": "number",
+            "format": "double"
+          },
+          "pe_use_megajoules": {
+            "type": "number",
+            "format": "double"
+          },
+          "gwp_manufacture_kgco2eq": {
+            "type": "number",
+            "format": "double"
+          },
+          "gwp_use_kgco2eq": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      }
+    }
+  }
+}

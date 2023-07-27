@@ -11,7 +11,16 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Added
 
+### Changed
+
+## [0.3.0-alpha3]-2023-07-27
+
+### Added
+
 - [Log time spend on actions · Issue #289 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/289)
+- [Return inventory as json in the standalone server mode · Issue #286 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/286) thanks to a contribution of @notCamelCaseName
+- [Return impacts as json in the standalone server mode · Issue #287 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/287)
+- [Expose OpenAPI spec · Issue #285 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/285)
 
 ### Changed
 
