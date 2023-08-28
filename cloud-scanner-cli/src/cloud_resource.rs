@@ -11,13 +11,26 @@ pub struct CloudResource {
     pub provider: String,
     pub id: String,
     pub location: UsageLocation,
-    pub resource_type: String,
+    pub resource_type: ResourceType,
     pub usage: Option<CloudResourceUsage>,
     pub tags: Vec<CloudResourceTag>,
     //pub tags: HashMap<String, CloudResourceTag>,
 }
 
 impl fmt::Display for CloudResource {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub enum ResourceType {
+    Instance { instance_type: String },
+    BlockStorage { storage_type: String },
+    ObjectStorage { storage_type: String },
+}
+
+impl fmt::Display for ResourceType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
     }
@@ -110,12 +123,14 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
-            resource_type: "t2.fictive".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "t2.fictive".to_string(),
+            },
             usage: None,
             tags: Vec::new(),
         };
 
-        assert_eq!("CloudResource { provider: \"aws\", id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: [] }", format!("{:?}", instance1));
+        assert_eq!("CloudResource { provider: \"aws\", id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: Instance { instance_type: \"t2.fictive\" }, usage: None, tags: [] }", format!("{:?}", instance1));
     }
 
     #[test]
@@ -124,7 +139,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
-            resource_type: "t2.fictive".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "t2.fictive".to_string(),
+            },
             usage: None,
             tags: Vec::new(),
         };
@@ -164,7 +181,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
-            resource_type: "t2.fictive".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "t2.fictive".to_string(),
+            },
             usage: None,
             tags: instance1tags,
         };

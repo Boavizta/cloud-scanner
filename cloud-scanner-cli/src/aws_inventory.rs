@@ -214,7 +214,9 @@ impl CloudInventory for AwsInventory {
                 provider: String::from("aws"),
                 id: instance_id,
                 location: location.clone(),
-                resource_type: instance.instance_type().unwrap().as_str().to_owned(),
+                resource_type: ResourceType::Instance {
+                    instance_type: instance.instance_type().unwrap().as_str().to_owned(),
+                },
                 usage: Some(usage),
                 tags: cloud_resource_tags,
             };

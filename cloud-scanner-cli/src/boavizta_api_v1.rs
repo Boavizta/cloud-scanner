@@ -27,64 +27,59 @@ impl BoaviztaApiV1 {
         cr: CloudResource,
         usage_duration_hours: &f32,
     ) -> Option<serde_json::Value> {
-        let instance_type = cr.resource_type;
-        let verbose = Some(false);
-        let mut usage_cloud: UsageCloud = UsageCloud::new();
-        //usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
-        usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
-        if let Some(usage) = cr.usage {
-            usage_cloud.time_workload = Some(usage.average_cpu_load as f32);
-        }
+        let resource_type = cr.resource_type;
 
-        let mut cloud: Cloud = Cloud::new();
-        cloud.provider = Some(String::from("aws"));
-        cloud.instance_type = Some(instance_type.clone());
-        cloud.usage = Some(Box::new(usage_cloud));
+        match resource_type {
+            ResourceType::Instance { instance_type } => {
+                let verbose = Some(false);
+                let mut usage_cloud: UsageCloud = UsageCloud::new();
+                //usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
+                usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
+                if let Some(usage) = cr.usage {
+                    usage_cloud.time_workload = Some(usage.average_cpu_load as f32);
+                }
 
-        let criteria = vec!["gwp".to_owned(), "adp".to_owned(), "pe".to_owned()];
+                let mut cloud: Cloud = Cloud::new();
+                cloud.provider = Some(String::from("aws"));
+                cloud.instance_type = Some(instance_type.clone());
+                cloud.usage = Some(Box::new(usage_cloud));
 
-        let res = cloud_api::instance_cloud_impact_v1_cloud_instance_post(
-            &self.configuration,
-            verbose,
-            Some(usage_duration_hours.to_owned()),
-            Some(criteria),
-            Some(cloud),
-        )
-        .await;
+                let criteria = vec!["gwp".to_owned(), "adp".to_owned(), "pe".to_owned()];
 
-        /*
-        pub async fn instance_cloud_impact_v1_cloud_instance_post(
-            configuration: &Configuration,
-            verbose: Option<bool>,
-            duration: Option<f32>,
-            criteria: Option<Vec<String>>,
-            cloud: Option<Cloud>
-        ) -> Result<Value, Error<InstanceCloudImpactV1CloudInstancePostError>>
+                let res = cloud_api::instance_cloud_impact_v1_cloud_instance_post(
+                    &self.configuration,
+                    verbose,
+                    Some(usage_duration_hours.to_owned()),
+                    Some(criteria),
+                    Some(cloud),
+                )
+                .await;
 
-         */
+                match res {
+                    Ok(res) => Some(res),
+                    Err(e) => {
+                        warn!(
+                            "Warning: Cannot get impacts from API for instance type {}: {}",
+                            instance_type, e
+                        );
+                        None
+                    }
+                }
+            }
 
-        // let res: cloud_api::instance_cloud_impact_v1_cloud_instance_post(configuration, verbose,  Some(usage_duration_hours.to_owned()), Some(criteria), Some(cloud)).await;
-        /*let res = cloud_api::instance_cloud_impact_v1_cloud_post(
-            &self.configuration,
-            verbose,
-            Some(Allocation::Total),
-            Some(criteria),
-            Some(cloud),
-        )
-        .await;
-            */
-        match res {
-            Ok(res) => Some(res),
-            Err(e) => {
+            ResourceType::BlockStorage { storage_type } => {
+                warn!("Warning: Block storage is not implemented {}", storage_type);
+                None
+            }
+            ResourceType::ObjectStorage { storage_type } => {
                 warn!(
-                    "Warning: Cannot get impacts from API for instance type {}: {}",
-                    instance_type, e
+                    "Warning: Object storage is not implemented {}",
+                    storage_type
                 );
                 None
             }
         }
     }
-
     // /// Get the impacts of a single CloudResource
     async fn get_resource_with_impacts(
         &self,
@@ -186,7 +181,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+            },
             usage: Some(CloudResourceUsage {
                 average_cpu_load: 100.0,
                 usage_duration_seconds: 3600,
@@ -214,7 +211,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+            },
             usage: Some(CloudResourceUsage {
                 average_cpu_load: 100.0,
                 usage_duration_seconds: 3600,
@@ -224,10 +223,11 @@ mod tests {
 
         let instance1_1percent: CloudResource = CloudResource {
             provider: String::from("aws"),
-
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+            },
             usage: Some(CloudResourceUsage {
                 average_cpu_load: 1.0,
                 usage_duration_seconds: 3600,
@@ -256,7 +256,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+            },
             usage: Some(CloudResourceUsage {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
@@ -268,7 +270,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+            },
             usage: Some(CloudResourceUsage {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
@@ -280,7 +284,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-3".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "type-not-in-boa".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "type-not-in-boa".to_string(),
+            },
             usage: Some(CloudResourceUsage {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
@@ -316,7 +322,9 @@ mod tests {
             provider: String::from("aws"),
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
+            resource_type: ResourceType::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+            },
             usage: Some(CloudResourceUsage {
                 average_cpu_load: 100.0, // Will not be considered in v1
                 usage_duration_seconds: 3600,
@@ -326,12 +334,9 @@ mod tests {
 
         let raw_impacts =
             Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap());
-
         let one_hour: f32 = 1 as f32;
-
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
-
         assert!(
             cloud_resource_with_impacts.resource_impacts.is_some(),
             "Emtpy impacts"
