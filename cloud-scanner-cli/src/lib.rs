@@ -27,8 +27,8 @@ pub mod cloud_inventory;
 pub mod cloud_resource;
 pub mod impact_provider;
 pub mod metric_exporter;
-pub mod metric_server;
 pub mod model;
+pub mod standalone_server;
 pub mod usage_location;
 
 use anyhow::{Context, Result};
@@ -189,11 +189,11 @@ pub async fn show_inventory(tags: &[String], aws_region: &str) -> Result<()> {
 
 /// Starts a server that exposes metrics http like <http://localhost:8000/metrics?aws-region=eu-west-1>
 pub async fn serve_metrics(api_url: &str) -> Result<()> {
-    let config = metric_server::Config {
+    let config = standalone_server::Config {
         boavizta_url: api_url.to_string(),
     };
-    warn!("Starting metric server.");
-    metric_server::run(config).await?;
+    warn!("Starting server.");
+    standalone_server::run(config).await?;
     Ok(())
 }
 /// Return current version of the cloud-scanner-cli crate
