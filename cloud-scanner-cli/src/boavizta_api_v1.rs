@@ -27,16 +27,20 @@ impl BoaviztaApiV1 {
         cr: CloudResource,
         usage_duration_hours: &f32,
     ) -> Option<serde_json::Value> {
-        let resource_type = cr.resource_type;
+        let resource_details = cr.resource_details;
 
-        match resource_type {
-            ResourceType::Instance { instance_type } => {
+        match resource_details {
+            ResourceDetails::Instance {
+                instance_type,
+                usage,
+            } => {
                 let verbose = Some(false);
                 let mut usage_cloud: UsageCloud = UsageCloud::new();
                 //usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
                 usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
-                if let Some(usage) = cr.usage {
-                    usage_cloud.time_workload = Some(usage.average_cpu_load as f32);
+
+                if let Some(instance_usage) = usage {
+                    usage_cloud.time_workload = Some(instance_usage.average_cpu_load as f32);
                 }
 
                 let mut cloud: Cloud = Cloud::new();
@@ -67,20 +71,14 @@ impl BoaviztaApiV1 {
                 }
             }
 
-            ResourceType::BlockStorage { storage_type } => {
-                warn!("Warning: Block storage is not implemented {}", storage_type);
-                None
-            }
-            ResourceType::ObjectStorage { storage_type } => {
-                warn!(
-                    "Warning: Object storage is not implemented {}",
-                    storage_type
-                );
+            _ => {
+                warn!("Warning: Other cloud resources  not implemented.");
                 None
             }
         }
     }
-    // /// Get the impacts of a single CloudResource
+
+    /// Get the impacts of a single CloudResource
     async fn get_resource_with_impacts(
         &self,
         resource: &CloudResource,
@@ -178,16 +176,16 @@ mod tests {
     #[tokio::test]
     async fn should_retrieve_raw_default_impacts_aws_fr() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: ResourceType::Instance {
+            resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
             },
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0,
-                usage_duration_seconds: 3600,
-            }),
             tags: Vec::new(),
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
@@ -200,38 +198,32 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn should_retrieve_different_pe_impacts_for_different_cpu_load() {
-        let mut tags = Vec::new();
-
-        tags.push(CloudResourceTag {
-            key: "appName".to_string(),
-            value: Some("myApp".to_string()),
-        });
+    async fn returns_different_pe_impacts_for_different_cpu_load() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: ResourceType::Instance {
+            resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
             },
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0,
-                usage_duration_seconds: 3600,
-            }),
-            tags: tags,
+            tags: Vec::new(),
         };
 
-        let instance1_1percent: CloudResource = CloudResource {
-            provider: String::from("aws"),
+        let instance1_1percent = CloudResource {
+            provider: CloudProvider::AWS,
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: ResourceType::Instance {
+            resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 1.0,
+                    usage_duration_seconds: 3600,
+                }),
             },
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 1.0,
-                usage_duration_seconds: 3600,
-            }),
             tags: Vec::new(),
         };
 
@@ -253,44 +245,44 @@ mod tests {
     #[tokio::test]
     async fn should_retrieve_multiple_default_impacts_fr() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: ResourceType::Instance {
+            resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
             },
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
             tags: Vec::new(),
         };
 
         let instance2: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: ResourceType::Instance {
+            resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
             },
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
             tags: Vec::new(),
         };
 
         let instance3: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-3".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: ResourceType::Instance {
+            resource_details: ResourceDetails::Instance {
                 instance_type: "type-not-in-boa".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
             },
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
             tags: Vec::new(),
         };
 
@@ -309,26 +301,28 @@ mod tests {
 
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
-        let r2 = res[2].resource_impacts.clone().is_none();
 
         assert_eq!(0.21321, r0.pe_use_megajoules);
         assert_eq!(0.21321, r1.pe_use_megajoules);
-        assert_eq!(true, r2);
+        assert!(
+            res[2].resource_impacts.clone().is_none(),
+            "This instance should return None impacts because it's type is unknown from API"
+        );
     }
 
     #[test]
     fn should_convert_results_to_impacts() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: ResourceType::Instance {
+            resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
             },
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
             tags: Vec::new(),
         };
 

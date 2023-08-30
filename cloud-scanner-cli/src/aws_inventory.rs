@@ -182,7 +182,7 @@ impl CloudInventory for AwsInventory {
                 .context("Cannot get CPU load of instance")
                 .unwrap();
 
-            let usage: CloudResourceUsage = CloudResourceUsage {
+            let usage: InstanceUsage = InstanceUsage {
                 average_cpu_load: cpuload,
                 usage_duration_seconds: 300,
             };
@@ -211,13 +211,14 @@ impl CloudInventory for AwsInventory {
             );
 
             let cs = CloudResource {
-                provider: String::from("aws"),
+                provider: CloudProvider::AWS,
                 id: instance_id,
                 location: location.clone(),
-                resource_type: ResourceType::Instance {
+                resource_details: ResourceDetails::Instance {
                     instance_type: instance.instance_type().unwrap().as_str().to_owned(),
+                    usage: Some(usage),
                 },
-                usage: Some(usage),
+
                 tags: cloud_resource_tags,
             };
 
