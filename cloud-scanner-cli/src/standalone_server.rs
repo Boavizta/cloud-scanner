@@ -1,12 +1,9 @@
 //! A standalone  HTTP endpoint
 
-use rocket::State;
-
-use rocket::{get, serde::json::Json};
-
-use rocket_okapi::{openapi, openapi_get_routes, swagger_ui::*};
-
 use crate::model::{Inventory, ResourcesWithImpacts};
+use rocket::State;
+use rocket::{get, serde::json::Json};
+use rocket_okapi::{openapi, openapi_get_routes, swagger_ui::*};
 
 ///  Configuration for the metric server
 pub struct Config {
@@ -39,7 +36,7 @@ fn index(config: &State<Config>) -> String {
     format!("Cloud scanner metric server  {} is running.\n\nUsing Boavizta API at: {}.\nMetrics are exposed on /metrics path and require passing a **region** in query string.\n e.g.  http://localhost:8000/metrics?aws_region=eu-west-3 \n See also /swagger-ui .", version, config.boavizta_url)
 }
 
-/// Returns the metrics
+/// Returns the metrics (corresponding to one hour use)
 /// Region is mandatory, tags are optional
 /// Example query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
 #[openapi(skip)]
@@ -69,7 +66,7 @@ async fn inventory(
     aws_region: &str,
     filter_tags: Vec<String>,
 ) -> Json<Inventory> {
-    warn!("Getting something on /inventorynew");
+    warn!("Getting something on /inventory");
     warn!("Filtering on tags {:?}", filter_tags);
     Json(
         crate::get_inventory(&filter_tags, aws_region)
@@ -78,18 +75,23 @@ async fn inventory(
     )
 }
 
-/// Returns the impacts as json
+/// Returns the impacts of use as json
 /// Region is mandatory, tags are optional
 /// Example query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
 #[openapi(tag = "impacts")]
-#[get("/impacts?<aws_region>&<filter_tags>")]
+#[get("/impacts?<aws_region>&<filter_tags>&<use_duration_hours>")]
 async fn impacts(
     _config: &State<Config>,
     aws_region: &str,
     filter_tags: Vec<String>,
+    use_duration_hours: Option<f32>,
 ) -> Json<ResourcesWithImpacts> {
-    warn!("Getting something on /impacts");
-    let hours_use_time: f32 = 1.0;
+    let hours_use_time = use_duration_hours.unwrap_or(1.0);
+    //let hours_use_time: f32 = 1.0;
+    warn!(
+        "Requesting /impacts for a duration of {} hours",
+        hours_use_time
+    );
     warn!("Filtering on tags {:?}", filter_tags);
     let res = crate::standard_scan(
         &hours_use_time,
