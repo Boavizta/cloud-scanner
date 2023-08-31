@@ -12,6 +12,7 @@ use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOut
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
 use aws_sdk_ec2::types::Instance;
+use aws_sdk_ec2::types::Volume;
 use chrono::Duration;
 use chrono::Utc;
 
@@ -46,7 +47,7 @@ impl AwsInventory {
             // Use default region (from env)
             let sdk_config = aws_config::from_env().load().await;
             warn!(
-                "Cannot initialize from empty region, falling back to using default region from environement [{}]",
+                "Cannot initialize from empty region, falling back to using default region from environment [{}]",
                 sdk_config.region().unwrap()
             );
             sdk_config
@@ -231,6 +232,30 @@ impl AwsInventory {
 
         Ok(resp)
     }
+
+
+     /// List all Volumes of current account.
+    ///
+    /// ⚠  Filtering on tags is not yet implemented.
+    pub async fn list_volumes(self, tags: &[String]) -> Result<Vec<Volume>> {
+        warn!("Warning: filtering on tags is not implemented {:?}", tags);
+
+        let client = &self.ec2_client;
+        let mut volumes: Vec<Volume> = Vec::new();
+        // Filter: AND on name, OR on values
+        //let filters :std::vec::Vec<aws_sdk_ec2::model::Filter>;
+
+        let resp = client
+            .describe_volumes()
+            //set_filters() // Use filters for tags
+            .send()
+            .await?;
+
+        for v in resp.volumes().unwrap_or_default() {
+            volumes.push(v.clone());
+        }
+        Ok(volumes)
+    }
 }
 
 #[async_trait]
@@ -370,5 +395,14 @@ mod tests {
         let instance_id = "i-03e0b3b1246001382";
         let res = inventory.get_average_cpu(instance_id).await.unwrap();
         assert_eq!(0 as f64, res);
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn returns_the_right_number_of_volumes() {
+        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let filtertags: Vec<String> = Vec::new();
+        let res = inventory.list_volumes(&filtertags).await.unwrap();
+        assert_eq!(4 , res.len());
     }
 }
