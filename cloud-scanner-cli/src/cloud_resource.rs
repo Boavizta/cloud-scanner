@@ -8,13 +8,11 @@ use std::{collections::HashMap, fmt};
 ///  A cloud resource (could be an instance, function or any other resource)
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResource {
-    pub provider: String,
+    pub provider: CloudProvider,
     pub id: String,
     pub location: UsageLocation,
-    pub resource_type: String,
-    pub usage: Option<CloudResourceUsage>,
+    pub resource_details: ResourceDetails,
     pub tags: Vec<CloudResourceTag>,
-    //pub tags: HashMap<String, CloudResourceTag>,
 }
 
 impl fmt::Display for CloudResource {
@@ -23,10 +21,34 @@ impl fmt::Display for CloudResource {
     }
 }
 
-/// Usage of a cloud resource
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum CloudProvider {
+    AWS,
+    OVH,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum ResourceDetails {
+    Instance {
+        instance_type: String,
+        usage: Option<InstanceUsage>,
+    },
+    BlockStorage {
+        storage_type: String,
+        usage: Option<StorageUsage>,
+    },
+    ObjectStorage,
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
-pub struct CloudResourceUsage {
+pub struct InstanceUsage {
     pub average_cpu_load: f64,
+    pub usage_duration_seconds: u32,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct StorageUsage {
+    pub size_gb: f64,
     pub usage_duration_seconds: u32,
 }
 
@@ -107,29 +129,19 @@ mod tests {
     #[test]
     pub fn a_cloud_resource_can_be_displayed() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
-            resource_type: "t2.fictive".to_string(),
-            usage: None,
+            resource_details: ResourceDetails::Instance {
+                instance_type: "t2.fictive".to_string(),
+                usage: None,
+            },
             tags: Vec::new(),
         };
 
-        assert_eq!("CloudResource { provider: \"aws\", id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_type: \"t2.fictive\", usage: None, tags: [] }", format!("{:?}", instance1));
+        assert_eq!("CloudResource { provider: AWS, id: \"inst-1\", location: UsageLocation { aws_region: \"eu-west-1\", iso_country_code: \"IRL\" }, resource_details: Instance { instance_type: \"t2.fictive\", usage: None }, tags: [] }", format!("{:?}", instance1));
     }
 
-    #[test]
-    pub fn a_cloud_resource_without_usage_data_is_allowed() {
-        let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
-            id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-1"),
-            resource_type: "t2.fictive".to_string(),
-            usage: None,
-            tags: Vec::new(),
-        };
-        assert_eq!(None, instance1.usage);
-    }
     #[test]
     pub fn parse_tags() {
         let tag_string = "name1=val1".to_string();
@@ -161,13 +173,16 @@ mod tests {
         });
 
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-1"),
-            resource_type: "t2.fictive".to_string(),
-            usage: None,
+            resource_details: ResourceDetails::Instance {
+                instance_type: "t2.fictive".to_string(),
+                usage: None,
+            },
             tags: instance1tags,
         };
+
         assert_eq!(
             true,
             instance1.has_matching_tagmap(&filtertags),
