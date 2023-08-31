@@ -1,4 +1,4 @@
-//! A standalone Metric HTTP endpoint
+//! A standalone  HTTP endpoint
 
 use rocket::State;
 
@@ -13,7 +13,7 @@ pub struct Config {
     pub boavizta_url: String,
 }
 
-/// Start the metric server
+/// Start the server
 pub async fn run(config: Config) -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
         .mount("/", openapi_get_routes![index, metrics, inventory, impacts])

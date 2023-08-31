@@ -4,7 +4,7 @@
       "value": 0.0015724,
       "significant_figures": 5,
       "min": 0.01442,
-      "max": 0.040746,
+      "max": 0.040747,
       "warnings": [
         "End of life is not included in the calculation"
       ]
@@ -41,8 +41,8 @@
     "embedded": {
       "value": 0.020883,
       "significant_figures": 5,
-      "min": 0.19012,
-      "max": 0.53335,
+      "min": 0.19013,
+      "max": 0.53336,
       "warnings": [
         "End of life is not included in the calculation"
       ]
