@@ -6,6 +6,7 @@ use std::time::Instant;
 use crate::cloud_inventory::CloudInventory;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
+
 use anyhow::{Context, Result};
 use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
@@ -60,7 +61,83 @@ impl AwsInventory {
         }
     }
 
-    /// List all ec2 instances of the current account.
+    /// Perform inventory of all aws instances of the region
+    async fn get_instances_with_usage_data(&self, tags: &[String]) -> Result<Vec<CloudResource>> {
+        let instances: Vec<Instance> = self
+            .clone()
+            .list_instances(tags)
+            .await
+            .context("Cannot list instances")
+            .unwrap();
+        // let usages = instances.iter().map(|i| self.get_average_cpu( i.instance_id().unwrap()).unwrap()).collect();
+        let location = UsageLocation::from(self.aws_region.as_str());
+
+        // Just to display statitstics
+        let cpu_info_timer = Instant::now();
+
+        let mut inventory: Vec<CloudResource> = Vec::new();
+        for instance in instances {
+            let instance_id = instance.instance_id().unwrap().to_string();
+            let cpuload: f64 = self
+                .clone()
+                .get_average_cpu(&instance_id)
+                .await
+                .context("Cannot get CPU load of instance")
+                .unwrap();
+
+            let usage: InstanceUsage = InstanceUsage {
+                average_cpu_load: cpuload,
+                usage_duration_seconds: 300,
+            };
+
+            let aws_tags = instance.tags();
+            // Convert AWS tags into  vendor agnostic model tags
+            let cloud_resource_tags = match aws_tags {
+                Some(tags) => {
+                    let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
+                    for nt in tags.iter() {
+                        let k = nt.key.to_owned().unwrap();
+                        let v = nt.value.to_owned();
+                        cs_tags.push(CloudResourceTag { key: k, value: v });
+                    }
+                    cs_tags
+                }
+                None => {
+                    let empty: Vec<CloudResourceTag> = Vec::new();
+                    empty
+                }
+            };
+
+            info!(
+                "Total time spend querying CPU load of instances: {:?}",
+                cpu_info_timer.elapsed()
+            );
+
+            let inst = CloudResource {
+                provider: CloudProvider::AWS,
+                id: instance_id,
+                location: location.clone(),
+                resource_details: ResourceDetails::Instance {
+                    instance_type: instance.instance_type().unwrap().as_str().to_owned(),
+                    usage: Some(usage),
+                },
+
+                tags: cloud_resource_tags,
+            };
+
+            if inst.has_matching_tags(tags) {
+                debug!("Resource matched on tags: {:?}", inst.id);
+                inventory.push(inst);
+            } else {
+                debug!("Filtered instance (tags do not match: {:?}", inst);
+            }
+            //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
+        }
+
+        Ok(inventory)
+    }
+
+    /// List all ec2 instances of the current account / region
     ///
     /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
     async fn list_instances(self, tags: &[String]) -> Result<Vec<Instance>> {
@@ -185,78 +262,16 @@ impl AwsInventory {
 impl CloudInventory for AwsInventory {
     /// list resources
     async fn list_resources(&self, tags: &[String]) -> Result<Vec<CloudResource>> {
-        let instances: Vec<Instance> = self
-            .clone()
-            .list_instances(tags)
-            .await
-            .context("Cannot list instances")
-            .unwrap();
-        // let usages = instances.iter().map(|i| self.get_average_cpu( i.instance_id().unwrap()).unwrap()).collect();
-        let location = UsageLocation::from(self.aws_region.as_str());
+        //let mut inventory: Vec<CloudResource> = Vec::new();
 
-        // Just to display statitstics
-        let cpu_info_timer = Instant::now();
+        // GET ALL INSTANCES WITH USAGE DATA
+        let resources = self.clone().get_instances_with_usage_data(tags).await?;
 
-        let mut res: Vec<CloudResource> = Vec::new();
-        for instance in instances {
-            let instance_id = instance.instance_id().unwrap().to_string();
-            let cpuload: f64 = self
-                .clone()
-                .get_average_cpu(&instance_id)
-                .await
-                .context("Cannot get CPU load of instance")
-                .unwrap();
+        // Here we should do the same for Storage
+        //self.clone().get_blockstorage_with_usage_data(tags).await
+        // https://levelup.gitconnected.com/rust-vector-concatenation-daca5886f0e7
 
-            let usage: InstanceUsage = InstanceUsage {
-                average_cpu_load: cpuload,
-                usage_duration_seconds: 300,
-            };
-
-            let aws_tags = instance.tags();
-            // Convert AWS tags into  vendor agnostic model tags
-            let cloud_resource_tags = match aws_tags {
-                Some(tags) => {
-                    let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
-                    for nt in tags.iter() {
-                        let k = nt.key.to_owned().unwrap();
-                        let v = nt.value.to_owned();
-                        cs_tags.push(CloudResourceTag { key: k, value: v });
-                    }
-                    cs_tags
-                }
-                None => {
-                    let empty: Vec<CloudResourceTag> = Vec::new();
-                    empty
-                }
-            };
-
-            info!(
-                "Total time spend querying CPU load of instances: {:?}",
-                cpu_info_timer.elapsed()
-            );
-
-            let cs = CloudResource {
-                provider: CloudProvider::AWS,
-                id: instance_id,
-                location: location.clone(),
-                resource_details: ResourceDetails::Instance {
-                    instance_type: instance.instance_type().unwrap().as_str().to_owned(),
-                    usage: Some(usage),
-                },
-
-                tags: cloud_resource_tags,
-            };
-
-            if cs.has_matching_tags(tags) {
-                debug!("Resource matched on tags: {:?}", cs.id);
-                res.push(cs);
-            } else {
-                debug!("Filtered instance (tags do not match: {:?}", cs);
-            }
-            //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
-        }
-
-        Ok(res)
+        Ok(resources)
     }
 }
 
@@ -268,11 +283,11 @@ mod tests {
 
     #[tokio::test]
     #[ignore]
-    async fn test_list_resources() {
+    async fn inventory_should_return_correct_number_of_instances() {
         let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
         let filtertags: Vec<String> = Vec::new();
         let res: Vec<CloudResource> = inventory
-            .list_resources(&filtertags)
+            .get_instances_with_usage_data(&filtertags)
             .await
             .context("Failed to list")
             .unwrap();
