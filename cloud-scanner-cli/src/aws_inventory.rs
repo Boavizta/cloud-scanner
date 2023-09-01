@@ -268,7 +268,7 @@ impl AwsInventory {
         for volume in volumes {
             let volume_id = volume.volume_id().unwrap();
             let usage: StorageUsage = StorageUsage {
-                size_gb: volume.size().unwrap().into(),
+                size_gb: volume.size().unwrap(),
                 usage_duration_seconds: 3600,
             };
 

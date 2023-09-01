@@ -48,7 +48,7 @@ pub struct InstanceUsage {
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct StorageUsage {
-    pub size_gb: f64,
+    pub size_gb: i32,
     pub usage_duration_seconds: u32,
 }
 
@@ -111,14 +111,6 @@ pub fn vec_to_map(tagv: Vec<CloudResourceTag>) -> HashMap<String, Option<String>
         tagh.insert(t.key.clone(), t.value.clone());
     });
     tagh
-}
-
-/// Define how to allocate the manufacturing impacts of a resource
-pub enum ManufacturingAllocation {
-    /// Amortized allocation (prorata of usage duration)
-    LinearAllocation,
-    /// Total (Full impact regardless of usage duration)
-    TotalAllocation,
 }
 
 #[cfg(test)]
