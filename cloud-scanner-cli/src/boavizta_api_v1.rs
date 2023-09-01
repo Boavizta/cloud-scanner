@@ -78,7 +78,6 @@ impl BoaviztaApiV1 {
                 usage,
             } => {
                 //let duration: f32 = usage.unwrap().usage_duration_seconds.into();
-
                 let disk = Disk {
                     capacity: Some(usage.unwrap().size_gb),
                     units: Some(1),
@@ -90,24 +89,50 @@ impl BoaviztaApiV1 {
                     layers: None,
                 };
 
-                let res = component_api::disk_impact_bottom_up_v1_component_hdd_post(
-                    &self.configuration,
-                    verbose,
-                    None,
-                    None,
-                    Some(criteria),
-                    Some(disk),
-                )
-                .await;
-
-                match res {
-                    Ok(res) => Some(res),
-                    Err(e) => {
-                        warn!(
-                            "Warning: Cannot get storage impact from API for type {}: {}",
-                            storage_type, e
-                        );
-                        None
+                match storage_type.as_str() {
+                    "st1" | "sc1" => {
+                        // This is a HDD
+                        let res = component_api::disk_impact_bottom_up_v1_component_hdd_post(
+                            &self.configuration,
+                            verbose,
+                            None,
+                            None,
+                            Some(criteria),
+                            Some(disk),
+                        )
+                        .await;
+                        match res {
+                            Ok(res) => Some(res),
+                            Err(e) => {
+                                warn!(
+                                    "Warning: Cannot get HHD impact from API for type {}: {}",
+                                    storage_type, e
+                                );
+                                None
+                            }
+                        }
+                    }
+                    _ => {
+                        // All other types (like gp2, gp3...) are considered SSD
+                        let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
+                            &self.configuration,
+                            verbose,
+                            None,
+                            None,
+                            Some(criteria),
+                            Some(disk),
+                        )
+                        .await;
+                        match res {
+                            Ok(res) => Some(res),
+                            Err(e) => {
+                                warn!(
+                                    "Warning: Cannot get SSD impact from API for type {}: {}",
+                                    storage_type, e
+                                );
+                                None
+                            }
+                        }
                     }
                 }
             }
@@ -225,8 +250,11 @@ mod tests {
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR.json");
 
-    const DEFAULT_RAW_IMPACTS_OF_HDD_1HRS_FR: &str =
-        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_HDD_1HRS_FR.json");
+    const DEFAULT_RAW_IMPACTS_OF_HDD: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_HDD.json");
+
+    const DEFAULT_RAW_IMPACTS_OF_SSD: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD.json");
 
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
@@ -273,9 +301,9 @@ mod tests {
             id: "disk-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
             resource_details: ResourceDetails::BlockStorage {
-                storage_type: "gp2".to_string(),
+                storage_type: "st1".to_string(),
                 usage: Some(StorageUsage {
-                    size_gb: 10000000,
+                    size_gb: 1000,
                     usage_duration_seconds: 0,
                 }),
             },
@@ -286,8 +314,31 @@ mod tests {
         let one_hour = 1.0 as f32;
         let res = api.get_raws_impacts(hdd, &one_hour).await.unwrap();
 
-        let expected: serde_json::Value =
-            serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_HDD_1HRS_FR).unwrap();
+        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_HDD).unwrap();
+        assert_json_include!(actual: res, expected: expected);
+    }
+
+    #[tokio::test]
+    async fn get_raw_impacts_of_a_ssd() {
+        let ssd: CloudResource = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "disk-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_details: ResourceDetails::BlockStorage {
+                storage_type: "gp2".to_string(),
+                usage: Some(StorageUsage {
+                    size_gb: 1000,
+                    usage_duration_seconds: 0,
+                }),
+            },
+            tags: Vec::new(),
+        };
+
+        let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
+        let one_hour = 1.0 as f32;
+        let res = api.get_raws_impacts(ssd, &one_hour).await.unwrap();
+
+        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD).unwrap();
         assert_json_include!(actual: res, expected: expected);
     }
 
