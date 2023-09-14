@@ -38,12 +38,12 @@ fn index(config: &State<Config>) -> String {
 
 /// Returns the metrics (corresponding to one hour use)
 /// Region is mandatory, tags are optional
-/// Example query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
+/// Example query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0
 #[openapi(skip)]
-#[get("/metrics?<aws_region>&<filter_tags>")]
-async fn metrics(config: &State<Config>, aws_region: &str, filter_tags: Vec<String>) -> String {
+#[get("/metrics?<aws_region>&<filter_tags>&<use_duration_hours>")]
+async fn metrics(config: &State<Config>, aws_region: &str, filter_tags: Vec<String>, use_duration_hours: Option<f32>) -> String {
     warn!("Getting something on /metrics");
-    let hours_use_time: f32 = 1.0;
+    let hours_use_time = use_duration_hours.unwrap_or(1.0);
     //let tags = Vec::new();
     warn!("Filtering on tags {:?}", filter_tags);
     let metrics = crate::get_default_impacts_as_metrics(
@@ -77,7 +77,7 @@ async fn inventory(
 
 /// Returns the impacts of use as json
 /// Region is mandatory, tags are optional
-/// Example query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
+/// Example query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0
 #[openapi(tag = "impacts")]
 #[get("/impacts?<aws_region>&<filter_tags>&<use_duration_hours>")]
 async fn impacts(
