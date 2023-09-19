@@ -44,6 +44,7 @@ pub struct ResourceImpacts {
     pub pe_use_megajoules: f64,
     pub gwp_manufacture_kgco2eq: f64,
     pub gwp_use_kgco2eq: f64,
+    pub verbose_impacts: Option<serde_json::Value>,
 }
 
 /// The aggregated impacts and meta data about the scan results

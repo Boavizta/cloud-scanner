@@ -41,7 +41,12 @@ fn index(config: &State<Config>) -> String {
 /// Example query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0
 #[openapi(skip)]
 #[get("/metrics?<aws_region>&<filter_tags>&<use_duration_hours>")]
-async fn metrics(config: &State<Config>, aws_region: &str, filter_tags: Vec<String>, use_duration_hours: Option<f32>) -> String {
+async fn metrics(
+    config: &State<Config>,
+    aws_region: &str,
+    filter_tags: Vec<String>,
+    use_duration_hours: Option<f32>,
+) -> String {
     warn!("Getting something on /metrics");
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
     //let tags = Vec::new();

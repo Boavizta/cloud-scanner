@@ -119,16 +119,37 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 ) -> CloudResourceWithImpacts {
     let resource_impacts: Option<ResourceImpacts>;
     if let Some(results) = raw_result {
-        debug!("This cloud resource has impacts data: {}", results);
+        debug!("Raw results: {}", results);
 
-        resource_impacts = Some(ResourceImpacts {
-            adp_manufacture_kgsbeq: results["adp"]["embedded"]["value"].as_f64().unwrap(),
-            adp_use_kgsbeq: results["adp"]["use"]["value"].as_f64().unwrap(),
-            pe_manufacture_megajoules: results["pe"]["embedded"]["value"].as_f64().unwrap(),
-            pe_use_megajoules: results["pe"]["use"]["value"].as_f64().unwrap(),
-            gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
-            gwp_use_kgco2eq: results["gwp"]["use"]["value"].as_f64().unwrap(),
-        });
+        let verbose_output = results.get("verbose");
+
+        match verbose_output {
+            Some(verbose_value) => {
+                info!("We have verbose data {}", verbose_value);
+                let impacts = &results["impacts"];
+                info!("Impacts {}", results);
+                resource_impacts = Some(ResourceImpacts {
+                    adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
+                    adp_use_kgsbeq: impacts["adp"]["use"]["value"].as_f64().unwrap(),
+                    pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
+                    pe_use_megajoules: impacts["pe"]["use"]["value"].as_f64().unwrap(),
+                    gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
+                    gwp_use_kgco2eq: impacts["gwp"]["use"]["value"].as_f64().unwrap(),
+                    verbose_impacts: Some(verbose_value.clone()),
+                });
+            }
+            None => {
+                resource_impacts = Some(ResourceImpacts {
+                    adp_manufacture_kgsbeq: results["adp"]["embedded"]["value"].as_f64().unwrap(),
+                    adp_use_kgsbeq: results["adp"]["use"]["value"].as_f64().unwrap(),
+                    pe_manufacture_megajoules: results["pe"]["embedded"]["value"].as_f64().unwrap(),
+                    pe_use_megajoules: results["pe"]["use"]["value"].as_f64().unwrap(),
+                    gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
+                    gwp_use_kgco2eq: results["gwp"]["use"]["value"].as_f64().unwrap(),
+                    verbose_impacts: None,
+                });
+            }
+        }
     } else {
         debug!(
             "Skipped resource: {:#?} while building impacts, it has no impact data",
@@ -158,6 +179,8 @@ mod tests {
 
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR.json");
+    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE.json");
 
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
@@ -311,7 +334,7 @@ mod tests {
     }
 
     #[test]
-    fn should_convert_results_to_impacts() {
+    fn should_convert_basic_results_to_impacts() {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
@@ -343,5 +366,42 @@ mod tests {
                 .unwrap()
                 .pe_use_megajoules
         );
+    }
+    #[test]
+    fn convert_verbose_results_to_impacts() {
+        let instance1: CloudResource = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
+            tags: Vec::new(),
+        };
+
+        let raw_impacts =
+            Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE).unwrap());
+        let one_hour: f32 = 1 as f32;
+        let cloud_resource_with_impacts: CloudResourceWithImpacts =
+            boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
+        assert!(
+            cloud_resource_with_impacts.resource_impacts.is_some(),
+            "Emtpy impacts"
+        );
+
+        assert_eq!(
+            0.21321,
+            cloud_resource_with_impacts
+                .resource_impacts
+                .unwrap()
+                .verbose_impacts
+                .unwrap()
+        );
+
+        // TODO check value of verbose
     }
 }
