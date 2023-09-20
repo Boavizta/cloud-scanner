@@ -20,6 +20,7 @@ impl From<&str> for UsageLocation {
     }
 }
 
+
 /// Converts aws region into country code, returns FRA if not found
 fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
     let cc: CountryCode = match aws_region {
@@ -35,7 +36,7 @@ fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
         "us-west-1" => CountryCode::USA,
         "us-west-2" => CountryCode::USA,
         _ => {
-            error!("Unable to match aws region to country code, defaulting to FRA !");
+            error!("Unsupported region: Unable to match aws region [{}] to country code, defaulting to FRA !", aws_region);
             CountryCode::FRA
         }
     };
