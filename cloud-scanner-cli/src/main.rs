@@ -34,6 +34,10 @@ enum SubCommand {
         #[clap(short = 'u', long)]
         /// The number of hours of use for which we want to estimate the impacts
         hours_use_time: f32,
+
+        #[clap(long, short = 'f', action)]
+        /// Retrieve and output the details from BoaviztaAPI (equivalent to the verbose flag when querying Boavizta API)
+        output_verbose_json: bool,
     },
     /// List instances and  their average cpu load for the last 5 minutes (no impact data)
     Inventory {},
@@ -84,7 +88,10 @@ async fn main() -> Result<()> {
     let api_url: String = set_api_url(args.boavizta_api_url);
 
     match args.cmd {
-        SubCommand::Estimate { hours_use_time } => {
+        SubCommand::Estimate {
+            hours_use_time,
+            output_verbose_json,
+        } => {
             if args.as_metrics {
                 cloud_scanner_cli::print_default_impacts_as_metrics(
                     &hours_use_time,
@@ -99,6 +106,7 @@ async fn main() -> Result<()> {
                     &args.filter_tags,
                     &region,
                     &api_url,
+                    output_verbose_json,
                 )
                 .await?
             }

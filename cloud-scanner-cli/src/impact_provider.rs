@@ -23,6 +23,7 @@ pub trait ImpactProvider {
         &self,
         resources: Vec<CloudResource>,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> Result<Vec<CloudResourceWithImpacts>>;
 }
 
@@ -35,6 +36,7 @@ pub struct CloudResourceWithImpacts {
     pub impacts_duration_hours: f32,
 }
 
+// TODO: shouldn't theses fields be optional ?
 /// Impacts of an individual resource
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct ResourceImpacts {
@@ -44,7 +46,7 @@ pub struct ResourceImpacts {
     pub pe_use_megajoules: f64,
     pub gwp_manufacture_kgco2eq: f64,
     pub gwp_use_kgco2eq: f64,
-    pub verbose_impacts: Option<serde_json::Value>,
+    pub raw_data: Option<serde_json::Value>,
 }
 
 /// The aggregated impacts and meta data about the scan results

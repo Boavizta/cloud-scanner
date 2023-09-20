@@ -84,12 +84,13 @@ async fn inventory(
 /// Region is mandatory, tags are optional
 /// Example query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0
 #[openapi(tag = "impacts")]
-#[get("/impacts?<aws_region>&<filter_tags>&<use_duration_hours>")]
+#[get("/impacts?<aws_region>&<filter_tags>&<use_duration_hours>&<verbose_output>")]
 async fn impacts(
     _config: &State<Config>,
     aws_region: &str,
     filter_tags: Vec<String>,
     use_duration_hours: Option<f32>,
+    verbose_output: Option<bool>,
 ) -> Json<ResourcesWithImpacts> {
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
     //let hours_use_time: f32 = 1.0;
@@ -103,6 +104,7 @@ async fn impacts(
         &filter_tags,
         aws_region,
         &_config.boavizta_url,
+        verbose_output.unwrap_or(false),
     )
     .await
     .unwrap();

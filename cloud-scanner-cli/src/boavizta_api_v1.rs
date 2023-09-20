@@ -26,6 +26,7 @@ impl BoaviztaApiV1 {
         &self,
         cr: CloudResource,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> Option<serde_json::Value> {
         let resource_details = cr.resource_details;
 
@@ -34,7 +35,6 @@ impl BoaviztaApiV1 {
                 instance_type,
                 usage,
             } => {
-                let verbose = Some(false);
                 let mut usage_cloud: UsageCloud = UsageCloud::new();
                 //usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
                 usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
@@ -52,7 +52,7 @@ impl BoaviztaApiV1 {
 
                 let res = cloud_api::instance_cloud_impact_v1_cloud_instance_post(
                     &self.configuration,
-                    verbose,
+                    Some(verbose),
                     Some(usage_duration_hours.to_owned()),
                     Some(criteria),
                     Some(cloud),
@@ -83,9 +83,10 @@ impl BoaviztaApiV1 {
         &self,
         resource: &CloudResource,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> CloudResourceWithImpacts {
         let raw_impacts = self
-            .get_raws_impacts(resource.clone(), usage_duration_hours)
+            .get_raws_impacts(resource.clone(), usage_duration_hours, verbose)
             .await;
         boa_impacts_to_cloud_resource_with_impacts(resource, &raw_impacts, usage_duration_hours)
     }
@@ -99,11 +100,12 @@ impl ImpactProvider for BoaviztaApiV1 {
         &self,
         resources: Vec<CloudResource>,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> Result<Vec<CloudResourceWithImpacts>> {
         let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
         for resource in resources.iter() {
             let cri = self
-                .get_resource_with_impacts(resource, usage_duration_hours)
+                .get_resource_with_impacts(resource, usage_duration_hours, verbose)
                 .await;
             v.push(cri.clone());
         }
@@ -111,7 +113,7 @@ impl ImpactProvider for BoaviztaApiV1 {
     }
 }
 
-/// Convert raw results from boavizta API into model objects
+/// Convert raw results from Boavizta API into model objects
 pub fn boa_impacts_to_cloud_resource_with_impacts(
     cloud_resource: &CloudResource,
     raw_result: &Option<serde_json::Value>,
@@ -119,40 +121,27 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 ) -> CloudResourceWithImpacts {
     let resource_impacts: Option<ResourceImpacts>;
     if let Some(results) = raw_result {
-        debug!("Raw results: {}", results);
+        debug!("Raw results before conversion: {}", results);
 
-        let verbose_output = results.get("verbose");
-
-        match verbose_output {
-            Some(verbose_value) => {
-                info!("We have verbose data {}", verbose_value);
-                let impacts = &results["impacts"];
-                info!("Impacts {}", results);
-                resource_impacts = Some(ResourceImpacts {
-                    adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
-                    adp_use_kgsbeq: impacts["adp"]["use"]["value"].as_f64().unwrap(),
-                    pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
-                    pe_use_megajoules: impacts["pe"]["use"]["value"].as_f64().unwrap(),
-                    gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
-                    gwp_use_kgco2eq: impacts["gwp"]["use"]["value"].as_f64().unwrap(),
-                    verbose_impacts: Some(verbose_value.clone()),
-                });
-            }
-            None => {
-                resource_impacts = Some(ResourceImpacts {
-                    adp_manufacture_kgsbeq: results["adp"]["embedded"]["value"].as_f64().unwrap(),
-                    adp_use_kgsbeq: results["adp"]["use"]["value"].as_f64().unwrap(),
-                    pe_manufacture_megajoules: results["pe"]["embedded"]["value"].as_f64().unwrap(),
-                    pe_use_megajoules: results["pe"]["use"]["value"].as_f64().unwrap(),
-                    gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
-                    gwp_use_kgco2eq: results["gwp"]["use"]["value"].as_f64().unwrap(),
-                    verbose_impacts: None,
-                });
-            }
-        }
+        // Structure of json returned by API is different in verbose and non-verbose mode
+        //  - In non-verbose mode, impacts are at the root of the json
+        //  - In verbose mode data, impacts are inside the "impacts" key
+        let impacts = match results.get("verbose") {
+            None => results,
+            Some(_) => &results["impacts"],
+        };
+        resource_impacts = Some(ResourceImpacts {
+            adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
+            adp_use_kgsbeq: impacts["adp"]["use"]["value"].as_f64().unwrap(),
+            pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
+            pe_use_megajoules: impacts["pe"]["use"]["value"].as_f64().unwrap(),
+            gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
+            gwp_use_kgco2eq: impacts["gwp"]["use"]["value"].as_f64().unwrap(),
+            raw_data: raw_result.clone(),
+        });
     } else {
         debug!(
-            "Skipped resource: {:#?} while building impacts, it has no impact data",
+            "Skipped resource: {:#?} while converting impacts, it has no impact data",
             cloud_resource
         );
         resource_impacts = None;
@@ -213,7 +202,10 @@ mod tests {
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(instance1, &one_hour).await.unwrap();
+        let res = api
+            .get_raws_impacts(instance1, &one_hour, false)
+            .await
+            .unwrap();
 
         let expected: serde_json::Value =
             serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap();
@@ -257,7 +249,7 @@ mod tests {
         instances.push(instance1);
         instances.push(instance1_1percent);
 
-        let res = api.get_impacts(instances, &one_hour).await.unwrap();
+        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
 
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
@@ -316,7 +308,7 @@ mod tests {
         let one_hour = 1.0 as f32;
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let res = api.get_impacts(instances, &one_hour).await.unwrap();
+        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
 
         assert_eq!(3, res.len());
         assert_eq!(res[0].cloud_resource.id, "inst-1");
@@ -363,8 +355,20 @@ mod tests {
             0.21321,
             cloud_resource_with_impacts
                 .resource_impacts
+                .as_ref()
                 .unwrap()
                 .pe_use_megajoules
+        );
+
+        assert_eq!(
+            0.21321,
+            cloud_resource_with_impacts
+                .resource_impacts
+                .unwrap()
+                .raw_data
+                .unwrap()["pe"]["use"]["value"]
+                .as_f64()
+                .unwrap()
         );
     }
     #[test]
@@ -398,8 +402,8 @@ mod tests {
             cloud_resource_with_impacts
                 .resource_impacts
                 .unwrap()
-                .verbose_impacts
-                .unwrap()["CPU-1"]["impacts"]["gwp"]["embedded"]["value"]
+                .raw_data
+                .unwrap()["verbose"]["CPU-1"]["impacts"]["gwp"]["embedded"]["value"]
                 .as_f64()
                 .unwrap()
         );
