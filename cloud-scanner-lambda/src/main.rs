@@ -64,6 +64,11 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         }
     };
 
+    let verbose_output: bool = match query_string_parameters.first("verbose_output") {
+        Some(verbose_string) => verbose_string.parse().unwrap_or(false),
+        None => false,
+    };
+
     println!("Using use time of {}", hours_use_time);
     println!("Using aws_region {}", aws_region);
     println!("Using tag filers {:?}", filter_tags);
@@ -73,6 +78,7 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         &filter_tags,
         aws_region,
         &config.boavizta_api_url,
+        verbose_output,
     )
     .await
     .unwrap();
