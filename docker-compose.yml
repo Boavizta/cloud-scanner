@@ -3,7 +3,7 @@ services:
   cloud_scanner:
     container_name: "cloud_scanner_boa"
     hostname: cloud_scanner
-    image: ghcr.io/boavizta/cloud-scanner-cli:0.3.0-alpha3
+    image: ghcr.io/boavizta/cloud-scanner-cli:0.3.0-alpha4
     command: 
       - -b http://boavizta_api:5000
       - -vv
