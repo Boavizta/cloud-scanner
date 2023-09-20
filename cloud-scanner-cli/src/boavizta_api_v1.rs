@@ -394,14 +394,14 @@ mod tests {
         );
 
         assert_eq!(
-            0.21321,
+            21.395,
             cloud_resource_with_impacts
                 .resource_impacts
                 .unwrap()
                 .verbose_impacts
+                .unwrap()["CPU-1"]["impacts"]["gwp"]["embedded"]["value"]
+                .as_f64()
                 .unwrap()
         );
-
-        // TODO check value of verbose
     }
 }
