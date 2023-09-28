@@ -48,6 +48,7 @@ functions:
               querystrings:
                 hours_use_time: true
                 aws_region: false
+                verbose_output: false
   metrics:
     handler: "cloud-scanner-lambda.bootstrap-metrics"
     events:

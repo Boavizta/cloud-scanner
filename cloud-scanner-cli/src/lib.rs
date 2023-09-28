@@ -38,6 +38,7 @@ async fn standard_scan(
     tags: &[String],
     aws_region: &str,
     api_url: &str,
+    verbose: bool,
 ) -> Result<ResourcesWithImpacts> {
     let start = Instant::now();
 
@@ -52,7 +53,7 @@ async fn standard_scan(
     let impact_start = Instant::now();
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let vec = api
-        .get_impacts(cloud_resources, hours_use_time)
+        .get_impacts(cloud_resources, hours_use_time, verbose)
         .await
         .context("Failure while retrieving impacts")?;
     let impact_duration = impact_start.elapsed();
@@ -81,8 +82,9 @@ pub async fn get_default_impacts_as_json_string(
     tags: &[String],
     aws_region: &str,
     api_url: &str,
+    verbose: bool,
 ) -> Result<String> {
-    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region, api_url)
+    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region, api_url, verbose)
         .await
         .context("Cannot perform standard scan")?;
 
@@ -96,7 +98,7 @@ pub async fn get_default_impacts_as_metrics(
     aws_region: &str,
     api_url: &str,
 ) -> Result<String> {
-    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region, api_url)
+    let instances_with_impacts = standard_scan(hours_use_time, tags, aws_region, api_url, false)
         .await
         .context("Cannot perform standard scan")?;
 
@@ -125,8 +127,10 @@ pub async fn print_default_impacts_as_json(
     tags: &[String],
     aws_region: &str,
     api_url: &str,
+    verbose: bool,
 ) -> Result<()> {
-    let j = get_default_impacts_as_json_string(hours_use_time, tags, aws_region, api_url).await?;
+    let j = get_default_impacts_as_json_string(hours_use_time, tags, aws_region, api_url, verbose)
+        .await?;
     println!("{}", j);
     Ok(())
 }

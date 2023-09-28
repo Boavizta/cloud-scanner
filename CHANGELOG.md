@@ -11,7 +11,22 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Added
 
+- Experimental feature / WIP:  272-provide-estimations-related-to-storage
+
 ### Changed
+
+## [0.3.0-alpha4]-2023-09-20
+
+### Added
+
+- [Add optional verbose output with the details of the calculation  · Issue #333 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/333). This introduces and additional (optional CLI option). Verbose is deactivated by default.
+- [Add a parameter to pass the duration of use when exposing metrics and data in standalone server mode · Issue #332 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/332), thanks to a contribution from @damienfernandes.
+
+### Changed
+
+- Format of json output evolved: It now contains a additional field `raw_data` that returns the json data exactly as fetched from Boavizta API (so the format varies depending if using verbose output or not).
+- dependencies updates
+- doc update
 
 ## [0.3.0-alpha3]-2023-07-27
 

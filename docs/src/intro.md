@@ -2,6 +2,17 @@
 
 [Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances (EC2) usage.
 
+```mermaid
+  graph LR;
+      inventory[ Account inventory] 
+      api[Impacts from BoaviztaAPI]
+      metrics[Prometheus metrics]
+      json[JSON output]
+      inventory --> api
+      api --> metrics
+      api --> json
+```
+
 It combines real time _inventory_ and _usage_ data from your AWS account with [Boavizta API](https://github.com/Boavizta/boaviztapi/) to offer a  view of your impacts on a given region.
 
 - multi criteria: Primary Energy consumption (PE), Abiotic resource depletion potential (ADP), and Global Warming Potential (GWP)
@@ -21,6 +32,12 @@ Cloud-scanner is an Open Source application maintained here: <https://github.com
 ## How it works
 
 ![System in context diagram of cloud scanner](images/cloud-scanner-system-in-context.png "System in context diagram of cloud scanner")
+
+Cloud scanner relies on cloud providers APIs to perform an inventory of your cloud resources.  It collects information about usage (instance types, tags, CPU load or volume size).
+
+This inventory is used to query Boavizta API which returns impact data.
+
+Results are exposed as JSON or metrics.
 
 ## ⚠ Alpha version
 

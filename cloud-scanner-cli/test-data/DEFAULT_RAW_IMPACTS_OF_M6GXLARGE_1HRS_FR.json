@@ -3,8 +3,8 @@
     "embedded": {
       "value": 0.0015724,
       "significant_figures": 5,
-      "min": 0.01442,
-      "max": 0.040747,
+      "min": 0.00090127,
+      "max": 0.0025467,
       "warnings": [
         "End of life is not included in the calculation"
       ]
@@ -12,8 +12,8 @@
     "use": {
       "value": 0.0018509,
       "significant_figures": 5,
-      "min": 0.026719,
-      "max": 0.035626
+      "min": 0.0016699,
+      "max": 0.0022266
     },
     "unit": "kgCO2eq",
     "description": "Total climate change"
@@ -22,8 +22,8 @@
     "embedded": {
       "value": 2.1477e-7,
       "significant_figures": 5,
-      "min": 0.0000023175,
-      "max": 0.0000049684,
+      "min": 1.4484e-7,
+      "max": 3.1052e-7,
       "warnings": [
         "End of life is not included in the calculation"
       ]
@@ -31,8 +31,8 @@
     "use": {
       "value": 9.17494e-10,
       "significant_figures": 6,
-      "min": 1.3245e-8,
-      "max": 1.766e-8
+      "min": 8.27814e-10,
+      "max": 1.10375e-9
     },
     "unit": "kgSbeq",
     "description": "Use of minerals and fossil ressources"
@@ -41,8 +41,8 @@
     "embedded": {
       "value": 0.020883,
       "significant_figures": 5,
-      "min": 0.19013,
-      "max": 0.53336,
+      "min": 0.011883,
+      "max": 0.033335,
       "warnings": [
         "End of life is not included in the calculation"
       ]
@@ -50,8 +50,8 @@
     "use": {
       "value": 0.21321,
       "significant_figures": 5,
-      "min": 3.0779,
-      "max": 4.1038
+      "min": 0.19237,
+      "max": 0.25649
     },
     "unit": "MJ",
     "description": "Consumption of primary energy"

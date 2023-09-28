@@ -1,6 +1,17 @@
 # Boavizta cloud-scanner 📡
 
-[Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances (EC2) usage.
+[Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns _environmental impacts_ of your AWS Instances (EC2) usage.
+
+```mermaid
+  graph LR;
+      inventory[ Account inventory] 
+      api[Impacts from BoaviztaAPI]
+      metrics[Prometheus metrics]
+      json[JSON output]
+      inventory --> api
+      api --> metrics
+      api --> json 
+```
 
 It combines real time _inventory_ and _usage_ data from your AWS account with [Boavizta API](https://github.com/Boavizta/boaviztapi/) to offer a  view of your impacts on a given region.
 
@@ -60,7 +71,7 @@ Several significant aspects of the global impacts of cloud usage are **excluded*
 - do not account serverless (lambda) compute.
 - supported regions (EU and US only for the time being)
 - unsupported instance types returns zero for their impacts.
-- we do not provide (yet) error margins https://github.com/Boavizta/boaviztapi/issues/147
-- The manufacturing impacts are not amortized (i.e. values returned for manufacturing impacts do not consider usage duration).
+- we do not provide (yet) error margins <https://github.com/Boavizta/boaviztapi/issues/147>
+- the manufacturing impacts are not amortized (i.e. values returned for manufacturing impacts do not consider usage duration).
 
 This is work in progress, and development version may already implement theses functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository or check the content of the `dev` branch.

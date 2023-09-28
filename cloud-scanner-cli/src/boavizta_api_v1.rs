@@ -28,6 +28,7 @@ impl BoaviztaApiV1 {
         &self,
         cr: CloudResource,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> Option<serde_json::Value> {
         let resource_details = cr.resource_details;
         let verbose = Some(false);
@@ -54,7 +55,7 @@ impl BoaviztaApiV1 {
 
                 let res = cloud_api::instance_cloud_impact_v1_cloud_instance_post(
                     &self.configuration,
-                    verbose,
+                    Some(verbose),
                     Some(usage_duration_hours.to_owned()),
                     Some(criteria),
                     Some(cloud),
@@ -148,9 +149,10 @@ impl BoaviztaApiV1 {
         &self,
         resource: &CloudResource,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> CloudResourceWithImpacts {
         let raw_impacts = self
-            .get_raws_impacts(resource.clone(), usage_duration_hours)
+            .get_raws_impacts(resource.clone(), usage_duration_hours, verbose)
             .await;
         boa_impacts_to_cloud_resource_with_impacts(resource, &raw_impacts, usage_duration_hours)
     }
@@ -164,11 +166,12 @@ impl ImpactProvider for BoaviztaApiV1 {
         &self,
         resources: Vec<CloudResource>,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> Result<Vec<CloudResourceWithImpacts>> {
         let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
         for resource in resources.iter() {
             let cri = self
-                .get_resource_with_impacts(resource, usage_duration_hours)
+                .get_resource_with_impacts(resource, usage_duration_hours, verbose)
                 .await;
             v.push(cri.clone());
         }
@@ -176,7 +179,7 @@ impl ImpactProvider for BoaviztaApiV1 {
     }
 }
 
-/// Convert raw results from boavizta API into model objects
+/// Convert raw results from Boavizta API into model objects
 pub fn boa_impacts_to_cloud_resource_with_impacts(
     cloud_resource: &CloudResource,
     raw_result: &Option<serde_json::Value>,
@@ -184,8 +187,15 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 ) -> CloudResourceWithImpacts {
     let resource_impacts: Option<ResourceImpacts>;
     if let Some(results) = raw_result {
-        debug!("This cloud resource has impacts data: {}", results);
+        debug!("Raw results before conversion: {}", results);
 
+        // Structure of json returned by API is different in verbose and non-verbose mode
+        //  - In non-verbose mode, impacts are at the root of the json
+        //  - In verbose mode data, impacts are inside the "impacts" key
+        let impacts = match results.get("verbose") {
+            None => results,
+            Some(_) => &results["impacts"],
+        };
         let resource_details = cloud_resource.resource_details.clone();
 
         match resource_details {
@@ -194,13 +204,14 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
                 usage: _,
             } => {
                 resource_impacts = Some(ResourceImpacts {
-                    adp_manufacture_kgsbeq: results["adp"]["embedded"]["value"].as_f64().unwrap(),
-                    adp_use_kgsbeq: results["adp"]["use"]["value"].as_f64().unwrap(),
-                    pe_manufacture_megajoules: results["pe"]["embedded"]["value"].as_f64().unwrap(),
-                    pe_use_megajoules: results["pe"]["use"]["value"].as_f64().unwrap(),
-                    gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
-                    gwp_use_kgco2eq: results["gwp"]["use"]["value"].as_f64().unwrap(),
-                });
+                    adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
+                    adp_use_kgsbeq: impacts["adp"]["use"]["value"].as_f64().unwrap(),
+                    pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
+                    pe_use_megajoules: impacts["pe"]["use"]["value"].as_f64().unwrap(),
+                    gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
+                    gwp_use_kgco2eq: impacts["gwp"]["use"]["value"].as_f64().unwrap(),
+                    raw_data: raw_result.clone(),
+        });
             }
             ResourceDetails::BlockStorage {
                 storage_type: _,
@@ -214,6 +225,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
                     pe_use_megajoules: 0 as f64,
                     gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
                     gwp_use_kgco2eq: 0 as f64,
+                    raw_data: raw_result.clone(),
                 });
             }
             _ => {
@@ -222,7 +234,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
         }
     } else {
         debug!(
-            "Skipped resource: {:#?} while building impacts, it has no impact data",
+            "Skipped resource: {:#?} while converting impacts, it has no impact data",
             cloud_resource
         );
         resource_impacts = None;
@@ -249,6 +261,8 @@ mod tests {
 
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR.json");
+    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE.json");
 
     const DEFAULT_RAW_IMPACTS_OF_HDD: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_HDD.json");
@@ -256,7 +270,7 @@ mod tests {
     const DEFAULT_RAW_IMPACTS_OF_SSD: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD.json");
 
-    #[tokio::test]
+     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let provider = Some("aws");
@@ -287,7 +301,10 @@ mod tests {
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(instance1, &one_hour).await.unwrap();
+        let res = api
+            .get_raws_impacts(instance1, &one_hour, false)
+            .await
+            .unwrap();
 
         let expected: serde_json::Value =
             serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap();
@@ -312,7 +329,7 @@ mod tests {
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(hdd, &one_hour).await.unwrap();
+        let res = api.get_raws_impacts(hdd, &one_hour, false).await.unwrap();
 
         let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_HDD).unwrap();
         assert_json_include!(actual: res, expected: expected);
@@ -336,7 +353,7 @@ mod tests {
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(ssd, &one_hour).await.unwrap();
+        let res = api.get_raws_impacts(ssd, &one_hour,false).await.unwrap();
 
         let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD).unwrap();
         assert_json_include!(actual: res, expected: expected);
@@ -379,7 +396,7 @@ mod tests {
         instances.push(instance1);
         instances.push(instance1_1percent);
 
-        let res = api.get_impacts(instances, &one_hour).await.unwrap();
+        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
 
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
@@ -438,7 +455,7 @@ mod tests {
         let one_hour = 1.0 as f32;
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let res = api.get_impacts(instances, &one_hour).await.unwrap();
+        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
 
         assert_eq!(3, res.len());
         assert_eq!(res[0].cloud_resource.id, "inst-1");
@@ -456,7 +473,7 @@ mod tests {
     }
 
     #[test]
-    fn should_convert_results_to_impacts() {
+    fn should_convert_basic_results_to_impacts() {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
@@ -485,8 +502,57 @@ mod tests {
             0.21321,
             cloud_resource_with_impacts
                 .resource_impacts
+                .as_ref()
                 .unwrap()
                 .pe_use_megajoules
+        );
+
+        assert_eq!(
+            0.21321,
+            cloud_resource_with_impacts
+                .resource_impacts
+                .unwrap()
+                .raw_data
+                .unwrap()["pe"]["use"]["value"]
+                .as_f64()
+                .unwrap()
+        );
+    }
+    #[test]
+    fn convert_verbose_results_to_impacts() {
+        let instance1: CloudResource = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
+            tags: Vec::new(),
+        };
+
+        let raw_impacts =
+            Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE).unwrap());
+        let one_hour: f32 = 1 as f32;
+        let cloud_resource_with_impacts: CloudResourceWithImpacts =
+            boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
+        assert!(
+            cloud_resource_with_impacts.resource_impacts.is_some(),
+            "Emtpy impacts"
+        );
+
+        assert_eq!(
+            21.395,
+            cloud_resource_with_impacts
+                .resource_impacts
+                .unwrap()
+                .raw_data
+                .unwrap()["verbose"]["CPU-1"]["impacts"]["gwp"]["embedded"]["value"]
+                .as_f64()
+                .unwrap()
         );
     }
 }
