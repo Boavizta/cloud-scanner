@@ -20,7 +20,6 @@ impl From<&str> for UsageLocation {
     }
 }
 
-
 /// Converts aws region into country code, returns FRA if not found
 fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
     let cc: CountryCode = match aws_region {

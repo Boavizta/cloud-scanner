@@ -31,7 +31,6 @@ impl BoaviztaApiV1 {
         verbose: bool,
     ) -> Option<serde_json::Value> {
         let resource_details = cr.resource_details;
-        let verbose = Some(false);
         let criteria = vec!["gwp".to_owned(), "adp".to_owned(), "pe".to_owned()];
 
         match resource_details {
@@ -95,7 +94,7 @@ impl BoaviztaApiV1 {
                         // This is a HDD
                         let res = component_api::disk_impact_bottom_up_v1_component_hdd_post(
                             &self.configuration,
-                            verbose,
+                            Some(verbose),
                             None,
                             None,
                             Some(criteria),
@@ -117,7 +116,7 @@ impl BoaviztaApiV1 {
                         // All other types (like gp2, gp3...) are considered SSD
                         let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
                             &self.configuration,
-                            verbose,
+                            Some(verbose),
                             None,
                             None,
                             Some(criteria),
@@ -211,7 +210,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
                     gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
                     gwp_use_kgco2eq: impacts["gwp"]["use"]["value"].as_f64().unwrap(),
                     raw_data: raw_result.clone(),
-        });
+                });
             }
             ResourceDetails::BlockStorage {
                 storage_type: _,
@@ -270,7 +269,7 @@ mod tests {
     const DEFAULT_RAW_IMPACTS_OF_SSD: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD.json");
 
-     #[tokio::test]
+    #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let provider = Some("aws");
@@ -353,7 +352,7 @@ mod tests {
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(ssd, &one_hour,false).await.unwrap();
+        let res = api.get_raws_impacts(ssd, &one_hour, false).await.unwrap();
 
         let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD).unwrap();
         assert_json_include!(actual: res, expected: expected);
