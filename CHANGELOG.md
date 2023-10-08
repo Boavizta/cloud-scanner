@@ -11,7 +11,9 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Added
 
-- Experimental feature / WIP:  272-provide-estimations-related-to-storage. Use the `--include_block_storage`or `-b` command line flag or parameter to consider the storage (either in inventory or when requesting an estimation of impacts.). This flag or parameter defaults to `false` . This means that by default block storage (volumes) are not counted in the inventory nor in the results.
+- 🧪 Experimental feature: [Provide estimations related to storage · Issue #272 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/272). Use the `--include-block-storage` command line flag or parameter to consider block storage (either in inventory or when requesting an estimation of impacts.). This flag or parameter defaults to `false` . This means that by default block storage (volumes) are not counted in the inventory nor in the results.
+
+⚠ This feature fails (program exits) when the the `--include-block-storage` is combined with the `--output-verbose-json` flags.
 
 ### Changed
 
