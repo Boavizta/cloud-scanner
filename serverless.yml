@@ -49,6 +49,7 @@ functions:
                 hours_use_time: true
                 aws_region: false
                 verbose_output: false
+                include_block_storage: false
   metrics:
     handler: "cloud-scanner-lambda.bootstrap-metrics"
     events:
@@ -59,3 +60,5 @@ functions:
             parameters:
               querystrings:
                 aws_region: false
+                include_block_storage: false
+

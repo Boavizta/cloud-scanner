@@ -293,15 +293,19 @@ impl AwsInventory {
 #[async_trait]
 impl CloudInventory for AwsInventory {
     /// list resources
-    async fn list_resources(&self, tags: &[String]) -> Result<Vec<CloudResource>> {
+    async fn list_resources(
+        &self,
+        tags: &[String],
+        include_block_storage: bool,
+    ) -> Result<Vec<CloudResource>> {
         let mut inventory: Vec<CloudResource> = Vec::new();
 
         let mut instances = self.clone().get_instances_with_usage_data(tags).await?;
         inventory.append(&mut instances);
-
-        let mut volumes = self.clone().get_volumes_with_usage_data(tags).await?;
-        inventory.append(&mut volumes);
-
+        if include_block_storage {
+            let mut volumes = self.clone().get_volumes_with_usage_data(tags).await?;
+            inventory.append(&mut volumes);
+        }
         Ok(inventory)
     }
 }

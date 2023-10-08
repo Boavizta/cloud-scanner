@@ -69,6 +69,11 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         None => false,
     };
 
+    let include_block_storage: bool = match query_string_parameters.first("include_block_storage") {
+        Some(include_block_storage_string) => include_block_storage_string.parse().unwrap_or(false),
+        None => false,
+    };
+
     println!("Using use time of {}", hours_use_time);
     println!("Using aws_region {}", aws_region);
     println!("Using tag filers {:?}", filter_tags);
@@ -79,6 +84,7 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         aws_region,
         &config.boavizta_api_url,
         verbose_output,
+        include_block_storage,
     )
     .await
     .unwrap();

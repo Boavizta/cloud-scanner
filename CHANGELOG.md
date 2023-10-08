@@ -11,7 +11,7 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Added
 
-- Experimental feature / WIP:  272-provide-estimations-related-to-storage
+- Experimental feature / WIP:  272-provide-estimations-related-to-storage. Use the `--include_block_storage`or `-b` command line flag or parameter to consider the storage (either in inventory or when requesting an estimation of impacts.). This flag or parameter defaults to `false` . This means that by default block storage (volumes) are not counted in the inventory nor in the results.
 
 ### Changed
 
