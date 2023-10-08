@@ -49,15 +49,23 @@ async fn summary(event: Request) -> Result<impl IntoResponse, Error> {
             filter_tags
         }
     };
+
+    let include_block_storage: bool = match query_string_parameters.first("include_block_storage") {
+        Some(include_block_storage_string) => include_block_storage_string.parse().unwrap_or(false),
+        None => false,
+    };
+
     println!("Using fixed use time of 1 hour.");
-    println!("Using aws_region {}", aws_region);
-    println!("Using tag filers {:?}", filter_tags);
+    println!("Using aws_region: {}", aws_region);
+    println!("Using tag filers: {:?}", filter_tags);
+    println!("Include block storage: {:?}", include_block_storage);
 
     let impacts: String = cloud_scanner_cli::get_default_impacts_as_metrics(
         &1.0,
         &filter_tags,
         aws_region,
         &config.boavizta_api_url,
+        include_block_storage,
     )
     .await
     .unwrap();

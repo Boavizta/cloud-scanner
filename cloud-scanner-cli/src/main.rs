@@ -38,9 +38,17 @@ enum SubCommand {
         #[clap(long, short = 'f', action)]
         /// Retrieve and output the details from BoaviztaAPI (equivalent to the verbose flag when querying Boavizta API)
         output_verbose_json: bool,
+
+        #[clap(long, short = 'b', action)]
+        /// Experimental feature: estimate impacts of block storage
+        include_block_storage: bool,
     },
     /// List instances and  their average cpu load for the last 5 minutes (no impact data)
-    Inventory {},
+    Inventory {
+        #[clap(long, short = 'b', action)]
+        /// List block storage
+        include_block_storage: bool,
+    },
     ///  Serve metrics on http://localhost:3000/metrics
     Serve {},
 }
@@ -90,6 +98,7 @@ async fn main() -> Result<()> {
     match args.cmd {
         SubCommand::Estimate {
             hours_use_time,
+            include_block_storage,
             output_verbose_json,
         } => {
             if args.as_metrics {
@@ -98,6 +107,7 @@ async fn main() -> Result<()> {
                     &args.filter_tags,
                     &region,
                     &api_url,
+                    include_block_storage,
                 )
                 .await?
             } else {
@@ -107,13 +117,17 @@ async fn main() -> Result<()> {
                     &region,
                     &api_url,
                     output_verbose_json,
+                    include_block_storage,
                 )
                 .await?
             }
         }
-        SubCommand::Inventory {} => {
+        SubCommand::Inventory {
+            include_block_storage,
+        } => {
             info!("Using filter tags {:?}", &args.filter_tags);
-            cloud_scanner_cli::show_inventory(&args.filter_tags, &region).await?
+            cloud_scanner_cli::show_inventory(&args.filter_tags, &region, include_block_storage)
+                .await?
         }
         SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
     }
