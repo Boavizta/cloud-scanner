@@ -2,10 +2,10 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
-version = "0.4.0"
+version = "0.4.1"
 
 [dependencies]
-aws-types = "0.55.3"
+aws-types = "0.56.1"
 chrono = "^0.4"
 isocountry = "^0.3"
 log = "0.4"
@@ -38,19 +38,19 @@ version = "0.3.0-alpha2"
 
 [dependencies.aws-config]
 features = ["rustls"]
-version = "0.55.3"
+version = "0.56.1"
 
 [dependencies.aws-sdk-cloudwatch]
 features = ["rustls"]
-version = "0.28.0"
+version = "0.33.0"
 
 [dependencies.aws-sdk-ec2]
 features = ["rustls"]
-version = "0.28.0"
+version = "0.33.1"
 
 [dependencies.aws-smithy-types-convert]
 features = ["convert-chrono"]
-version = "0.55.3"
+version = "0.56.1"
 
 [dependencies.clap]
 features = ["derive"]
