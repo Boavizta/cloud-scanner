@@ -20,8 +20,10 @@ anyhow = "1.0.65"
 async-trait = "0.1.58"
 assert-json-diff = "2.0.2"
 
-rocket =  { version ="0.5.0-rc.3", default-features = false, features = ["json"]}
-rocket_okapi = { version="0.8.0-rc.3",  features = ["swagger", "rapidoc"]} 
+rocket = { version = "0.5.0-rc.3", default-features = false, features = [
+  "json",
+] }
+rocket_okapi = { version = "0.8.0-rc.3", features = ["swagger", "rapidoc"] }
 
 # schemars = { version = "0.8.10" }
 # okapi = { version = "0.7", features = ["derive_json_schema"] }
@@ -33,7 +35,6 @@ rocket_okapi = { version="0.8.0-rc.3",  features = ["swagger", "rapidoc"]}
 [dependencies.boavizta_api_sdk]
 version = "0.3.0-alpha2"
 # path = "../../boaviztapi-sdk-rust"
-
 
 
 [dependencies.aws-config]
