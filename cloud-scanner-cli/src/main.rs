@@ -5,25 +5,30 @@ extern crate log;
 extern crate loggerv;
 
 #[derive(Parser, Debug)]
-#[clap(author, version, about)]
+#[command(author, version, about)]
 /// List aws instances and their environmental impact (from Boavizta API)
 struct Arguments {
-    #[clap(subcommand)]
+    #[command(subcommand)]
     cmd: SubCommand,
-    #[clap(short, long)]
+
+    #[arg(short, long)]
     /// AWS region (The default aws profile region is used if not provided)
     aws_region: Option<String>,
-    #[clap(short, long)]
+
+    #[arg(short, long)]
     /// Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. https://api.boavizta.org)
     boavizta_api_url: Option<String>,
-    #[clap(short = 't', long)]
+
+    #[arg(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
     filter_tags: Vec<String>,
-    #[clap(short, long,  action = clap::ArgAction::Count)]
+
+    #[arg(short, long,  action = clap::ArgAction::Count)]
     /// Enable logging and show execution duration, use multiple `v`s to increase logging level warning to debug
     verbosity: u8,
-    /// Returns OpenMetrics (Prometheus) instead of json output
-    #[clap(short = 'm', long)]
+
+    /// Returns results as OpenMetrics (Prometheus) instead of json
+    #[arg(short = 'm', long)]
     as_metrics: bool,
 }
 
@@ -31,25 +36,26 @@ struct Arguments {
 enum SubCommand {
     /// Get estimation of impacts for a given usage duration
     Estimate {
-        #[clap(short = 'u', long)]
+        #[arg(short = 'u', long)]
         /// The number of hours of use for which we want to estimate the impacts
         hours_use_time: f32,
 
-        #[clap(long, short = 'f', action)]
+        #[arg(long, short = 'f', action)]
         /// Retrieve and output the details from BoaviztaAPI (equivalent to the verbose flag when querying Boavizta API)
         output_verbose_json: bool,
 
-        #[clap(long, short = 'b', action)]
+        #[arg(long, short = 'b', action)]
         /// Experimental feature: estimate impacts of block storage
         include_block_storage: bool,
     },
-    /// List instances and  their average cpu load for the last 5 minutes (no impact data)
+    /// List instances and  their average cpu load for the last 5 minutes (without returning impacts)
     Inventory {
-        #[clap(long, short = 'b', action)]
+        #[arg(long, short = 'b', action)]
         /// List block storage
         include_block_storage: bool,
     },
-    ///  Serve metrics on http://localhost:3000/metrics
+    ///  Run as a standalone server.
+    /// Access metrics (e.g. http://localhost:8000/metrics?aws_region=eu-west-3), inventory or impacts (see http://localhost:8000/swagger-ui)
     Serve {},
 }
 

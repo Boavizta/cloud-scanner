@@ -36,10 +36,14 @@ fn index(config: &State<Config>) -> String {
     format!("Cloud scanner metric server  {} is running.\n\nUsing Boavizta API at: {}.\nMetrics are exposed on /metrics path and require passing a **region** in query string.\n e.g.  http://localhost:8000/metrics?aws_region=eu-west-3 \n See also /swagger-ui .", version, config.boavizta_url)
 }
 
-/// Returns the metrics (corresponding to one hour use)
-/// Region is mandatory, tags are optional
+/// # Returns Prometheus metrics.
+///
+/// Region is mandatory, filter_tags can be an empty string ("").
+///
+///  Results are estimated for one hour of use by default.
+///
 /// Example query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0&include_storage=true
-#[openapi(skip)]
+#[openapi(tag = "metrics")]
 #[get("/metrics?<aws_region>&<filter_tags>&<use_duration_hours>&<include_block_storage>")]
 async fn metrics(
     config: &State<Config>,
@@ -50,7 +54,6 @@ async fn metrics(
 ) -> String {
     warn!("Getting something on /metrics");
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
-    //let tags = Vec::new();
     warn!("Filtering on tags {:?}", filter_tags);
     let metrics = crate::get_default_impacts_as_metrics(
         &hours_use_time,
@@ -63,8 +66,10 @@ async fn metrics(
     metrics.unwrap()
 }
 
-/// Returns the inventory as json
-/// Region is mandatory, tags are optional
+/// # Returns the inventory as json.
+///
+/// Region is mandatory, filter_tags can be an empty string ("").
+///
 /// Example query: http://localhost:8000/inventorynew?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
 #[openapi(tag = "inventory")]
 #[get("/inventory?<aws_region>&<filter_tags>&<include_block_storage>")]
@@ -87,8 +92,10 @@ async fn inventory(
     )
 }
 
-/// Returns the impacts of use as json
-/// Region is mandatory, tags are optional
+/// # Returns the impacts (use and embedded) as json.
+///
+/// Region is mandatory, filter_tags can be an empty string ("").
+///
 /// Example query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0
 #[openapi(tag = "impacts")]
 #[get(
