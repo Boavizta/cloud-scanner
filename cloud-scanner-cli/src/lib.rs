@@ -84,7 +84,7 @@ pub async fn get_default_impacts_as_json_string(
     aws_region: &str,
     api_url: &str,
     verbose: bool,
-    include_storage: bool,
+    include_block_storage: bool,
 ) -> Result<String> {
     let instances_with_impacts = standard_scan(
         hours_use_time,
@@ -92,7 +92,7 @@ pub async fn get_default_impacts_as_json_string(
         aws_region,
         api_url,
         verbose,
-        include_storage,
+        include_block_storage,
     )
     .await
     .context("Cannot perform standard scan")?;
