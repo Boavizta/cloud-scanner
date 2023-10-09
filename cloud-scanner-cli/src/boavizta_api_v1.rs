@@ -216,13 +216,14 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
                 storage_type: _,
                 usage: _,
             } => {
-                // TODO: handle empty values differently
+                // TODO: handle empty values differently, it could be better to have an option to be explicit about null values.
+                info!("Impacts of the use phase of storage are not counted (only embedded impacts are counted).");
                 resource_impacts = Some(ResourceImpacts {
-                    adp_manufacture_kgsbeq: results["adp"]["embedded"]["value"].as_f64().unwrap(),
+                    adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
                     adp_use_kgsbeq: 0 as f64,
-                    pe_manufacture_megajoules: results["pe"]["embedded"]["value"].as_f64().unwrap(),
+                    pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
                     pe_use_megajoules: 0 as f64,
-                    gwp_manufacture_kgco2eq: results["gwp"]["embedded"]["value"].as_f64().unwrap(),
+                    gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
                     gwp_use_kgco2eq: 0 as f64,
                     raw_data: raw_result.clone(),
                 });

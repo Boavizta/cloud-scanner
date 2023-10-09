@@ -11,11 +11,20 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Added
 
-- 🧪 Experimental feature: [Provide estimations related to storage · Issue #272 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/272). Use the `--include-block-storage` command line flag or parameter to consider block storage (either in inventory or when requesting an estimation of impacts.). This flag or parameter defaults to `false` . This means that by default block storage (volumes) are not counted in the inventory nor in the results.
-
-⚠ This feature fails (program exits) when the the `--include-block-storage` is combined with the `--output-verbose-json` flags.
-
 ### Changed
+
+## [0.4.0]-2023-10-09
+
+### Added
+
+- 🧪 Experimental feature: [Provide estimations related to storage · Issue #272 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/272). Use the `--include-block-storage` command line flag or parameter to consider block storage (either in inventory or when requesting an estimation of impacts.). This parameter defaults to `false` . This means that by default block storage (volumes) are not counted in the inventory nor in the results.
+
+⚠ In any case, for storage, the impacts of the _use_ phase are _not_ counted. Boavizta API returns only the impacts of the _manufacturing_ phase for HDD and SSD.
+
+```sh
+# Experimental: get impacts of instances and attached storage
+cargo run estimate --hours-use-time 1 --include-block-storage --output-verbose-json
+```
 
 ## [0.3.0-alpha4]-2023-09-20
 
