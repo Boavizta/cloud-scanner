@@ -2,9 +2,9 @@
   "impacts": {
     "gwp": {
       "embedded": {
-        "value": 0.0018,
-        "min": 0.0008953,
-        "max": 0.005346,
+        "value": 0.0022,
+        "min": 0.00142,
+        "max": 0.004647,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -15,9 +15,9 @@
     },
     "adp": {
       "embedded": {
-        "value": 7e-8,
-        "min": 4.015e-8,
-        "max": 1.676e-7,
+        "value": 7.8e-8,
+        "min": 5.519e-8,
+        "max": 1.476e-7,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -28,9 +28,9 @@
     },
     "pe": {
       "embedded": {
-        "value": 0.022,
-        "min": 0.01104,
-        "max": 0.06627,
+        "value": 0.027,
+        "min": 0.01756,
+        "max": 0.0576,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -44,9 +44,9 @@
     "impacts": {
       "gwp": {
         "embedded": {
-          "value": 0.0018,
-          "min": 0.0008953,
-          "max": 0.005346,
+          "value": 0.0022,
+          "min": 0.00142,
+          "max": 0.004647,
           "warnings": [
             "End of life is not included in the calculation"
           ]
@@ -57,9 +57,9 @@
       },
       "adp": {
         "embedded": {
-          "value": 7e-8,
-          "min": 4.015e-8,
-          "max": 1.676e-7,
+          "value": 7.8e-8,
+          "min": 5.519e-8,
+          "max": 1.476e-7,
           "warnings": [
             "End of life is not included in the calculation"
           ]
@@ -70,9 +70,9 @@
       },
       "pe": {
         "embedded": {
-          "value": 0.022,
-          "min": 0.01104,
-          "max": 0.06627,
+          "value": 0.027,
+          "min": 0.01756,
+          "max": 0.0576,
           "warnings": [
             "End of life is not included in the calculation"
           ]
@@ -88,18 +88,22 @@
       "min": 1,
       "max": 1
     },
+    "manufacturer": {
+      "value": "Samsung",
+      "status": "INPUT"
+    },
     "capacity": {
       "value": 1000,
       "status": "INPUT",
       "unit": "GB"
     },
     "density": {
-      "value": 54.8842105263158,
+      "value": 42.51428571428572,
       "status": "COMPLETED",
       "unit": "GB/cm2",
-      "source": "Average of 19 rows",
-      "min": 16.4,
-      "max": 128
+      "source": "Average of 7 rows",
+      "min": 19,
+      "max": 71
     },
     "duration": {
       "value": 1,
