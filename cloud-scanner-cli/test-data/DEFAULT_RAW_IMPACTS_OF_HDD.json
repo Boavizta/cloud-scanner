@@ -1,44 +1,43 @@
 {
-  "gwp": {
-    "embedded": {
-      "value": 31.1,
-      "significant_figures": 5,
-      "min": 31.1,
-      "max": 31.1,
-      "warnings": [
-        "End of life is not included in the calculation"
-      ]
+  "impacts": {
+    "gwp": {
+      "embedded": {
+        "value": 31.1,
+        "min": 31.1,
+        "max": 31.1,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": "not implemented",
+      "unit": "kgCO2eq",
+      "description": "Total climate change"
     },
-    "use": "not implemented",
-    "unit": "kgCO2eq",
-    "description": "Total climate change"
-  },
-  "adp": {
-    "embedded": {
-      "value": 0.00025,
-      "significant_figures": 5,
-      "min": 0.00025,
-      "max": 0.00025,
-      "warnings": [
-        "End of life is not included in the calculation"
-      ]
+    "adp": {
+      "embedded": {
+        "value": 0.00025,
+        "min": 0.00025,
+        "max": 0.00025,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": "not implemented",
+      "unit": "kgSbeq",
+      "description": "Use of minerals and fossil ressources"
     },
-    "use": "not implemented",
-    "unit": "kgSbeq",
-    "description": "Use of minerals and fossil ressources"
-  },
-  "pe": {
-    "embedded": {
-      "value": 276.0,
-      "significant_figures": 5,
-      "min": 276.0,
-      "max": 276.0,
-      "warnings": [
-        "End of life is not included in the calculation"
-      ]
-    },
-    "use": "not implemented",
-    "unit": "MJ",
-    "description": "Consumption of primary energy"
+    "pe": {
+      "embedded": {
+        "value": 276.0,
+        "min": 276.0,
+        "max": 276.0,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": "not implemented",
+      "unit": "MJ",
+      "description": "Consumption of primary energy"
+    }
   }
 }

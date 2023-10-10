@@ -188,13 +188,8 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
     if let Some(results) = raw_result {
         debug!("Raw results before conversion: {}", results);
 
-        // Structure of json returned by API is different in verbose and non-verbose mode
-        //  - In non-verbose mode, impacts are at the root of the json
-        //  - In verbose mode data, impacts are inside the "impacts" key
-        let impacts = match results.get("verbose") {
-            None => results,
-            Some(_) => &results["impacts"],
-        };
+        let impacts = &results["impacts"];
+
         let resource_details = cloud_resource.resource_details.clone();
 
         match resource_details {
@@ -267,8 +262,8 @@ mod tests {
     const DEFAULT_RAW_IMPACTS_OF_HDD: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_HDD.json");
 
-    const DEFAULT_RAW_IMPACTS_OF_SSD: &str =
-        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD.json");
+    const DEFAULT_RAW_IMPACTS_OF_SSD_1GB_1HR: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD_1GB_1HR.json");
 
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
@@ -345,7 +340,7 @@ mod tests {
                 storage_type: "gp2".to_string(),
                 usage: Some(StorageUsage {
                     size_gb: 1000,
-                    usage_duration_seconds: 0,
+                    usage_duration_seconds: 3600,
                 }),
             },
             tags: Vec::new(),
@@ -355,7 +350,7 @@ mod tests {
         let one_hour = 1.0 as f32;
         let res = api.get_raws_impacts(ssd, &one_hour, false).await.unwrap();
 
-        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD).unwrap();
+        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD_1GB_1HR).unwrap();
         assert_json_include!(actual: res, expected: expected);
     }
 
@@ -400,8 +395,8 @@ mod tests {
 
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
-        assert_eq!(0.21321, r0.pe_use_megajoules);
-        assert_eq!(0.08903, r1.pe_use_megajoules);
+        assert_eq!(0.212, r0.pe_use_megajoules);
+        assert_eq!(0.088, r1.pe_use_megajoules);
     }
 
     #[tokio::test]
@@ -464,8 +459,8 @@ mod tests {
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
 
-        assert_eq!(0.21321, r0.pe_use_megajoules);
-        assert_eq!(0.21321, r1.pe_use_megajoules);
+        assert_eq!(0.212, r0.pe_use_megajoules);
+        assert_eq!(0.212, r1.pe_use_megajoules);
         assert!(
             res[2].resource_impacts.clone().is_none(),
             "This instance should return None impacts because it's type is unknown from API"
@@ -499,7 +494,7 @@ mod tests {
         );
 
         assert_eq!(
-            0.21321,
+            0.212,
             cloud_resource_with_impacts
                 .resource_impacts
                 .as_ref()
