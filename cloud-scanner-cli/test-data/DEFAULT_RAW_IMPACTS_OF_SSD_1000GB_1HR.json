@@ -1,0 +1,109 @@
+{
+  "impacts": {
+    "gwp": {
+      "embedded": {
+        "value": 0.0018,
+        "min": 0.0008953,
+        "max": 0.005346,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": "not implemented",
+      "unit": "kgCO2eq",
+      "description": "Total climate change"
+    },
+    "adp": {
+      "embedded": {
+        "value": 7e-8,
+        "min": 4.015e-8,
+        "max": 1.676e-7,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": "not implemented",
+      "unit": "kgSbeq",
+      "description": "Use of minerals and fossil ressources"
+    },
+    "pe": {
+      "embedded": {
+        "value": 0.022,
+        "min": 0.01104,
+        "max": 0.06627,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": "not implemented",
+      "unit": "MJ",
+      "description": "Consumption of primary energy"
+    }
+  },
+  "verbose": {
+    "impacts": {
+      "gwp": {
+        "embedded": {
+          "value": 0.0018,
+          "min": 0.0008953,
+          "max": 0.005346,
+          "warnings": [
+            "End of life is not included in the calculation"
+          ]
+        },
+        "use": "not implemented",
+        "unit": "kgCO2eq",
+        "description": "Total climate change"
+      },
+      "adp": {
+        "embedded": {
+          "value": 7e-8,
+          "min": 4.015e-8,
+          "max": 1.676e-7,
+          "warnings": [
+            "End of life is not included in the calculation"
+          ]
+        },
+        "use": "not implemented",
+        "unit": "kgSbeq",
+        "description": "Use of minerals and fossil ressources"
+      },
+      "pe": {
+        "embedded": {
+          "value": 0.022,
+          "min": 0.01104,
+          "max": 0.06627,
+          "warnings": [
+            "End of life is not included in the calculation"
+          ]
+        },
+        "use": "not implemented",
+        "unit": "MJ",
+        "description": "Consumption of primary energy"
+      }
+    },
+    "units": {
+      "value": 1,
+      "status": "ARCHETYPE",
+      "min": 1,
+      "max": 1
+    },
+    "capacity": {
+      "value": 1000,
+      "status": "INPUT",
+      "unit": "GB"
+    },
+    "density": {
+      "value": 54.8842105263158,
+      "status": "COMPLETED",
+      "unit": "GB/cm2",
+      "source": "Average of 19 rows",
+      "min": 16.4,
+      "max": 128
+    },
+    "duration": {
+      "value": 1,
+      "unit": "hours"
+    }
+  }
+}

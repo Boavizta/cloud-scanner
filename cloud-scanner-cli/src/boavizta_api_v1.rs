@@ -262,8 +262,8 @@ mod tests {
     const DEFAULT_RAW_IMPACTS_OF_HDD: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_HDD.json");
 
-    const DEFAULT_RAW_IMPACTS_OF_SSD_1GB_1HR: &str =
-        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD_1GB_1HR.json");
+    const DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR.json");
 
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
@@ -350,7 +350,7 @@ mod tests {
         let one_hour = 1.0 as f32;
         let res = api.get_raws_impacts(ssd, &one_hour, false).await.unwrap();
 
-        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD_1GB_1HR).unwrap();
+        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR).unwrap();
         assert_json_include!(actual: res, expected: expected);
     }
 
@@ -503,12 +503,12 @@ mod tests {
         );
 
         assert_eq!(
-            0.21321,
+            0.212,
             cloud_resource_with_impacts
                 .resource_impacts
                 .unwrap()
                 .raw_data
-                .unwrap()["pe"]["use"]["value"]
+                .unwrap()["impacts"]["pe"]["use"]["value"]
                 .as_f64()
                 .unwrap()
         );
@@ -540,7 +540,7 @@ mod tests {
         );
 
         assert_eq!(
-            21.395,
+            0.0005454,
             cloud_resource_with_impacts
                 .resource_impacts
                 .unwrap()
