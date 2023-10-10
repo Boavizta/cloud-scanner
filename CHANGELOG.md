@@ -13,6 +13,8 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Changed
 
+- Update the parsing of JSON returned by Boavizta API to follow latest changes in API V1 (see <https://github.com/Boavizta/boaviztapi/issues/229>).
+
 ## [0.4.0]-2023-10-09
 
 ### Added
