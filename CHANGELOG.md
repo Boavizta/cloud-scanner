@@ -13,6 +13,12 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Changed
 
+## [0.4.1]-2023-10-11
+
+### Changed
+
+- Update the parsing of JSON returned by Boavizta API to follow latest changes in API v1.0.0 (see [Align verbose and non verbose json output format · Issue #229 · Boavizta/boaviztapi](https://github.com/Boavizta/boaviztapi/issues/229)).
+
 ## [0.4.0]-2023-10-09
 
 ### Added

@@ -1,59 +1,55 @@
 {
-  "gwp": {
-    "embedded": {
-      "value": 0.0015724,
-      "significant_figures": 5,
-      "min": 0.00090127,
-      "max": 0.0025467,
-      "warnings": [
-        "End of life is not included in the calculation"
-      ]
+  "impacts": {
+    "gwp": {
+      "embedded": {
+        "value": 0.0016,
+        "min": 0.0009013,
+        "max": 0.002547,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": {
+        "value": 0.00184,
+        "min": 0.00166,
+        "max": 0.002213
+      },
+      "unit": "kgCO2eq",
+      "description": "Total climate change"
     },
-    "use": {
-      "value": 0.0018509,
-      "significant_figures": 5,
-      "min": 0.0016699,
-      "max": 0.0022266
+    "adp": {
+      "embedded": {
+        "value": 2.1e-7,
+        "min": 1.448e-7,
+        "max": 3.105e-7,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": {
+        "value": 9.1e-10,
+        "min": 8.228e-10,
+        "max": 1.097e-9
+      },
+      "unit": "kgSbeq",
+      "description": "Use of minerals and fossil ressources"
     },
-    "unit": "kgCO2eq",
-    "description": "Total climate change"
-  },
-  "adp": {
-    "embedded": {
-      "value": 2.1477e-7,
-      "significant_figures": 5,
-      "min": 1.4484e-7,
-      "max": 3.1052e-7,
-      "warnings": [
-        "End of life is not included in the calculation"
-      ]
-    },
-    "use": {
-      "value": 9.17494e-10,
-      "significant_figures": 6,
-      "min": 8.27814e-10,
-      "max": 1.10375e-9
-    },
-    "unit": "kgSbeq",
-    "description": "Use of minerals and fossil ressources"
-  },
-  "pe": {
-    "embedded": {
-      "value": 0.020883,
-      "significant_figures": 5,
-      "min": 0.011883,
-      "max": 0.033335,
-      "warnings": [
-        "End of life is not included in the calculation"
-      ]
-    },
-    "use": {
-      "value": 0.21321,
-      "significant_figures": 5,
-      "min": 0.19237,
-      "max": 0.25649
-    },
-    "unit": "MJ",
-    "description": "Consumption of primary energy"
+    "pe": {
+      "embedded": {
+        "value": 0.021,
+        "min": 0.01188,
+        "max": 0.03333,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": {
+        "value": 0.212,
+        "min": 0.1912,
+        "max": 0.2549
+      },
+      "unit": "MJ",
+      "description": "Consumption of primary energy"
+    }
   }
 }
