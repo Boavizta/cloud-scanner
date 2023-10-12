@@ -13,6 +13,14 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Changed
 
+## [1.0.0]-2023-10-12
+
+First stable release of cloud-scanner that supports latest Boavizta API v1.x [Releases · Boavizta/boaviztapi](https://github.com/Boavizta/boaviztapi/releases).
+
+_Cloud-scanner 1.x is really based on the previous releases 0.4.x and 0.3.x , but renamed to v1.0.x to follow the Boavizta API naming._
+
+Thanks to the contributions of @damienfernandes, @notCamelCaseName and the great work of members of the Boavizta collective, with a special mention for @da-ekchajzer !
+
 ## [0.4.1]-2023-10-11
 
 ### Changed
