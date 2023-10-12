@@ -4,8 +4,10 @@ use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ResourceI
 use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
+use boavizta_api_sdk::apis::component_api;
 use boavizta_api_sdk::apis::configuration;
-use boavizta_api_sdk::models::{Allocation, Cloud, UsageCloud};
+
+use boavizta_api_sdk::models::{Cloud, Disk, UsageCloud};
 
 /// Access data of Boavizta API
 pub struct BoaviztaApiV1 {
@@ -26,49 +28,131 @@ impl BoaviztaApiV1 {
         &self,
         cr: CloudResource,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> Option<serde_json::Value> {
-        let instance_type = cr.resource_type;
-        let verbose = Some(false);
-        let mut usage_cloud: UsageCloud = UsageCloud::new();
-        usage_cloud.hours_use_time = Some(usage_duration_hours.to_owned());
-        usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
-        if let Some(usage) = cr.usage {
-            usage_cloud.time_workload = Some(usage.average_cpu_load as f32);
-        }
+        let resource_details = cr.resource_details;
+        let criteria = vec!["gwp".to_owned(), "adp".to_owned(), "pe".to_owned()];
 
-        let mut cloud: Cloud = Cloud::new();
-        cloud.provider = Some(String::from("aws"));
-        cloud.instance_type = Some(instance_type.clone());
-        cloud.usage = Some(Box::new(usage_cloud));
+        match resource_details {
+            ResourceDetails::Instance {
+                instance_type,
+                usage,
+            } => {
+                let mut usage_cloud: UsageCloud = UsageCloud::new();
 
-        let res = cloud_api::instance_cloud_impact_v1_cloud_post(
-            &self.configuration,
-            verbose,
-            Some(Allocation::Total),
-            Some(cloud),
-        )
-        .await;
+                //usage_cloud.hours_life_time = Some(usage_duration_hours.to_owned());
+                usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
 
-        match res {
-            Ok(res) => Some(res),
-            Err(e) => {
-                warn!(
-                    "Warning: Cannot get impacts from API for instance type {}: {}",
-                    instance_type, e
-                );
+                if let Some(instance_usage) = usage {
+                    usage_cloud.time_workload = Some(instance_usage.average_cpu_load as f32);
+                }
+
+                let mut cloud: Cloud = Cloud::new();
+                cloud.provider = Some(String::from("aws"));
+                cloud.instance_type = Some(instance_type.clone());
+                cloud.usage = Some(Box::new(usage_cloud));
+
+                let res = cloud_api::instance_cloud_impact_v1_cloud_instance_post(
+                    &self.configuration,
+                    Some(verbose),
+                    Some(usage_duration_hours.to_owned()),
+                    Some(criteria),
+                    Some(cloud),
+                )
+                .await;
+
+                match res {
+                    Ok(res) => Some(res),
+                    Err(e) => {
+                        warn!(
+                            "Warning: Cannot get impacts from API for instance type {}: {}",
+                            instance_type, e
+                        );
+                        None
+                    }
+                }
+            }
+
+            ResourceDetails::BlockStorage {
+                storage_type,
+                usage,
+            } => {
+                //let duration: f32 = usage.unwrap().usage_duration_seconds.into();
+                let disk = Disk {
+                    capacity: Some(usage.unwrap().size_gb),
+                    units: None,
+                    usage: None,
+                    r#type: None,
+                    density: None,
+                    manufacturer: None,
+                    model: None,
+                    layers: None,
+                };
+
+                match storage_type.as_str() {
+                    "st1" | "sc1" => {
+                        // This is a HDD
+                        let res = component_api::disk_impact_bottom_up_v1_component_hdd_post(
+                            &self.configuration,
+                            Some(verbose),
+                            Some(usage_duration_hours.to_owned()),
+                            Some("DEFAULT"),
+                            Some(criteria),
+                            Some(disk),
+                        )
+                        .await;
+                        match res {
+                            Ok(res) => Some(res),
+                            Err(e) => {
+                                warn!(
+                                    "Warning: Cannot get HHD impact from API for type {}: {}",
+                                    storage_type, e
+                                );
+                                None
+                            }
+                        }
+                    }
+                    _ => {
+                        error!("Query ssd {:?}", disk);
+                        // All other types (like gp2, gp3...) are considered SSD
+                        let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
+                            &self.configuration,
+                            Some(verbose),
+                            Some(usage_duration_hours.to_owned()),
+                            Some("DEFAULT"),
+                            Some(criteria),
+                            Some(disk),
+                        )
+                        .await;
+                        match res {
+                            Ok(res) => Some(res),
+                            Err(e) => {
+                                warn!(
+                                    "Warning: Cannot get SSD impact from API for type {}: {}",
+                                    storage_type, e
+                                );
+                                None
+                            }
+                        }
+                    }
+                }
+            }
+            _ => {
+                warn!("Warning: This type of cloud resource is not supported.");
                 None
             }
         }
     }
 
-    // /// Get the impacts of a single CloudResource
+    /// Get the impacts of a single CloudResource
     async fn get_resource_with_impacts(
         &self,
         resource: &CloudResource,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> CloudResourceWithImpacts {
         let raw_impacts = self
-            .get_raws_impacts(resource.clone(), usage_duration_hours)
+            .get_raws_impacts(resource.clone(), usage_duration_hours, verbose)
             .await;
         boa_impacts_to_cloud_resource_with_impacts(resource, &raw_impacts, usage_duration_hours)
     }
@@ -82,11 +166,12 @@ impl ImpactProvider for BoaviztaApiV1 {
         &self,
         resources: Vec<CloudResource>,
         usage_duration_hours: &f32,
+        verbose: bool,
     ) -> Result<Vec<CloudResourceWithImpacts>> {
         let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
         for resource in resources.iter() {
             let cri = self
-                .get_resource_with_impacts(resource, usage_duration_hours)
+                .get_resource_with_impacts(resource, usage_duration_hours, verbose)
                 .await;
             v.push(cri.clone());
         }
@@ -94,7 +179,7 @@ impl ImpactProvider for BoaviztaApiV1 {
     }
 }
 
-/// Convert raw results from boavizta API into model objects
+/// Convert raw results from Boavizta API into model objects
 pub fn boa_impacts_to_cloud_resource_with_impacts(
     cloud_resource: &CloudResource,
     raw_result: &Option<serde_json::Value>,
@@ -102,19 +187,50 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 ) -> CloudResourceWithImpacts {
     let resource_impacts: Option<ResourceImpacts>;
     if let Some(results) = raw_result {
-        debug!("This cloud resource has impacts data: {}", results);
+        debug!("Raw results before conversion: {}", results);
 
-        resource_impacts = Some(ResourceImpacts {
-            adp_manufacture_kgsbeq: results["adp"]["manufacture"].as_f64().unwrap(),
-            adp_use_kgsbeq: results["adp"]["use"].as_f64().unwrap(),
-            pe_manufacture_megajoules: results["pe"]["manufacture"].as_f64().unwrap(),
-            pe_use_megajoules: results["pe"]["use"].as_f64().unwrap(),
-            gwp_manufacture_kgco2eq: results["gwp"]["manufacture"].as_f64().unwrap(),
-            gwp_use_kgco2eq: results["gwp"]["use"].as_f64().unwrap(),
-        });
+        let impacts = &results["impacts"];
+
+        let resource_details = cloud_resource.resource_details.clone();
+
+        match resource_details {
+            ResourceDetails::Instance {
+                instance_type: _,
+                usage: _,
+            } => {
+                resource_impacts = Some(ResourceImpacts {
+                    adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
+                    adp_use_kgsbeq: impacts["adp"]["use"]["value"].as_f64().unwrap(),
+                    pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
+                    pe_use_megajoules: impacts["pe"]["use"]["value"].as_f64().unwrap(),
+                    gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
+                    gwp_use_kgco2eq: impacts["gwp"]["use"]["value"].as_f64().unwrap(),
+                    raw_data: raw_result.clone(),
+                });
+            }
+            ResourceDetails::BlockStorage {
+                storage_type: _,
+                usage: _,
+            } => {
+                // TODO: handle empty values differently, it could be better to have an option to be explicit about null values.
+                info!("Impacts of the use phase of storage are not counted (only embedded impacts are counted).");
+                resource_impacts = Some(ResourceImpacts {
+                    adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
+                    adp_use_kgsbeq: 0 as f64,
+                    pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
+                    pe_use_megajoules: 0 as f64,
+                    gwp_manufacture_kgco2eq: impacts["gwp"]["embedded"]["value"].as_f64().unwrap(),
+                    gwp_use_kgco2eq: 0 as f64,
+                    raw_data: raw_result.clone(),
+                });
+            }
+            _ => {
+                resource_impacts = None;
+            }
+        }
     } else {
         debug!(
-            "Skipped resource: {:#?} while building impacts, it has no impact data",
+            "Skipped resource: {:#?} while converting impacts, it has no impact data",
             cloud_resource
         );
         resource_impacts = None;
@@ -131,6 +247,8 @@ mod tests {
 
     use super::*;
     use crate::UsageLocation;
+    use assert_json_diff::assert_json_include;
+    use assert_json_diff::{assert_json_matches, CompareMode, Config, NumericMode};
 
     const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API
@@ -138,32 +256,23 @@ mod tests {
     // Test against dev version of Boavizta API
     // const TEST_API_URL: &str = "https://dev.api.boavizta.org";
 
-    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str = r#"   
-    {
-        "adp": {
-            "manufacture": 0.0083, 
-            "unit":"kgSbeq", 
-            "use": 9e-10
-        }, 
-        "gwp": {
-            "manufacture": 83.0,
-            "unit": "kgCO2eq", 
-            "use": 0.002
-            },
-        "pe": {
-            "manufacture": 1100.0,
-            "unit": "MJ",
-            "use": 0.2
-            }
-    }
-    "#;
+    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR.json");
+    const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE.json");
+
+    const DEFAULT_RAW_IMPACTS_OF_HDD: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_HDD.json");
+
+    const DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR: &str =
+        include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR.json");
 
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let provider = Some("aws");
 
-        let res = cloud_api::server_get_all_archetype_name_v1_cloud_all_instances_get(
+        let res = cloud_api::server_get_all_archetype_name_v1_cloud_instance_all_instances_get(
             &api.configuration,
             provider,
         )
@@ -175,55 +284,112 @@ mod tests {
     #[tokio::test]
     async fn should_retrieve_raw_default_impacts_aws_fr() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0,
-                usage_duration_seconds: 3600,
-            }),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
             tags: Vec::new(),
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(instance1, &one_hour).await.unwrap();
+        let res = api
+            .get_raws_impacts(instance1, &one_hour, false)
+            .await
+            .unwrap();
 
         let expected: serde_json::Value =
             serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap();
-        assert_eq!(expected, res);
+        assert_json_include!(actual: res, expected: expected);
     }
 
     #[tokio::test]
-    async fn should_retrieve_different_pe_impacts_for_different_cpu_load() {
-        let mut tags = Vec::new();
+    async fn get_verbose_raw_impacts_of_a_hdd() {
+        let hdd: CloudResource = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "disk-1".to_string(),
 
-        tags.push(CloudResourceTag {
-            key: "appName".to_string(),
-            value: Some("myApp".to_string()),
-        });
-        let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
-            id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0,
-                usage_duration_seconds: 3600,
-            }),
-            tags: tags,
+            resource_details: ResourceDetails::BlockStorage {
+                storage_type: "st1".to_string(),
+                usage: Some(StorageUsage {
+                    size_gb: 1000,
+                    usage_duration_seconds: 0,
+                }),
+            },
+            tags: Vec::new(),
         };
 
-        let instance1_1percent: CloudResource = CloudResource {
-            provider: String::from("aws"),
+        let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
+        let one_hour = 1.0 as f32;
+        let res = api.get_raws_impacts(hdd, &one_hour, true).await.unwrap();
 
+        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_HDD).unwrap();
+
+        let config = Config::new(CompareMode::Strict).numeric_mode(NumericMode::AssumeFloat);
+        assert_json_matches!(res, expected, config);
+    }
+
+    // not sure why it fails, ignoring it for now
+    #[tokio::test]
+    async fn get_verbose_raw_impacts_of_a_ssd() {
+        let ssd: CloudResource = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "disk-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_details: ResourceDetails::BlockStorage {
+                storage_type: "gp2".to_string(),
+                usage: Some(StorageUsage {
+                    size_gb: 1000,
+                    usage_duration_seconds: 3600,
+                }),
+            },
+            tags: Vec::new(),
+        };
+
+        let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
+        let one_hour = 1.0 as f32;
+        let res = api.get_raws_impacts(ssd, &one_hour, true).await.unwrap();
+
+        let expected: serde_json::Value =
+            serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR).unwrap();
+
+        let config = Config::new(CompareMode::Strict).numeric_mode(NumericMode::AssumeFloat);
+        assert_json_matches!(res, expected, config);
+    }
+
+    #[tokio::test]
+    async fn returns_different_pe_impacts_for_different_cpu_load() {
+        let instance1: CloudResource = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
+            tags: Vec::new(),
+        };
+
+        let instance1_1percent = CloudResource {
+            provider: CloudProvider::AWS,
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 1.0,
-                usage_duration_seconds: 3600,
-            }),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 1.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
             tags: Vec::new(),
         };
 
@@ -234,49 +400,55 @@ mod tests {
         instances.push(instance1);
         instances.push(instance1_1percent);
 
-        let res = api.get_impacts(instances, &one_hour).await.unwrap();
+        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
 
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
-        assert_eq!(0.2, r0.pe_use_megajoules);
-        assert_eq!(0.09, r1.pe_use_megajoules);
+        assert_eq!(0.212, r0.pe_use_megajoules);
+        assert_eq!(0.088, r1.pe_use_megajoules);
     }
 
     #[tokio::test]
     async fn should_retrieve_multiple_default_impacts_fr() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
             tags: Vec::new(),
         };
 
         let instance2: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-2".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
             tags: Vec::new(),
         };
 
         let instance3: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-3".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "type-not-in-boa".to_string(),
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "type-not-in-boa".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
             tags: Vec::new(),
         };
 
@@ -287,7 +459,7 @@ mod tests {
         let one_hour = 1.0 as f32;
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let res = api.get_impacts(instances, &one_hour).await.unwrap();
+        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
 
         assert_eq!(3, res.len());
         assert_eq!(res[0].cloud_resource.id, "inst-1");
@@ -295,41 +467,96 @@ mod tests {
 
         let r0 = res[0].resource_impacts.clone().unwrap();
         let r1 = res[1].resource_impacts.clone().unwrap();
-        let r2 = res[2].resource_impacts.clone().is_none();
 
-        assert_eq!(0.2, r0.pe_use_megajoules);
-        assert_eq!(0.2, r1.pe_use_megajoules);
-        assert_eq!(true, r2);
+        assert_eq!(0.212, r0.pe_use_megajoules);
+        assert_eq!(0.212, r1.pe_use_megajoules);
+        assert!(
+            res[2].resource_impacts.clone().is_none(),
+            "This instance should return None impacts because it's type is unknown from API"
+        );
     }
 
     #[test]
-    fn should_convert_results_to_impacts() {
+    fn should_convert_basic_results_to_impacts() {
         let instance1: CloudResource = CloudResource {
-            provider: String::from("aws"),
+            provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
             location: UsageLocation::from("eu-west-3"),
-            resource_type: "m6g.xlarge".to_string(),
-            usage: Some(CloudResourceUsage {
-                average_cpu_load: 100.0, // Will not be considered in v1
-                usage_duration_seconds: 3600,
-            }),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
             tags: Vec::new(),
         };
 
         let raw_impacts =
             Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap());
-
         let one_hour: f32 = 1 as f32;
-
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
+        assert!(
+            cloud_resource_with_impacts.resource_impacts.is_some(),
+            "Emtpy impacts"
+        );
 
         assert_eq!(
-            0.2,
+            0.212,
+            cloud_resource_with_impacts
+                .resource_impacts
+                .as_ref()
+                .unwrap()
+                .pe_use_megajoules
+        );
+
+        assert_eq!(
+            0.212,
             cloud_resource_with_impacts
                 .resource_impacts
                 .unwrap()
-                .pe_use_megajoules
+                .raw_data
+                .unwrap()["impacts"]["pe"]["use"]["value"]
+                .as_f64()
+                .unwrap()
+        );
+    }
+    #[test]
+    fn convert_verbose_results_to_impacts() {
+        let instance1: CloudResource = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "inst-1".to_string(),
+            location: UsageLocation::from("eu-west-3"),
+            resource_details: ResourceDetails::Instance {
+                instance_type: "m6g.xlarge".to_string(),
+                usage: Some(InstanceUsage {
+                    average_cpu_load: 100.0,
+                    usage_duration_seconds: 3600,
+                }),
+            },
+            tags: Vec::new(),
+        };
+
+        let raw_impacts =
+            Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE).unwrap());
+        let one_hour: f32 = 1 as f32;
+        let cloud_resource_with_impacts: CloudResourceWithImpacts =
+            boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
+        assert!(
+            cloud_resource_with_impacts.resource_impacts.is_some(),
+            "Emtpy impacts"
+        );
+
+        assert_eq!(
+            0.0005454,
+            cloud_resource_with_impacts
+                .resource_impacts
+                .unwrap()
+                .raw_data
+                .unwrap()["verbose"]["CPU-1"]["impacts"]["gwp"]["embedded"]["value"]
+                .as_f64()
+                .unwrap()
         );
     }
 }

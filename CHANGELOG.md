@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased (DEV branch)
 
+_This paragraph may describe WIP/unreleased features_
+
+### Added
+
+### Changed
+
+## [0.4.1]-2023-10-11
+
+### Changed
+
+- Update the parsing of JSON returned by Boavizta API to follow latest changes in API v1.0.0 (see [Align verbose and non verbose json output format · Issue #229 · Boavizta/boaviztapi](https://github.com/Boavizta/boaviztapi/issues/229)).
+
+## [0.4.0]-2023-10-09
+
+### Added
+
+- 🧪 Experimental feature: [Provide estimations related to storage · Issue #272 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/272). Use the `--include-block-storage` command line flag or parameter to consider block storage (either in inventory or when requesting an estimation of impacts.). This parameter defaults to `false` . This means that by default block storage (volumes) are not counted in the inventory nor in the results.
+
+⚠ In any case, for storage, the impacts of the _use_ phase are _not_ counted. Boavizta API returns only the impacts of the _manufacturing_ phase for HDD and SSD.
+
+```sh
+# Experimental: get impacts of instances and attached storage
+cargo run estimate --hours-use-time 1 --include-block-storage --output-verbose-json
+```
+
+## [0.3.0-alpha4]-2023-09-20
+
+### Added
+
+- [Add optional verbose output with the details of the calculation  · Issue #333 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/333). This introduces and additional (optional CLI option). Verbose is deactivated by default.
+- [Add a parameter to pass the duration of use when exposing metrics and data in standalone server mode · Issue #332 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/332), thanks to a contribution from @damienfernandes.
+
+### Changed
+
+- Format of json output evolved: It now contains a additional field `raw_data` that returns the json data exactly as fetched from Boavizta API (so the format varies depending if using verbose output or not).
+- dependencies updates
+- doc update
+
+## [0.3.0-alpha3]-2023-07-27
+
+### Added
+
+- [Log time spend on actions · Issue #289 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/289)
+- [Return inventory as json in the standalone server mode · Issue #286 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/286) thanks to a contribution of @notCamelCaseName
+- [Return impacts as json in the standalone server mode · Issue #287 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/287)
+- [Expose OpenAPI spec · Issue #285 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/285)
+
+### Changed
+
+- [Update to latest AWS SDK · Issue #308 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/308)
+- Serverless: update `lambda_runtime` and `lambda_http` crates to v 0.8.1, bump version of cloud_scanner_lambda package to `0.3.0-alpha3`.
+
+## [0.3.0-alpha2]-2023-06-26
+
+Minor adaptations to the not yet released Boavizta API V1.0alpha.
+
+## [0.3.0-alpha]-2023-05-16
+
+This alpha release contains changes to integrate with the new version of Boavizta API (v0.3.0).
+
+It does not bring any new feature but allow retrieving the latest data set.
+
 ## [0.2.4]-2023-04-19
 
 ### Changed

@@ -1,8 +1,10 @@
 use isocountry::CountryCode;
+use rocket_okapi::okapi::schemars;
+use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 /// TODO! the usage location should be part of the cloud_inventory model (region names are tied to a specific cloud provider)
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct UsageLocation {
     pub aws_region: String,
     /// The 3-letters ISO country code corresponding to the country of the aws_region
@@ -33,7 +35,7 @@ fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
         "us-west-1" => CountryCode::USA,
         "us-west-2" => CountryCode::USA,
         _ => {
-            error!("Unable to match aws region to country code, defaulting to FRA !");
+            error!("Unsupported region: Unable to match aws region [{}] to country code, defaulting to FRA !", aws_region);
             CountryCode::FRA
         }
     };

@@ -1,0 +1,55 @@
+{
+  "impacts": {
+    "gwp": {
+      "embedded": {
+        "value": 0.0016,
+        "min": 0.0009013,
+        "max": 0.002547,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": {
+        "value": 0.00184,
+        "min": 0.00166,
+        "max": 0.002213
+      },
+      "unit": "kgCO2eq",
+      "description": "Total climate change"
+    },
+    "adp": {
+      "embedded": {
+        "value": 2.1e-7,
+        "min": 1.448e-7,
+        "max": 3.105e-7,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": {
+        "value": 9.1e-10,
+        "min": 8.228e-10,
+        "max": 1.097e-9
+      },
+      "unit": "kgSbeq",
+      "description": "Use of minerals and fossil ressources"
+    },
+    "pe": {
+      "embedded": {
+        "value": 0.021,
+        "min": 0.01188,
+        "max": 0.03333,
+        "warnings": [
+          "End of life is not included in the calculation"
+        ]
+      },
+      "use": {
+        "value": 0.212,
+        "min": 0.1912,
+        "max": 0.2549
+      },
+      "unit": "MJ",
+      "description": "Consumption of primary energy"
+    }
+  }
+}

@@ -22,6 +22,12 @@ copy-fonts = true
 git-repository-url = "https://github.com/Boavizta/cloud-scanner"
 git-repository-icon = "fa-github"
 edit-url-template = "https://github.com/Boavizta/cloud-scanner/edit/main/docs/{path}"
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+
+[preprocessor]
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
 #site-url = "/example-book/"
 #cname = "myproject.rs"
 #input-404 = "not-found.md"
