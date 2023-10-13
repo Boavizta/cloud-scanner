@@ -1,10 +1,10 @@
-name: Setup mdBook with plugins (latest)
+name: Publish doc to Github pages
 on:
   push:
-    # branches:
-    #   - main
+    branches:
+      - main
 jobs:
-  publish:
+  publish-doc:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
