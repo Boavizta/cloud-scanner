@@ -1,0 +1,52 @@
+name: Publish doc to Github pages
+on:
+  push:
+    branches:
+      - main
+jobs:
+  publish-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jontze/action-mdbook@v2
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          # Optional Plugins have to be enabled
+          use-linkcheck: true
+          use-mermaid: true
+          use-toc: true
+          use-opengh: true
+          use-admonish: true
+          use-katex: true
+      - name: Show mdbook version
+        run: mdbook --version
+      - name: Show linkchecker version
+        run: mdbook-linkcheck --version
+      - name: Show mermaid version
+        run: mdbook-mermaid --version
+      - name: Show toc version
+        run: mdbook-toc --version
+      - name: Show open-on-gh version
+        run: mdbook-open-on-gh --version
+      - name: Show admonish version
+        run: mdbook-admonish --version
+      - name: Show katex version
+        run: mdbook-katex --version
+      - name: Deploy GitHub Pages
+        run: |
+          # This assumes your book is in the root of your repository.
+          # Just add a `cd` here if you need to change to another directory.
+          cd docs
+          mdbook build
+          mdbook test
+          git worktree add gh-pages
+          git config user.name "Deploy from CI"
+          git config user.email ""
+          cd gh-pages
+          # Delete the ref to avoid keeping history.
+          git update-ref -d refs/heads/gh-pages
+          rm -rf *
+          mv ../book/* .
+          git add .
+          git commit -m "Deploy $GITHUB_SHA to gh-pages"
+          git push --force --set-upstream origin gh-pages
