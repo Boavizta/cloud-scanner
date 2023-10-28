@@ -51,7 +51,7 @@ enum SubCommand {
     /// List instances and  their average cpu load for the last 5 minutes (without returning impacts)
     Inventory {
         #[arg(long, short = 'b', action)]
-        /// List block storage
+        /// Experimental feature: include block storage in the inventory
         include_block_storage: bool,
     },
     ///  Run as a standalone server.

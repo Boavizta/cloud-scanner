@@ -267,12 +267,26 @@ impl AwsInventory {
 
         for volume in volumes {
             let volume_id = volume.volume_id().unwrap();
+
             let usage: StorageUsage = StorageUsage {
                 size_gb: volume.size().unwrap(),
                 usage_duration_seconds: 3600,
             };
 
             let volume_type: String = volume.volume_type().unwrap().as_str().to_string();
+            let mut attached_instances: Option<Vec<StorageAttachment>> = None;
+
+            if let Some(all_volume_attachments) = volume.attachments.clone() {
+                for single_attachment in all_volume_attachments {
+                    let mut attachment_list: Vec<StorageAttachment> = Vec::new();
+
+                    if let Some(instance_id) = single_attachment.instance_id {
+                        attachment_list.push(StorageAttachment { instance_id });
+                    }
+                    attached_instances = Some(attachment_list);
+                }
+            }
+
             let disk = CloudResource {
                 provider: CloudProvider::AWS,
                 id: volume_id.into(),
@@ -280,6 +294,7 @@ impl AwsInventory {
                 resource_details: ResourceDetails::BlockStorage {
                     storage_type: volume_type,
                     usage: Some(usage),
+                    attached_instances,
                 },
                 tags: Self::cloud_resource_tags_from_aws_tags(volume.tags()),
             };

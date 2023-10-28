@@ -13,6 +13,12 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Changed
 
+## [1.0.1]-2023-10-27
+
+### Added
+
+- [Return ids of the instances attached to a volume when doing block storage inventory · Issue #366 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/366)
+
 ## [1.0.0]-2023-10-12
 
 First stable release of cloud-scanner that supports latest Boavizta API v1.x [Releases · Boavizta/boaviztapi](https://github.com/Boavizta/boaviztapi/releases).

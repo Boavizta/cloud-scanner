@@ -76,6 +76,7 @@ impl BoaviztaApiV1 {
             ResourceDetails::BlockStorage {
                 storage_type,
                 usage,
+                attached_instances: _,
             } => {
                 //let duration: f32 = usage.unwrap().usage_duration_seconds.into();
                 let disk = Disk {
@@ -211,6 +212,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
             ResourceDetails::BlockStorage {
                 storage_type: _,
                 usage: _,
+                attached_instances: _,
             } => {
                 // TODO: handle empty values differently, it could be better to have an option to be explicit about null values.
                 info!("Impacts of the use phase of storage are not counted (only embedded impacts are counted).");
@@ -321,6 +323,7 @@ mod tests {
                     size_gb: 1000,
                     usage_duration_seconds: 0,
                 }),
+                attached_instances: None,
             },
             tags: Vec::new(),
         };
@@ -348,6 +351,7 @@ mod tests {
                     size_gb: 1000,
                     usage_duration_seconds: 3600,
                 }),
+                attached_instances: None,
             },
             tags: Vec::new(),
         };
