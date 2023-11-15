@@ -1,8 +1,8 @@
 # Testing
 
-Whne launched with `cargo test -- --include-ignored` some the unit tests require a specific instance to run (when launched ).
+When launched with `cargo test -- --include-ignored` some the unit tests require a specific instance to run (when launched ).
 
-> These integration tests requiere specific instance to be up and running to pass. This means they are tied to a specific cloud account.
+> These integration tests require specific instances to be up and running to pass. This means they are tied to a specific cloud account.
 
 Commands to start or stop instances:
 

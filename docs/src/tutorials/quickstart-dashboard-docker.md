@@ -1,8 +1,10 @@
 # Quick start : display dashboard using docker-compose 🐳
 
-No installation needed, you will run a public docker image of cloud-scanner CLI and Boavizta API.
+Visualize the live impacts of you account in a dashboard.
 
-All data remain local (this docker-compose stack uses a _private instance_ of Boavizta API).
+No installation needed, you will run a public docker image of cloud-scanner CLI, Boavizta API, Prometheus and Grafana to get access to a demo dashboard..
+
+All data remain will  local to your environment (this docker-compose stack uses a _private instance_ of Boavizta API).
 
 ## Pre-requisites
 
@@ -31,6 +33,6 @@ docker-compose up
 - ⚠ This docker-compose example is **not** intended  for production deployment, but rather for quick testing.
   - ports of all services are exposed.
   - Grafana is served on http with default login.
-- You may have to update the line mapping your AWS profile (Replace `AWS_PROFILE=${AWS_PROFILE}` by `AWS_PROFILE=the-real-name-of-your-profile`).
+- You may have to update the line mapping your AWS profile (Replace `AWS_PROFILE=${AWS_PROFILE}` by `AWS_PROFILE=the-real-name-of-your-profile`) when using Podman. It seems that Podman compose does not map the variables of the environment to the containers.
 - In corporate environments, you may need to provide your certificates authorities certificates (`ca-certificates`) to the cloud-scanner container (uncomment the mapping line in the docker-compose file).
-- For the demo, we deliberately set a short metrics scrapping interval (30 seconds in this demo). In production deloymnent, you may want to increase this metric scraping interval in the prometheus configuration file.
+- For the demo, we deliberately set a short metrics scrapping interval (30 seconds). In a production environment, you may want to increase this metric scraping interval to reduce the API calls and volume of data. This scrapping period is set in the Prometheus configuration file.

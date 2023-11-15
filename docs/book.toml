@@ -7,7 +7,7 @@ title = "Boavizta cloud scanner 📡"
 
 # Deactivate link checker by default
 # cargo install mdbook-linkcheck
-# [output.linkcheck]
+[output.linkcheck]
 
 [output.html]
 #theme = "my-theme"
