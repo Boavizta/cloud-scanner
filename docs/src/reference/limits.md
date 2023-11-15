@@ -47,7 +47,7 @@ Carbon intensity of electricity is not (yet) real time. It uses and yearly extra
 
 ### Allocation of manufacture impacts
 
-Today, cloud scanner returns the manufacture impacts of a resource corresponding to _the entire lifecycle_ of the ressource. The manufacture impacts returned for a VM are the same if you use it one hours or several year. Said differently we do _not_ amortize the manufacturing impacts over the duration of use.
+Today, cloud scanner returns the manufacture impacts of a resource corresponding to _the entire lifecycle_ of the ressource. The manufacture impacts returned for a VM are the same if you use it one hours or several year. To say it differently, we do _not_ amortize the manufacturing impacts over the duration of use.
 
 ### We do not provide margins of error
 
