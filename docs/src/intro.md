@@ -1,4 +1,7 @@
-# About cloud-scanner  📡
+
+![Cloud scanner logo](images/cloudscanner_color_logo.svg)
+
+# About cloud-scanner
 
 [Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances (EC2) usage.
 
