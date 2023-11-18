@@ -22,6 +22,14 @@ pub struct Labels {
     pub country: String,
 }
 
+// This is the kind of thing we want to duplicate as  get_metrics(resource_wiyh_impacts: &Cloud_Resource_wiyth_impact)
+//   Set labels specific  to the resource (region,  country, resource id, resource type, maybe resource state)
+//  create a registry
+// Create the metric 
+// register each metric (one day this should be dynamic on each dimenstion of the asesment)
+// set the value
+
+
 /// Retursn the ImpactsSumary as metrics in the prometheus format
 pub fn get_metrics(summary: &ImpactsSummary) -> Result<String> {
     let label_set: Labels = Labels {
