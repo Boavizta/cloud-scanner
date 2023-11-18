@@ -76,11 +76,12 @@ impl BoaviztaApiV1 {
             ResourceDetails::BlockStorage {
                 storage_type,
                 usage,
+                attached_instances: _,
             } => {
                 //let duration: f32 = usage.unwrap().usage_duration_seconds.into();
                 let disk = Disk {
                     capacity: Some(usage.unwrap().size_gb),
-                    units: Some(1),
+                    units: None,
                     usage: None,
                     r#type: None,
                     density: None,
@@ -95,8 +96,8 @@ impl BoaviztaApiV1 {
                         let res = component_api::disk_impact_bottom_up_v1_component_hdd_post(
                             &self.configuration,
                             Some(verbose),
-                            None,
-                            None,
+                            Some(usage_duration_hours.to_owned()),
+                            Some("DEFAULT"),
                             Some(criteria),
                             Some(disk),
                         )
@@ -113,12 +114,13 @@ impl BoaviztaApiV1 {
                         }
                     }
                     _ => {
+                        error!("Query ssd {:?}", disk);
                         // All other types (like gp2, gp3...) are considered SSD
                         let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
                             &self.configuration,
                             Some(verbose),
-                            None,
-                            None,
+                            Some(usage_duration_hours.to_owned()),
+                            Some("DEFAULT"),
                             Some(criteria),
                             Some(disk),
                         )
@@ -210,6 +212,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
             ResourceDetails::BlockStorage {
                 storage_type: _,
                 usage: _,
+                attached_instances: _,
             } => {
                 // TODO: handle empty values differently, it could be better to have an option to be explicit about null values.
                 info!("Impacts of the use phase of storage are not counted (only embedded impacts are counted).");
@@ -247,12 +250,13 @@ mod tests {
     use super::*;
     use crate::UsageLocation;
     use assert_json_diff::assert_json_include;
+    use assert_json_diff::{assert_json_matches, CompareMode, Config, NumericMode};
 
-    // const TEST_API_URL: &str = "https://api.boavizta.org";
+    const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API
     // const TEST_API_URL: &str = "http:/localhost:5000";
     // Test against dev version of Boavizta API
-    const TEST_API_URL: &str = "https://dev.api.boavizta.org";
+    // const TEST_API_URL: &str = "https://dev.api.boavizta.org";
 
     const DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR.json");
@@ -307,10 +311,11 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn get_raw_impacts_of_a_hdd() {
+    async fn get_verbose_raw_impacts_of_a_hdd() {
         let hdd: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "disk-1".to_string(),
+
             location: UsageLocation::from("eu-west-3"),
             resource_details: ResourceDetails::BlockStorage {
                 storage_type: "st1".to_string(),
@@ -318,22 +323,24 @@ mod tests {
                     size_gb: 1000,
                     usage_duration_seconds: 0,
                 }),
+                attached_instances: None,
             },
             tags: Vec::new(),
         };
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(hdd, &one_hour, false).await.unwrap();
+        let res = api.get_raws_impacts(hdd, &one_hour, true).await.unwrap();
 
         let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_HDD).unwrap();
-        assert_json_include!(actual: res, expected: expected);
+
+        let config = Config::new(CompareMode::Strict).numeric_mode(NumericMode::AssumeFloat);
+        assert_json_matches!(res, expected, config);
     }
 
     // not sure why it fails, ignoring it for now
     #[tokio::test]
-    #[ignore]
-    async fn get_raw_impacts_of_a_ssd() {
+    async fn get_verbose_raw_impacts_of_a_ssd() {
         let ssd: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "disk-1".to_string(),
@@ -344,16 +351,20 @@ mod tests {
                     size_gb: 1000,
                     usage_duration_seconds: 3600,
                 }),
+                attached_instances: None,
             },
             tags: Vec::new(),
         };
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let one_hour = 1.0 as f32;
-        let res = api.get_raws_impacts(ssd, &one_hour, false).await.unwrap();
+        let res = api.get_raws_impacts(ssd, &one_hour, true).await.unwrap();
 
-        let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR).unwrap();
-        assert_json_include!(actual: res, expected: expected);
+        let expected: serde_json::Value =
+            serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR).unwrap();
+
+        let config = Config::new(CompareMode::Strict).numeric_mode(NumericMode::AssumeFloat);
+        assert_json_matches!(res, expected, config);
     }
 
     #[tokio::test]

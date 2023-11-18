@@ -7,6 +7,11 @@
 - [Quickstart - using cargo 🦀](tutorials/quickstart-rust-cli.md)
 - [Quickstart as serverless ⚡](tutorials/quickstart-serverless.md)
 
+# Explanations
+
+- [Methodology](explanations/methodology.md)
+- [How we process workload](explanations/processing-workload.md)
+
 # How-to guides
 
 - [Building CLI](how-to/building-cli.md)
@@ -16,8 +21,6 @@
 - [Setup monitoring dashboard](how-to/set-up-dashboard.md)
 - [Filtering by tags](how-to/filter-by-tags.md)
 - [Using a private instance of Boavizta API](how-to/using-private-boaviztapi.md)
-- [Source of data](explanations/source-of-data.md)
-- [How we process workload](explanations/processing-workload.md)
 
 # Reference
 

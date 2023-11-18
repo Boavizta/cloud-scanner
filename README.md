@@ -1,6 +1,13 @@
-# Boavizta cloud-scanner 📡
+<p align="center">
+    <img src="https://github.com/da-ekchajzer/cloud-scanner/blob/main/cloudscanner_color.svg" height="100">
+</p>
 
-[Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns _environmental impacts_ of your AWS Instances (EC2) usage.
+<h3 align="center">
+    Boavizta's Cloud-scanner returns <i>environmental impacts</i> of your AWS Instances (EC2) usage.
+</h3>
+
+---
+
 
 ```mermaid
   graph LR;

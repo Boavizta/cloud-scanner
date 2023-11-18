@@ -36,6 +36,7 @@ pub enum ResourceDetails {
     BlockStorage {
         storage_type: String,
         usage: Option<StorageUsage>,
+        attached_instances: Option<Vec<StorageAttachment>>,
     },
     ObjectStorage,
 }
@@ -50,6 +51,11 @@ pub struct InstanceUsage {
 pub struct StorageUsage {
     pub size_gb: i32,
     pub usage_duration_seconds: u32,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct StorageAttachment {
+    pub instance_id: String,
 }
 
 /// A tag (just a mandatory key + optional value)
