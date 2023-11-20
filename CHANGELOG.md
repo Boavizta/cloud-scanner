@@ -13,6 +13,11 @@ _This paragraph may describe WIP/unreleased features_
 
 ### Changed
 
+- Use API v1.1.0 in docker-compose (support aditional instances): https://github.com/Boavizta/cloud-scanner/issues/386
+- Update logo in documentation https://github.com/Boavizta/cloud-scanner/pull/381
+- Add link checker when pubishing doc https://github.com/Boavizta/cloud-scanner/pull/382
+- Add logo in the doc website https://github.com/Boavizta/cloud-scanner/pull/383
+
 ## [1.0.1]-2023-10-27
 
 ### Added
