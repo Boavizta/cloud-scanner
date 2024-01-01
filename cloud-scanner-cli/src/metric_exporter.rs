@@ -2,9 +2,10 @@
 use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
+use crate::cloud_resource::{CloudResource, InstanceState};
 use crate::impact_provider::CloudResourceWithImpacts;
 use prometheus_client::encoding::text::encode;
-use prometheus_client::encoding::EncodeLabelSet;
+use prometheus_client::encoding::{EncodeLabelSet, EncodeLabelValue};
 use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
@@ -17,43 +18,101 @@ use crate::ImpactsSummary;
 // You could as well use `(String, String)` to represent a label set,
 // instead of the custom type below.
 #[derive(Clone, Hash, PartialEq, Eq, EncodeLabelSet, Debug)]
-pub struct Labels {
+pub struct SummaryLabels {
     pub awsregion: String,
     pub country: String,
 }
-///
-pub fn get_full_metrics(resources_with_impacts: Vec<CloudResourceWithImpacts>) -> Result<String> {
-    // Pour chaque resource
-    // Créer un label set
-    // On pourrait avoir le status de la resource
-    //
-    Ok("test".parse()?)
+#[derive(Clone, Hash, PartialEq, Eq, EncodeLabelSet, Debug)]
+pub struct ResourceLabels {
+    pub awsregion: String,
+    pub country: String,
+    pub resourceType: ResourceType,
+    pub resourceId: String,
+    pub resourceTags: String,
+    pub resourceState: ResourceState,
+}
+#[derive(Clone, Debug, Hash, PartialEq, Eq, EncodeLabelValue)]
+pub enum ResourceType {
+    BlockStorage,
+    Instance,
 }
 
-/// Return the ImpactsSummary as metrics in the prometheus format
-pub fn get_metrics(summary: &ImpactsSummary) -> Result<String> {
-    let label_set: Labels = Labels {
-        awsregion: summary.aws_region.to_string(),
-        country: summary.country.to_string(),
-    };
+#[derive(Clone, Debug, Hash, PartialEq, Eq, EncodeLabelValue)]
+pub enum ResourceState {
+    Running,
+    Stopped,
+    Unknown,
+}
 
-    let registry = register_all_metrics_new(summary, label_set);
+///
+pub fn get_resources_metrics(
+    resources_with_impacts: Vec<CloudResourceWithImpacts>,
+) -> Result<String> {
+    let mut registry = <Registry>::default();
+    //TODO: define resource metrics here, something like below
+
+    let boavizta_resource_thing = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    // Register the metric family with the registry.
+    registry.register(
+        // With the metric name.
+        "boavizta_resource_thing",
+        // And the metric help text.
+        "Number of resource thing",
+        boavizta_resource_thing.clone(),
+    );
+
+    for resource in resources_with_impacts.iter() {
+        // some kind of match on resource.cloud_resource. enum to get resource type
+        // TODO: fix resource type
+        // TODO: fix resource state
+        // TODO: convert tags
+        let resource_labels = ResourceLabels {
+            awsregion: resource.cloud_resource.location.aws_region.clone(),
+            country: resource.cloud_resource.location.iso_country_code.clone(),
+            resourceType: ResourceType::Instance,
+            resourceId: resource.cloud_resource.id.clone(),
+            resourceTags: "tags-no-supported".parse().unwrap(),
+            resourceState: ResourceState::Running,
+        };
+
+        let impacts = resource.resource_impacts.as_ref().unwrap();
+
+        boavizta_resource_thing
+            .get_or_create(&resource_labels)
+            .set(impacts.pe_use_megajoules);
+    }
 
     let mut buffer = String::new();
-    encode(&mut buffer, &registry).context("Fails to encode result into metrics")?;
+    encode(&mut buffer, &registry).context("Fails to encode resources impacts into metrics")?;
     let metrics = buffer;
 
     Ok(metrics)
 }
 
-fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Registry {
+/// Return the ImpactsSummary as metrics in the prometheus format
+pub fn get_summary_metrics(summary: &ImpactsSummary) -> Result<String> {
+    let summary_labels: SummaryLabels = SummaryLabels {
+        awsregion: summary.aws_region.to_string(),
+        country: summary.country.to_string(),
+    };
+
+    let registry = register_summary_metrics(summary, summary_labels);
+
+    let mut buffer = String::new();
+    encode(&mut buffer, &registry).context("Fails to encode impacts summary into metrics")?;
+    let metrics = buffer;
+
+    Ok(metrics)
+}
+
+fn register_summary_metrics(summary: &ImpactsSummary, summary_labels: SummaryLabels) -> Registry {
     // Create a metric registry.
     //
     // Note the angle brackets to make sure to use the default (dynamic
     // dispatched boxed metric) for the generic type parameter.
     let mut registry = <Registry>::default();
 
-    let boavizta_number_of_instances_total = Family::<Labels, Gauge>::default();
+    let boavizta_number_of_instances_total = Family::<SummaryLabels, Gauge>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -63,7 +122,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_number_of_instances_total.clone(),
     );
 
-    let boavizta_number_of_instances_assessed = Family::<Labels, Gauge>::default();
+    let boavizta_number_of_instances_assessed = Family::<SummaryLabels, Gauge>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -73,7 +132,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_number_of_instances_assessed.clone(),
     );
 
-    let boavizta_duration_of_use_hours = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_duration_of_use_hours = Family::<SummaryLabels, Gauge<f64, AtomicU64>>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -83,7 +142,8 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_duration_of_use_hours.clone(),
     );
 
-    let boavizta_pe_manufacture_megajoules = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_pe_manufacture_megajoules =
+        Family::<SummaryLabels, Gauge<f64, AtomicU64>>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -93,7 +153,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_pe_manufacture_megajoules.clone(),
     );
 
-    let boavizta_pe_use_megajoules = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_pe_use_megajoules = Family::<SummaryLabels, Gauge<f64, AtomicU64>>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -103,7 +163,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_pe_use_megajoules.clone(),
     );
 
-    let boavizta_adp_manufacture_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_adp_manufacture_kgsbeq = Family::<SummaryLabels, Gauge<f64, AtomicU64>>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -113,7 +173,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_adp_manufacture_kgsbeq.clone(),
     );
 
-    let boavizta_adp_use_kgsbeq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_adp_use_kgsbeq = Family::<SummaryLabels, Gauge<f64, AtomicU64>>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -123,7 +183,8 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_adp_use_kgsbeq.clone(),
     );
 
-    let boavizta_gwp_manufacture_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_gwp_manufacture_kgco2eq =
+        Family::<SummaryLabels, Gauge<f64, AtomicU64>>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -133,7 +194,7 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
         boavizta_gwp_manufacture_kgco2eq.clone(),
     );
 
-    let boavizta_gwp_use_kgco2eq = Family::<Labels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_gwp_use_kgco2eq = Family::<SummaryLabels, Gauge<f64, AtomicU64>>::default();
     // Register the metric family with the registry.
     registry.register(
         // With the metric name.
@@ -145,38 +206,38 @@ fn register_all_metrics_new(summary: &ImpactsSummary, label_set: Labels) -> Regi
 
     // Set the values
     boavizta_number_of_instances_total
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.number_of_instances_total.into());
     boavizta_number_of_instances_assessed
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.number_of_instances_assessed.into());
 
     boavizta_duration_of_use_hours
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.duration_of_use_hours);
 
     boavizta_pe_manufacture_megajoules
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.pe_manufacture_megajoules);
 
     boavizta_pe_use_megajoules
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.pe_use_megajoules);
 
     boavizta_adp_manufacture_kgsbeq
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.adp_manufacture_kgsbeq);
 
     boavizta_adp_use_kgsbeq
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.adp_use_kgsbeq);
 
     boavizta_gwp_manufacture_kgco2eq
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.gwp_manufacture_kgco2eq);
 
     boavizta_gwp_use_kgco2eq
-        .get_or_create(&label_set)
+        .get_or_create(&summary_labels)
         .set(summary.gwp_use_kgco2eq);
 
     registry
@@ -203,7 +264,7 @@ mod tests {
             country: "IRL".to_string(),
         };
 
-        let metrics = get_metrics(&summary).unwrap();
+        let metrics = get_summary_metrics(&summary).unwrap();
 
         println!("{}", metrics);
 
