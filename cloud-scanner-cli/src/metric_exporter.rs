@@ -1,7 +1,8 @@
-//!  Formatting results into Prometheus metrics
+//!  Formatting impacts into Prometheus metrics
 use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
+use crate::impact_provider::CloudResourceWithImpacts;
 use prometheus_client::encoding::text::encode;
 use prometheus_client::encoding::EncodeLabelSet;
 use prometheus_client::metrics::family::Family;
@@ -18,19 +19,18 @@ use crate::ImpactsSummary;
 #[derive(Clone, Hash, PartialEq, Eq, EncodeLabelSet, Debug)]
 pub struct Labels {
     pub awsregion: String,
-    // Or just a plain string.
     pub country: String,
 }
+///
+pub fn get_full_metrics(resources_with_impacts: Vec<CloudResourceWithImpacts>) -> Result<String> {
+    // Pour chaque resource
+    // Créer un label set
+    // On pourrait avoir le status de la resource
+    //
+    Ok("test".parse()?)
+}
 
-// This is the kind of thing we want to duplicate as  get_metrics(resource_wiyh_impacts: &Cloud_Resource_wiyth_impact)
-//   Set labels specific  to the resource (region,  country, resource id, resource type, maybe resource state)
-//  create a registry
-// Create the metric 
-// register each metric (one day this should be dynamic on each dimenstion of the asesment)
-// set the value
-
-
-/// Retursn the ImpactsSumary as metrics in the prometheus format
+/// Return the ImpactsSummary as metrics in the prometheus format
 pub fn get_metrics(summary: &ImpactsSummary) -> Result<String> {
     let label_set: Labels = Labels {
         awsregion: summary.aws_region.to_string(),
