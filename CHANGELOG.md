@@ -5,11 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased (DEV branch)
+## Unreleased (main branch but not tagged)
 
 _This paragraph may describe WIP/unreleased features_
 
 ### Added
+
+- Return instance state (either *Running* or *Stopped*) with the inventory. https://github.com/Boavizta/cloud-scanner/issues/396.
 
 ### Changed
 

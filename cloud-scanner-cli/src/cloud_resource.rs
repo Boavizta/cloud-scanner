@@ -45,6 +45,14 @@ pub enum ResourceDetails {
 pub struct InstanceUsage {
     pub average_cpu_load: f64,
     pub usage_duration_seconds: u32,
+    pub state: InstanceState,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub enum InstanceState {
+    #[default]
+    Running,
+    Stopped,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]

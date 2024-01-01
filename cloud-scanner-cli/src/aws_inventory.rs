@@ -11,8 +11,8 @@ use anyhow::{Context, Result};
 use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
-use aws_sdk_ec2::types::Instance;
 use aws_sdk_ec2::types::Volume;
+use aws_sdk_ec2::types::{Instance, InstanceStateName};
 use chrono::Duration;
 use chrono::Utc;
 
@@ -109,6 +109,7 @@ impl AwsInventory {
             let usage: InstanceUsage = InstanceUsage {
                 average_cpu_load: cpuload,
                 usage_duration_seconds: 300,
+                state: Self::aws_state_to_generic(instance.clone()),
             };
 
             let cloud_resource_tags = Self::cloud_resource_tags_from_aws_tags(instance.tags());
@@ -142,9 +143,26 @@ impl AwsInventory {
         Ok(inventory)
     }
 
+    /// We consider that an instance is running unless explicitly stopped or terminated
+    fn aws_state_to_generic(instance: Instance) -> InstanceState {
+        if let Some(state) = instance.state {
+            if let Some(state_name) = state.name {
+                match state_name {
+                    InstanceStateName::Stopped => InstanceState::Stopped,
+                    InstanceStateName::Terminated => InstanceState::Stopped,
+                    _ => InstanceState::Running,
+                }
+            } else {
+                InstanceState::Running
+            }
+        } else {
+            InstanceState::Running
+        }
+    }
+
     /// List all ec2 instances of the current account / region
     ///
-    /// ⚠  Filtering instance on tags is not yet implemented. All instances (running or stopped) are returned.
+    /// ⚠  Filtering instance on tags during query is not yet implemented. All instances (running or stopped) are returned.
     async fn list_instances(self, _tags: &[String]) -> Result<Vec<Instance>> {
         let client = &self.ec2_client;
         let mut instances: Vec<Instance> = Vec::new();
