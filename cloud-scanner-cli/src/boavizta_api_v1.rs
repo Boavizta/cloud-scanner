@@ -294,6 +294,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running
                 }),
             },
             tags: Vec::new(),
@@ -378,6 +379,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
@@ -392,6 +394,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 1.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
@@ -423,6 +426,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
@@ -437,6 +441,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
@@ -451,6 +456,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
@@ -491,6 +497,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
@@ -537,6 +544,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
