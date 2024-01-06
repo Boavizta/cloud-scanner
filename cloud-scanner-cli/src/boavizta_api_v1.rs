@@ -113,9 +113,35 @@ impl BoaviztaApiV1 {
                             }
                         }
                     }
+                    "gp2" | "gp3" => {
+                        // Use impacts of an SSD
+                        let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
+                            &self.configuration,
+                            Some(verbose),
+                            Some(usage_duration_hours.to_owned()),
+                            Some("DEFAULT"),
+                            Some(criteria),
+                            Some(disk),
+                        )
+                        .await;
+                        match res {
+                            Ok(res) => Some(res),
+                            Err(e) => {
+                                warn!(
+                                    "Warning: Cannot get SSD impact from API for type {}: {}",
+                                    storage_type, e
+                                );
+                                None
+                            }
+                        }
+                    }
                     _ => {
-                        error!("Query ssd {:?}", disk);
-                        // All other types (like gp2, gp3...) are considered SSD
+                        warn!(
+                            "Unknown disk type ({:?}), we use impacts of an ssd {:?}",
+                            storage_type.as_str(),
+                            disk
+                        );
+                        // All other types are considered SSD
                         let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
                             &self.configuration,
                             Some(verbose),
@@ -294,7 +320,7 @@ mod tests {
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
-                    state: InstanceState::Running
+                    state: InstanceState::Running,
                 }),
             },
             tags: Vec::new(),
