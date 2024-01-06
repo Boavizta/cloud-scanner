@@ -168,7 +168,7 @@ pub async fn print_default_impacts_as_json(
     Ok(())
 }
 
-/// Prints impacts  to standard output as metrics in prometheus format
+/// Prints impacts to standard output as metrics in prometheus format
 pub async fn print_default_impacts_as_metrics(
     hours_use_time: &f32,
     tags: &[String],
