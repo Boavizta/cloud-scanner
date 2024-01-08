@@ -119,34 +119,28 @@ pub async fn get_default_impacts_as_metrics(
     .await
     .context("Cannot perform standard scan")?;
 
-    /*  let usage_location = UsageLocation::from(aws_region);
+    let usage_location = UsageLocation::from(aws_region);
     let summary: ImpactsSummary = ImpactsSummary::new(
         String::from(aws_region),
         usage_location.iso_country_code,
-        instances_with_impacts.impacts,
+        instances_with_impacts.impacts.clone(),
         (*hours_use_time).into(),
     );
     debug!("Summary: {:#?}", summary);
 
-    let metrics = get_summary_metrics(&summary).with_context(|| {
-        format!(
-            "Unable to get default impacts as metrics for region {}",
-            aws_region
-        )
-    })?;*/
 
-    let resource_metrics =
-        get_resources_metrics(instances_with_impacts.impacts).with_context(|| {
+    let all_metrics =
+        get_all_metrics(&summary, instances_with_impacts.impacts).with_context(|| {
             format!(
                 "Unable to get resource impacts as metrics for region {}",
                 aws_region
             )
         })?;
 
-    Ok(resource_metrics)
+    Ok(all_metrics)
 }
 
-/// Prints  impacts  to standard output in json format
+/// Prints  impacts to standard output in json format
 pub async fn print_default_impacts_as_json(
     hours_use_time: &f32,
     tags: &[String],

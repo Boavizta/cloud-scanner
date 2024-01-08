@@ -5,22 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased (main branch but not tagged)
+## Unreleased 
 
-_This paragraph may describe WIP/unreleased features_
+_This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
 ### Added
 
-- Return instance state (either *Running* or *Stopped*) with the inventory. https://github.com/Boavizta/cloud-scanner/issues/396.
+- Return instance state (either *Running* or *Stopped*) with the inventory: [Add instance state to the inventory](https://github.com/Boavizta/cloud-scanner/issues/396).
+- Return metrics of individual resources: [Expose individual metrics (label metrics with resource id's and other metadata)](https://github.com/Boavizta/cloud-scanner/issues/379)
 
 ### Changed
 
-- Use API v1.1.0 in docker-compose (support aditional instances): https://github.com/Boavizta/cloud-scanner/issues/386
-- Update logo in documentation https://github.com/Boavizta/cloud-scanner/pull/381
-- Add link checker when pubishing doc https://github.com/Boavizta/cloud-scanner/pull/382
-- Add logo in the doc website https://github.com/Boavizta/cloud-scanner/pull/383
+- **Breaking change**: Renamed count summary metrics (_instances_ become _resources_): 
+  - `boavizta_number_of_instances_total` becomes `boavizta_number_of_resources_total`
+  - `boavizta_number_of_instances_assessed` becomes `boavizta_number_of_instances_assessed`
+- Use API v1.1.0 in docker-compose (this adds support for additional instances): https://github.com/Boavizta/cloud-scanner/issues/386
+- Update logo in documentation: https://github.com/Boavizta/cloud-scanner/pull/381
+- Add link checker when publishing documentation: https://github.com/Boavizta/cloud-scanner/pull/382
+- Add logo in the doc website: https://github.com/Boavizta/cloud-scanner/pull/383
 
-## [1.0.1]-2023-10-27
+## [1.0.1]-2023-10-28
 
 ### Added
 
