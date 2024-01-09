@@ -59,8 +59,11 @@ fn build_resource_labels(resource: &CloudResourceWithImpacts) -> ResourceLabels 
         _ => ResourceState::Unknown,
     };
     // TODO: convert tags to a better format instead of using the default debug string
-    let tags_string = format!("{:?}", resource.cloud_resource.tags);
-
+    warn!("Tag strings are not exported as metric labels");
+    // TODO escape tag strings properly before exporting in label
+    //let tags_string = format!("{:?}", resource.cloud_resource.tags);
+    let tags_string = "".into();
+    
     ResourceLabels {
         awsregion: resource.cloud_resource.location.aws_region.clone(),
         country: resource.cloud_resource.location.iso_country_code.clone(),
@@ -82,12 +85,12 @@ pub fn register_resource_metrics(
         "Use duration considered to estimate impacts",
         boavizta_resource_duration_of_use_hours.clone(),
     );
-    let boavizta_resource_pe_embedded_megajoules =
+    let boavizta_resource_pe_embodied_megajoules =
         Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
-        "boavizta_resource_pe_embedded_megajoules",
+        "boavizta_resource_pe_embodied_megajoules",
         "Energy consumed for manufacture",
-        boavizta_resource_pe_embedded_megajoules.clone(),
+        boavizta_resource_pe_embodied_megajoules.clone(),
     );
     let boavizta_resource_pe_use_megajoules = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
@@ -95,11 +98,11 @@ pub fn register_resource_metrics(
         "Energy consumed during use",
         boavizta_resource_pe_use_megajoules.clone(),
     );
-    let boavizta_resource_adp_embedded_kgsbeq = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_resource_adp_embodied_kgsbeq = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
-        "boavizta_resource_adp_embedded_kgsbeq",
-        "Abiotic resources depletion potential of embedded impacts",
-        boavizta_resource_adp_embedded_kgsbeq.clone(),
+        "boavizta_resource_adp_embodied_kgsbeq",
+        "Abiotic resources depletion potential of embodied impacts",
+        boavizta_resource_adp_embodied_kgsbeq.clone(),
     );
     let boavizta_resource_adp_use_kgsbeq = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
@@ -107,12 +110,12 @@ pub fn register_resource_metrics(
         "Abiotic resources depletion potential of use",
         boavizta_resource_adp_use_kgsbeq.clone(),
     );
-    let boavizta_resource_gwp_embedded_kgco2eq =
+    let boavizta_resource_gwp_embodied_kgco2eq =
         Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
-        "boavizta_resource_gwp_embedded_kgco2eq",
-        "Global Warming Potential of embedded impacts",
-        boavizta_resource_gwp_embedded_kgco2eq.clone(),
+        "boavizta_resource_gwp_embodied_kgco2eq",
+        "Global Warming Potential of embodied impacts",
+        boavizta_resource_gwp_embodied_kgco2eq.clone(),
     );
     let boavizta_resource_gwp_use_kgco2eq = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
@@ -132,19 +135,19 @@ pub fn register_resource_metrics(
         boavizta_resource_pe_use_megajoules
             .get_or_create(&resource_labels)
             .set(impacts.pe_use_megajoules);
-        boavizta_resource_pe_embedded_megajoules
+        boavizta_resource_pe_embodied_megajoules
             .get_or_create(&resource_labels)
             .set(impacts.pe_manufacture_megajoules);
         boavizta_resource_adp_use_kgsbeq
             .get_or_create(&resource_labels)
             .set(impacts.adp_use_kgsbeq);
-        boavizta_resource_adp_embedded_kgsbeq
+        boavizta_resource_adp_embodied_kgsbeq
             .get_or_create(&resource_labels)
             .set(impacts.adp_manufacture_kgsbeq);
         boavizta_resource_gwp_use_kgco2eq
             .get_or_create(&resource_labels)
             .set(impacts.gwp_use_kgco2eq);
-        boavizta_resource_gwp_embedded_kgco2eq
+        boavizta_resource_gwp_embodied_kgco2eq
             .get_or_create(&resource_labels)
             .set(impacts.gwp_manufacture_kgco2eq);
     }
@@ -465,21 +468,21 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 # HELP boavizta_resource_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_resource_duration_of_use_hours gauge
 boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 1.0
-# HELP boavizta_resource_pe_embedded_megajoules Energy consumed for manufacture.
-# TYPE boavizta_resource_pe_embedded_megajoules gauge
-boavizta_resource_pe_embedded_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.3
+# HELP boavizta_resource_pe_embodied_megajoules Energy consumed for manufacture.
+# TYPE boavizta_resource_pe_embodied_megajoules gauge
+boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.3
 # HELP boavizta_resource_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_resource_pe_use_megajoules gauge
 boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.4
-# HELP boavizta_resource_adp_embedded_kgsbeq Abiotic resources depletion potential of embedded impacts.
-# TYPE boavizta_resource_adp_embedded_kgsbeq gauge
-boavizta_resource_adp_embedded_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.1
+# HELP boavizta_resource_adp_embodied_kgsbeq Abiotic resources depletion potential of embodied impacts.
+# TYPE boavizta_resource_adp_embodied_kgsbeq gauge
+boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.1
 # HELP boavizta_resource_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_resource_adp_use_kgsbeq gauge
 boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.2
-# HELP boavizta_resource_gwp_embedded_kgco2eq Global Warming Potential of embedded impacts.
-# TYPE boavizta_resource_gwp_embedded_kgco2eq gauge
-boavizta_resource_gwp_embedded_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.5
+# HELP boavizta_resource_gwp_embodied_kgco2eq Global Warming Potential of embodied impacts.
+# TYPE boavizta_resource_gwp_embodied_kgco2eq gauge
+boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.5
 # HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_resource_gwp_use_kgco2eq gauge
 boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.6
