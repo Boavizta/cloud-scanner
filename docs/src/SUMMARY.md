@@ -11,6 +11,7 @@
 
 - [Methodology](explanations/methodology.md)
 - [How we process workload](explanations/processing-workload.md)
+- [Implementation](explanation/implementation.md)
 
 # How-to guides
 
