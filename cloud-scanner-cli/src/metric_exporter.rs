@@ -467,25 +467,25 @@ boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.5
 boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 # HELP boavizta_resource_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_resource_duration_of_use_hours gauge
-boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 1.0
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 1.0
 # HELP boavizta_resource_pe_embodied_megajoules Energy consumed for manufacture.
 # TYPE boavizta_resource_pe_embodied_megajoules gauge
-boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.3
+boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.3
 # HELP boavizta_resource_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_resource_pe_use_megajoules gauge
-boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.4
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.4
 # HELP boavizta_resource_adp_embodied_kgsbeq Abiotic resources depletion potential of embodied impacts.
 # TYPE boavizta_resource_adp_embodied_kgsbeq gauge
-boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.1
+boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.1
 # HELP boavizta_resource_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_resource_adp_use_kgsbeq gauge
-boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.2
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.2
 # HELP boavizta_resource_gwp_embodied_kgco2eq Global Warming Potential of embodied impacts.
 # TYPE boavizta_resource_gwp_embodied_kgco2eq gauge
-boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.5
+boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.5
 # HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_resource_gwp_use_kgco2eq gauge
-boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="[]",resource_state="Running"} 0.6
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.6
 # EOF
 "#;
 
