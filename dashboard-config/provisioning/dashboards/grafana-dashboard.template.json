@@ -214,13 +214,13 @@
             "uid": "grafanacloud-prom"
           },
           "editorMode": "builder",
-          "expr": "boavizta_number_of_instances_assessed",
+          "expr": "boavizta_number_of_resources_assessed",
           "legendFormat": "{{country}} ({{awsregion}})",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Number of instances assessed",
+      "title": "Number of resources assessed",
       "type": "stat"
     },
     {
@@ -279,13 +279,13 @@
             "uid": "grafanacloud-prom"
           },
           "editorMode": "builder",
-          "expr": "boavizta_number_of_instances_total",
+          "expr": "boavizta_number_of_resources_total",
           "legendFormat": "{{country}} ({{awsregion}})",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Number of instances total",
+      "title": "Number of resources total",
       "type": "stat"
     },
     {
@@ -371,13 +371,13 @@
             "uid": "grafanacloud-prom"
           },
           "editorMode": "builder",
-          "expr": "boavizta_number_of_instances_assessed",
+          "expr": "boavizta_number_of_resources_assessed",
           "legendFormat": "{{country}} ({{awsregion}})",
           "range": true,
-          "refId": "Number of instances"
+          "refId": "Number of resources"
         }
       ],
-      "title": "Number of instances (taken into assessment)",
+      "title": "Number of resources (taken into assessment)",
       "type": "timeseries"
     },
     {
