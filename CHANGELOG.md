@@ -11,15 +11,21 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 
 ### Added
 
+### Changed
+
+## [2.0.0]-2024-01-10
+
+### Added
+
 - Return instance state (either *Running* or *Stopped*) with the inventory: [Add instance state to the inventory](https://github.com/Boavizta/cloud-scanner/issues/396).
 - Return metrics of individual resources: [Expose individual metrics (label metrics with resource id's and other metadata)](https://github.com/Boavizta/cloud-scanner/issues/379)
 
 ### Changed
 
-- **Breaking change**: Renamed count summary metrics (_instances_ become _resources_): 
+- **Breaking change**: Renamed the count summary metrics (_instances_ become _resources_ because we now take into account additional resources like storage):
   - `boavizta_number_of_instances_total` becomes `boavizta_number_of_resources_total`
-  - `boavizta_number_of_instances_assessed` becomes `boavizta_number_of_instances_assessed`
-- Use API v1.1.0 in docker-compose (this adds support for additional instances): https://github.com/Boavizta/cloud-scanner/issues/386
+  - `boavizta_number_of_instances_assessed` becomes `boavizta_number_of_resources_assessed`
+- Use Boavizta API v1.1.0 in docker-compose (this adds support for additional instances): https://github.com/Boavizta/cloud-scanner/issues/386
 - Update logo in documentation: https://github.com/Boavizta/cloud-scanner/pull/381
 - Add link checker when publishing documentation: https://github.com/Boavizta/cloud-scanner/pull/382
 - Add logo in the doc website: https://github.com/Boavizta/cloud-scanner/pull/383
