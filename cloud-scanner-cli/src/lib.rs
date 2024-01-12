@@ -128,7 +128,6 @@ pub async fn get_default_impacts_as_metrics(
     );
     debug!("Summary: {:#?}", summary);
 
-
     let all_metrics =
         get_all_metrics(&summary, instances_with_impacts.impacts).with_context(|| {
             format!(

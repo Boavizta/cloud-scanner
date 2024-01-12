@@ -63,7 +63,7 @@ fn build_resource_labels(resource: &CloudResourceWithImpacts) -> ResourceLabels 
     // TODO escape tag strings properly before exporting in label
     //let tags_string = format!("{:?}", resource.cloud_resource.tags);
     let tags_string = "".into();
-    
+
     ResourceLabels {
         awsregion: resource.cloud_resource.location.aws_region.clone(),
         country: resource.cloud_resource.location.iso_country_code.clone(),
@@ -79,7 +79,8 @@ pub fn register_resource_metrics(
     resources_with_impacts: Vec<CloudResourceWithImpacts>,
 ) {
     // Register metrics
-    let boavizta_resource_duration_of_use_hours = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_resource_duration_of_use_hours =
+        Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
         "boavizta_resource_duration_of_use_hours",
         "Use duration considered to estimate impacts",
@@ -92,19 +93,22 @@ pub fn register_resource_metrics(
         "Energy consumed for manufacture",
         boavizta_resource_pe_embodied_megajoules.clone(),
     );
-    let boavizta_resource_pe_use_megajoules = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_resource_pe_use_megajoules =
+        Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
         "boavizta_resource_pe_use_megajoules",
         "Energy consumed during use",
         boavizta_resource_pe_use_megajoules.clone(),
     );
-    let boavizta_resource_adp_embodied_kgsbeq = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_resource_adp_embodied_kgsbeq =
+        Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
         "boavizta_resource_adp_embodied_kgsbeq",
         "Abiotic resources depletion potential of embodied impacts",
         boavizta_resource_adp_embodied_kgsbeq.clone(),
     );
-    let boavizta_resource_adp_use_kgsbeq = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_resource_adp_use_kgsbeq =
+        Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
         "boavizta_resource_adp_use_kgsbeq",
         "Abiotic resources depletion potential of use",
@@ -117,7 +121,8 @@ pub fn register_resource_metrics(
         "Global Warming Potential of embodied impacts",
         boavizta_resource_gwp_embodied_kgco2eq.clone(),
     );
-    let boavizta_resource_gwp_use_kgco2eq = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    let boavizta_resource_gwp_use_kgco2eq =
+        Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
     registry.register(
         "boavizta_resource_gwp_use_kgco2eq",
         "Global Warming Potential of use",
