@@ -120,7 +120,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_pe_use_megajoules * 0.277778",
@@ -160,7 +160,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "description": "Number of instances really taken into account for impact calculations (some instance types have no data in Boavizta dataset).",
       "fieldConfig": {
@@ -211,7 +211,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_number_of_resources_assessed",
@@ -226,7 +226,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -276,7 +276,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_number_of_resources_total",
@@ -291,7 +291,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -368,7 +368,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_number_of_resources_assessed",
@@ -383,7 +383,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -461,7 +461,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_pe_use_megajoules",
@@ -476,7 +476,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -527,7 +527,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "exemplar": false,
@@ -546,7 +546,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -597,7 +597,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "exemplar": false,
@@ -616,7 +616,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -694,7 +694,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_gwp_use_kgco2eq",
@@ -709,7 +709,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "description": "",
       "fieldConfig": {
@@ -761,7 +761,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "exemplar": false,
@@ -780,7 +780,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -831,7 +831,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "exemplar": false,
@@ -850,7 +850,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -928,7 +928,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_adp_manufacture_kgsbeq",
@@ -943,7 +943,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -994,7 +994,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_adp_use_kgsbeq",
@@ -1009,7 +1009,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "grafanacloud-prom"
+        "uid": "cloud-scanner-prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -1060,7 +1060,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "grafanacloud-prom"
+            "uid": "cloud-scanner-prometheus"
           },
           "editorMode": "builder",
           "expr": "boavizta_adp_manufacture_kgsbeq",
@@ -1112,7 +1112,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Environmental Impacts of Cloud",
-  "uid": "Umu0EndVz",
+  "uid": "another",
   "version": 8,
   "weekStart": ""
 }
