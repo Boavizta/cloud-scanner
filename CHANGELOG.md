@@ -13,6 +13,8 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 
 ### Changed
 
+- Make _filter tags_ optional in the API routes.
+
 ## [2.0.0]-2024-01-10
 
 ### Added
