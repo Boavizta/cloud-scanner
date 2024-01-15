@@ -21,6 +21,21 @@ impl fmt::Display for CloudResource {
     }
 }
 
+impl CloudResource {
+    /// Convert tags into a format supported by prometheus metrics label (like `tag_key_1:tag_value_1;tag_key_2:tag_value_2;`)
+    pub fn tags_as_metric_label_value(&self) -> String {
+        let mut res = "".to_string();
+        for tag in self.tags.iter() {
+            let val = tag.value.clone().unwrap_or("".parse().unwrap());
+            res.push_str(&tag.key);
+            res.push(':');
+            res.push_str(&val);
+            res.push(';');
+        }
+        res
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum CloudProvider {
     AWS,
@@ -149,7 +164,7 @@ mod tests {
     }
 
     #[test]
-    pub fn parse_tags() {
+    pub fn parse_tag() {
         let tag_string = "name1=val1".to_string();
         let res = CloudResourceTag::try_from(tag_string).unwrap();
         assert_eq!(res.key, "name1", "Wrong key");
@@ -159,6 +174,13 @@ mod tests {
         let res = CloudResourceTag::try_from(tag_string).unwrap();
         assert_eq!(res.key, "name1", "Wrong key");
         assert_eq!(res.value, None, "Wrong value");
+    }
+    #[test]
+    pub fn parse_tags_with_spaces() {
+        let tag_string = "name 1=val 1".to_string();
+        let res = CloudResourceTag::try_from(tag_string).unwrap();
+        assert_eq!(res.key, "name 1", "Wrong key");
+        assert_eq!(res.value.unwrap(), "val 1", "Wrong value");
     }
 
     #[test]
@@ -263,6 +285,35 @@ mod tests {
             true,
             instance1.has_matching_tagmap(&empty_filter),
             "Tags should match (i.e. we should ignore this invalid filter"
+        );
+    }
+    #[test]
+    pub fn format_tags_as_metric_label() {
+        let tag1 = CloudResourceTag {
+            key: "name1".to_string(),
+            value: Some("value1".to_string()),
+        };
+        let tag2 = CloudResourceTag {
+            key: "name2".to_string(),
+            value: Some("value2".to_string()),
+        };
+
+        let cr = CloudResource {
+            provider: CloudProvider::AWS,
+            id: "123".to_string(),
+            location: UsageLocation {
+                aws_region: "eu-west-3".to_string(),
+                iso_country_code: "FR".to_string(),
+            },
+            resource_details: ResourceDetails::ObjectStorage,
+            tags: vec![tag1, tag2],
+        };
+
+        let tag_label_value = cr.tags_as_metric_label_value();
+
+        assert_eq!(
+            "name1:value1;name2:value2;", tag_label_value,
+            "could not convert tags to metric label values"
         );
     }
 }

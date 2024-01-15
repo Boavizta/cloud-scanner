@@ -58,18 +58,13 @@ fn build_resource_labels(resource: &CloudResourceWithImpacts) -> ResourceLabels 
         },
         _ => ResourceState::Unknown,
     };
-    // TODO: convert tags to a better format instead of using the default debug string
-    warn!("Tag strings are not exported as metric labels");
-    // TODO escape tag strings properly before exporting in label
-    //let tags_string = format!("{:?}", resource.cloud_resource.tags);
-    let tags_string = "".into();
 
     ResourceLabels {
         awsregion: resource.cloud_resource.location.aws_region.clone(),
         country: resource.cloud_resource.location.iso_country_code.clone(),
         resource_type,
         resource_id: resource.cloud_resource.id.clone(),
-        resource_tags: tags_string,
+        resource_tags: resource.cloud_resource.tags_as_metric_label_value(),
         resource_state,
     }
 }
@@ -333,7 +328,7 @@ fn register_summary_metrics(registry: &mut Registry, summary: &ImpactsSummary) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cloud_resource::{CloudProvider, CloudResource, InstanceUsage};
+    use crate::cloud_resource::{CloudProvider, CloudResource, CloudResourceTag, InstanceUsage};
     use crate::impact_provider::ResourceImpacts;
     use crate::usage_location::UsageLocation;
 
@@ -392,6 +387,15 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
     }
     #[tokio::test]
     async fn test_get_all_metrics() {
+        let tag1 = CloudResourceTag {
+            key: "tag_key_1".to_string(),
+            value: Some("tag_value_1".to_string()),
+        };
+        let tag2 = CloudResourceTag {
+            key: "tag_key_2".to_string(),
+            value: Some("tag_value_2".to_string()),
+        };
+
         let cloud_resource: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
@@ -404,7 +408,7 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
                     state: InstanceState::Running,
                 }),
             },
-            tags: Vec::new(),
+            tags: vec![tag1, tag2],
         };
 
         let cloud_resource_with_impacts = CloudResourceWithImpacts {
@@ -472,25 +476,25 @@ boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.5
 boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 # HELP boavizta_resource_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_resource_duration_of_use_hours gauge
-boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 1.0
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 1.0
 # HELP boavizta_resource_pe_embodied_megajoules Energy consumed for manufacture.
 # TYPE boavizta_resource_pe_embodied_megajoules gauge
-boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.3
+boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.3
 # HELP boavizta_resource_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_resource_pe_use_megajoules gauge
-boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.4
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.4
 # HELP boavizta_resource_adp_embodied_kgsbeq Abiotic resources depletion potential of embodied impacts.
 # TYPE boavizta_resource_adp_embodied_kgsbeq gauge
-boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.1
+boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.1
 # HELP boavizta_resource_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_resource_adp_use_kgsbeq gauge
-boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.2
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.2
 # HELP boavizta_resource_gwp_embodied_kgco2eq Global Warming Potential of embodied impacts.
 # TYPE boavizta_resource_gwp_embodied_kgco2eq gauge
-boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.5
+boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.5
 # HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_resource_gwp_use_kgco2eq gauge
-boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="",resource_state="Running"} 0.6
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.6
 # EOF
 "#;
 
