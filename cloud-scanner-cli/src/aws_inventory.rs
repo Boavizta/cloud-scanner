@@ -8,6 +8,7 @@ use crate::cloud_resource::*;
 use crate::usage_location::*;
 
 use anyhow::{Context, Result};
+use aws_config::meta::region::RegionProviderChain;
 use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
@@ -17,6 +18,7 @@ use chrono::Duration;
 use chrono::Utc;
 
 use async_trait::async_trait;
+use aws_types::SdkConfig;
 
 ///  An inventory of AWS resources
 #[derive(Clone, Debug)]
@@ -31,6 +33,7 @@ impl AwsInventory {
     /// Initializes it with a specific region and configures the SDK's that will query your account to perform the inventory of resources.
     pub async fn new(aws_region: &str) -> Self {
         let shared_config = Self::load_aws_config(aws_region).await;
+
         AwsInventory {
             aws_region: String::from(aws_region),
             ec2_client: aws_sdk_ec2::Client::new(&shared_config),
@@ -42,45 +45,40 @@ impl AwsInventory {
     ///
     /// - If region is empty, uses a default region.
     /// - ⚠  If the region is invalid, it does **not** return error.
-    async fn load_aws_config(aws_region: &str) -> aws_types::sdk_config::SdkConfig {
+    async fn load_aws_config(aws_region: &str) -> SdkConfig {
         if aws_region.is_empty() {
             // Use default region (from env)
-            let sdk_config = aws_config::from_env().load().await;
+            let sdk_config = aws_config::load_from_env().await;
             warn!(
                 "Cannot initialize from empty region, falling back to using default region from environment [{}]",
                 sdk_config.region().unwrap()
             );
             sdk_config
         } else {
-            let sdk_config = aws_config::from_env()
-                .region(Region::new(String::from(aws_region)))
-                .load()
-                .await;
-            info!("Initializing SDK with with region [{}]", aws_region);
+            // region provider that first checks the passed region,
+            // then checks the default provider chain, then falls back to eu-west-3
+            let region_provider =
+                RegionProviderChain::first_try(Region::new(aws_region.to_string()))
+                    .or_default_provider()
+                    .or_else(Region::new("eu-west-3"));
+
+            let sdk_config = aws_config::from_env().region(region_provider).load().await;
+            info!("Initialized SDK with with region [{}]", aws_region);
             sdk_config
         }
     }
 
     /// Convert AWS tags into Cloud Scanner tags
     fn cloud_resource_tags_from_aws_tags(
-        aws_tags: Option<&[aws_sdk_ec2::types::Tag]>,
+        aws_tags: &[aws_sdk_ec2::types::Tag],
     ) -> Vec<CloudResourceTag> {
-        let cloud_resource_tags: Vec<CloudResourceTag> = match aws_tags {
-            Some(tags) => {
-                let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
-                for nt in tags.iter() {
-                    let k = nt.key.to_owned().unwrap();
-                    let v = nt.value.to_owned();
-                    cs_tags.push(CloudResourceTag { key: k, value: v });
-                }
-                cs_tags
-            }
-            None => {
-                let empty: Vec<CloudResourceTag> = Vec::new();
-                empty
-            }
-        };
-        cloud_resource_tags
+        let mut cs_tags: Vec<CloudResourceTag> = Vec::new();
+        for nt in aws_tags.iter() {
+            let k = nt.key.to_owned().unwrap();
+            let v = nt.value.to_owned();
+            cs_tags.push(CloudResourceTag { key: k, value: v });
+        }
+        cs_tags
     }
 
     /// Perform inventory of all aws instances of the region
@@ -175,8 +173,8 @@ impl AwsInventory {
             .send()
             .await?;
 
-        for reservation in resp.reservations().unwrap_or_default() {
-            for instance in reservation.instances().unwrap_or_default() {
+        for reservation in resp.reservations() {
+            for instance in reservation.instances() {
                 instances.push(instance.clone());
             }
         }
@@ -271,7 +269,7 @@ impl AwsInventory {
             //set_filters() // Use filters for tags
             .send()
             .await?;
-        for v in resp.volumes().unwrap_or_default() {
+        for v in resp.volumes() {
             volumes.push(v.clone());
         }
         Ok(volumes)

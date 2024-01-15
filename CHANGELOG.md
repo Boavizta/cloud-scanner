@@ -5,15 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased 
+## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
 ### Added
 
+- [Expose resource tags in metrics labels · Issue #407 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/407)
+
 ### Changed
 
 - Make _filter tags_ optional in the API routes.
+- [Update to latest aws SDK 1.x · Issue #410 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/410)
 
 ## [2.0.0]-2024-01-10
 
