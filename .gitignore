@@ -4,3 +4,6 @@ node_modules
 .serverless
 .env
 .vscode
+.idea/cloud-scanner.iml
+.idea/modules.xml
+.idea/vcs.xml

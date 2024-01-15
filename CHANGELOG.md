@@ -16,6 +16,7 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 ### Changed
 
 - Make _filter tags_ optional in the API routes.
+- [Update to latest aws SDK 1.x · Issue #410 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/410)
 
 ## [2.0.0]-2024-01-10
 
