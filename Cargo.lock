@@ -624,9 +624,9 @@ dependencies = [
 
 [[package]]
 name = "boavizta_api_sdk"
-version = "1.1.0"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fa0b72ca37b926d3af5417a39dcc9b78ef08cab8bc5a012a2f4c8e980728821"
+checksum = "fa67633b559c09b4fa85edb0cb076fc426b221f2d4afd89b9d4ef8139b0c6736"
 dependencies = [
  "reqwest",
  "serde",
@@ -738,7 +738,7 @@ checksum = "cd7cc57abe963c6d3b9d8be5b06ba7c8957a930305ca90304f24ef040aa6f961"
 
 [[package]]
 name = "cloud-scanner-cli"
-version = "2.0.2"
+version = "2.0.3"
 dependencies = [
  "anyhow",
  "assert-json-diff",
@@ -766,7 +766,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "2.0.2"
+version = "2.0.3"
 dependencies = [
  "cloud-scanner-cli",
  "envy",

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+- [Use Boavizta API v1.2.0 · Issue #416 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/416)
+
 ## [2.0.2]-2024-01-17
 
 ### Added
