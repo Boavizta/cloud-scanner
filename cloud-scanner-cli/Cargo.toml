@@ -2,7 +2,7 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
-version = "2.0.1"
+version = "2.0.2"
 
 [dependencies]
 chrono = "^0.4"
@@ -24,7 +24,7 @@ rocket_okapi = { version = "0.8.0", features = ["swagger", "rapidoc"] }
 aws-types = "1"
 
 [dependencies.boavizta_api_sdk]
-version = "0.3.0-alpha2"
+version = "1.1.0"
 # path = "../../boaviztapi-sdk-rust"
 
 [dependencies.aws-config]
