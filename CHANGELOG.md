@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+## [2.0.2]-2024-01-17
+
+### Added
+
+- [Revamp demo grafana dashboard to display individual resource metrics · Issue #403 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/403)
+
+### Changed
+
+- Use latest realeased version of Rust client for Boavizta API v1.0.1
+
 ## [2.0.1]-2024-01-17
 
 ### Added
