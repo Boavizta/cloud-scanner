@@ -47,8 +47,8 @@
         "uid": "grafana"
       },
       "gridPos": {
-        "h": 3,
-        "w": 10,
+        "h": 2,
+        "w": 19,
         "x": 0,
         "y": 0
       },
@@ -62,8 +62,102 @@
         "content": "\r\n<img style=\"float:right;height:42px;\" src=\"https://boavizta.org/media/site/d84925bc94-1642413712/boavizta-logo-4.png\"/> \r\n<strong>Boavizta Cloud-Scanner - Environmental impacts of EC2 instances and block storage</strong>",
         "mode": "html"
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "10.2.0",
       "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cloud-scanner-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 19,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cloud-scanner-prometheus"
+          },
+          "editorMode": "builder",
+          "expr": "boavizta_number_of_resources_assessed",
+          "legendFormat": "{{country}} ({{awsregion}})",
+          "range": true,
+          "refId": "Number of resources"
+        }
+      ],
+      "title": "Number of resources (taken into assessment)",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -94,10 +188,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
-        "w": 7,
-        "x": 12,
-        "y": 0
+        "h": 4,
+        "w": 9,
+        "x": 0,
+        "y": 2
       },
       "id": 21,
       "options": {
@@ -115,7 +209,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "10.2.0",
       "targets": [
         {
           "datasource": {
@@ -135,6 +229,274 @@
         }
       ],
       "title": "⚡ Primary Energy (use) for 1 hour",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1396FDEEF9E8C375"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "masskg"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 9,
+        "y": 2
+      },
+      "id": 34,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "",
+          "url": "https://www.google.com/search"
+        }
+      ],
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1396FDEEF9E8C375"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum(boavizta_resource_gwp_use_kgco2eq{awsregion=~\"$region\", resource_type=~\"$resource_type\",resource_tags=~\".*$tags_to_include.*\"}  ) * 24 * 365",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "total",
+          "range": true,
+          "refId": "Total",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1396FDEEF9E8C375"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum by(awsregion) (boavizta_resource_gwp_use_kgco2eq{awsregion=~\"$region\", resource_type=~\"$resource_type\", resource_tags=~\".*$tags_to_include.*\"}) * 24 * 365",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "By region",
+          "useBackend": false
+        }
+      ],
+      "title": "🔥 GWP (Use) - by region (Kg Co2 eq)  - for 1 year",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1396FDEEF9E8C375"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 19,
+        "y": 5
+      },
+      "id": 31,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1396FDEEF9E8C375"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "count by(resource_type) (boavizta_resource_duration_of_use_hours)",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Type of resources",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1396FDEEF9E8C375"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 9,
+        "x": 0,
+        "y": 6
+      },
+      "id": 35,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1396FDEEF9E8C375"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum by(country) (boavizta_resource_pe_use_megajoules{resource_tags=~\".*$tags_to_include.*\", resource_type=~\"$resource_type\"}) * 0.277778 * 24 * 365",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "Energy Use by region",
+          "useBackend": false
+        }
+      ],
+      "title": "⚡ Primary Energy (use) for 1 YEAR",
       "type": "stat"
     },
     {
@@ -168,9 +530,9 @@
         "h": 3,
         "w": 5,
         "x": 19,
-        "y": 0
+        "y": 8
       },
-      "id": 30,
+      "id": 24,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -186,7 +548,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "10.2.0",
       "targets": [
         {
           "datasource": {
@@ -194,8 +556,8 @@
             "uid": "P1396FDEEF9E8C375"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "count by(country) (boavizta_resource_duration_of_use_hours{resource_state!=\"Stopped\"})",
+          "editorMode": "code",
+          "expr": "count by(country) (boavizta_resource_duration_of_use_hours{resource_tags=~\".*$tags_to_include.*\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -205,7 +567,7 @@
           "useBackend": false
         }
       ],
-      "title": "Number of resources - Running",
+      "title": "Number of resources - any state",
       "type": "stat"
     },
     {
@@ -219,6 +581,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -232,6 +595,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -268,9 +632,9 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
+        "w": 9,
         "x": 0,
-        "y": 3
+        "y": 10
       },
       "id": 26,
       "options": {
@@ -333,6 +697,125 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 9,
+        "y": 10
+      },
+      "id": 29,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1396FDEEF9E8C375"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(boavizta_resource_pe_embodied_megajoules{awsregion=~\"$region\", resource_type=~\"$resource_type\", resource_tags=~\".*$tags_to_include.*\"}) * 0.277778 * 24 * 365 * 5",
+          "format": "time_series",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "Total",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1396FDEEF9E8C375"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "sum by(awsregion) (boavizta_resource_pe_embodied_megajoules{awsregion=~\"$region\", resource_type=~\"$resource_type\", resource_tags=~\".*$tags_to_include.*\"}) * 0.277778 * 24 * 365 * 5",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "By region",
+          "useBackend": false
+        }
+      ],
+      "title": "⚡ Primary Energy (embodied) - by region (5 year)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P1396FDEEF9E8C375"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "mode": "thresholds"
           },
           "mappings": [],
@@ -356,9 +839,9 @@
         "h": 3,
         "w": 5,
         "x": 19,
-        "y": 3
+        "y": 11
       },
-      "id": 24,
+      "id": 30,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -374,78 +857,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "9.3.0-beta1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1396FDEEF9E8C375"
-          },
-          "disableTextWrap": false,
-          "editorMode": "code",
-          "expr": "count by(country) (boavizta_resource_duration_of_use_hours{resource_tags=~\".*$tags_to_include.*\"})",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "title": "Number of resources - any state",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "P1396FDEEF9E8C375"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 5,
-        "x": 19,
-        "y": 6
-      },
-      "id": 31,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "9.3.0-beta1",
+      "pluginVersion": "10.2.0",
       "targets": [
         {
           "datasource": {
@@ -454,7 +866,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "count by(resource_type) (boavizta_resource_duration_of_use_hours)",
+          "expr": "count by(country) (boavizta_resource_duration_of_use_hours{resource_state!=\"Stopped\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -464,7 +876,7 @@
           "useBackend": false
         }
       ],
-      "title": "Type of resources",
+      "title": "Number of resources - Running",
       "type": "stat"
     },
     {
@@ -478,6 +890,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -491,6 +904,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -527,9 +941,9 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
+        "w": 9,
         "x": 0,
-        "y": 8
+        "y": 15
       },
       "id": 27,
       "links": [
@@ -592,7 +1006,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus"
+        "uid": "P1396FDEEF9E8C375"
       },
       "fieldConfig": {
         "defaults": {
@@ -600,6 +1014,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -613,6 +1028,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -642,17 +1058,50 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "masskg"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "eu-west-3"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 5,
-        "w": 5,
-        "x": 19,
-        "y": 8
+        "w": 8,
+        "x": 9,
+        "y": 15
       },
-      "id": 4,
+      "id": 32,
+      "links": [
+        {
+          "targetBlank": true,
+          "title": "",
+          "url": "https://www.google.com/search"
+        }
+      ],
       "options": {
         "legend": {
           "calcs": [],
@@ -669,16 +1118,38 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus"
+            "uid": "P1396FDEEF9E8C375"
           },
-          "editorMode": "builder",
-          "expr": "boavizta_number_of_resources_assessed",
-          "legendFormat": "{{country}} ({{awsregion}})",
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "expr": "sum(boavizta_resource_gwp_embodied_kgco2eq{awsregion=~\"$region\", resource_type=~\"$resource_type\", resource_tags=~\".*$tags_to_include.*\"}) * 24 * 365 * 5",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "total",
           "range": true,
-          "refId": "Number of resources"
+          "refId": "Total",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1396FDEEF9E8C375"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum by(awsregion) (boavizta_resource_gwp_embodied_kgco2eq{awsregion=~\"$region\", resource_type=~\"$resource_type\", resource_tags=~\".*$tags_to_include.*\"}) * 24 * 365 * 5",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "By region",
+          "useBackend": false
         }
       ],
-      "title": "Number of resources (taken into assessment)",
+      "title": "🔥 Global Warming Potential (Embodied) - by region (Kg Co2 eq)  - 5 years",
       "type": "timeseries"
     },
     {
@@ -693,6 +1164,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -706,6 +1178,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -742,9 +1215,9 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
+        "w": 9,
         "x": 0,
-        "y": 13
+        "y": 20
       },
       "id": 28,
       "links": [
@@ -806,40 +1279,17 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "grafana"
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 14,
-        "x": 0,
-        "y": 18
-      },
-      "id": 20,
-      "options": {
-        "code": {
-          "language": "plaintext",
-          "showLineNumbers": false,
-          "showMiniMap": false
-        },
-        "content": "Cloud-scanner returns environmental impacts of your AWS usage.\n\nIt combines real time inventory and usage data from an AWS account with impact data from Boavizta API.\n\n## Resource considered\n\n- EC2 instances (type and CPU load)\n- Block storage (type and size)\n\n## Indicators\n\n- 🔥 Global Warming Potential - GWP (CO2eq)\n- ⚡ Primary Energy - PE (KWH or Mega Joules)\n- 🌍 Abiotic Depletion Potential - ADP: reousrces like mineral, water (kgSbeq)\n\n## Scopes\n\n- Use (displayed here for **one hour** of use)\n- Embodied impacts (i.e. manufacture related impacts, amortized for one hour of use)\n\n## Data and methodology\n\n- https://boavizta.github.io/cloud-scanner/\n- https://www.boavizta.org/en\n- https://boavizta.org/en/blog/empreinte-de-la-fabrication-d-un-serveur\n\n\n",
-        "mode": "markdown"
-      },
-      "pluginVersion": "9.3.0-beta1",
-      "title": "Explanations",
-      "type": "text"
-    },
-    {
-      "datasource": {
         "type": "prometheus",
         "uid": "P1396FDEEF9E8C375"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -853,6 +1303,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -890,10 +1341,10 @@
       "gridPos": {
         "h": 5,
         "w": 8,
-        "x": 0,
-        "y": 30
+        "x": 9,
+        "y": 20
       },
-      "id": 32,
+      "id": 33,
       "links": [
         {
           "targetBlank": true,
@@ -920,8 +1371,8 @@
             "uid": "P1396FDEEF9E8C375"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum(boavizta_resource_gwp_use_kgco2eq{awsregion=~\"$region\", resource_type=~\"$resource_type\"}) * 0.277778 * 24 * 365 * 5",
+          "editorMode": "code",
+          "expr": "sum(boavizta_resource_adp_embodied_kgsbeq{awsregion=~\"$region\", resource_type=~\"$resource_type\", resource_tags=~\".*$tags_to_include.*\"}) * 24 * 365 * 5",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -936,8 +1387,8 @@
             "uid": "P1396FDEEF9E8C375"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum by(awsregion) (boavizta_resource_pe_use_megajoules{awsregion=~\"$region\", resource_type=~\"$resource_type\"}) * 0.277778",
+          "editorMode": "code",
+          "expr": "sum by(awsregion) (boavizta_resource_adp_embodied_kgsbeq{awsregion=~\"$region\", resource_type=~\"$resource_type\", resource_tags=~\".*$tags_to_include.*\"}) * 24 * 365 * 5",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -948,130 +1399,37 @@
           "useBackend": false
         }
       ],
-      "title": "🔥 Global Warming Potential (Embodied) - by region (Kg Co2 eq) ",
+      "title": "🌍ADP - Abiotic Depletion Potential (Embodied) - by region (Kg sb eq) ",
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "P1396FDEEF9E8C375"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "kwatth"
-        },
-        "overrides": []
+        "type": "datasource",
+        "uid": "grafana"
       },
       "gridPos": {
-        "h": 5,
-        "w": 8,
+        "h": 12,
+        "w": 14,
         "x": 0,
-        "y": 35
+        "y": 25
       },
-      "id": 29,
+      "id": 20,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "content": "Cloud-scanner returns environmental impacts of your AWS usage.\n\nIt combines real time inventory and usage data from an AWS account with impact data from Boavizta API.\n\n## Resource considered\n\n- EC2 instances (type and CPU load)\n- Block storage (type and size)\n\n## Indicators\n\n- 🔥 Global Warming Potential - GWP (CO2eq)\n- ⚡ Primary Energy - PE (KWH or Mega Joules)\n- 🌍 Abiotic Depletion Potential - ADP: reousrces like mineral, water (kgSbeq)\n\n## Scopes\n\n- Use (displayed here for **one hour** of use)\n- Embodied impacts (i.e. manufacture related impacts, amortized for one hour of use)\n\n## Data and methodology\n\n- https://boavizta.github.io/cloud-scanner/\n- https://www.boavizta.org/en\n- https://boavizta.org/en/blog/empreinte-de-la-fabrication-d-un-serveur\n\n\n",
+        "mode": "markdown"
       },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1396FDEEF9E8C375"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "sum(boavizta_resource_pe_embodied_megajoules{awsregion=~\"$region\", resource_type=~\"$resource_type\"}) * 0.277778 * 24 * 365",
-          "format": "time_series",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "Total",
-          "range": true,
-          "refId": "Total",
-          "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P1396FDEEF9E8C375"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "sum by(awsregion) (boavizta_resource_pe_embodied_megajoules{awsregion=~\"$region\", resource_type=~\"$resource_type\"}) * 0.277778",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "By region",
-          "useBackend": false
-        }
-      ],
-      "title": "⚡ Primary Energy (embodied) - by region",
-      "type": "timeseries"
+      "pluginVersion": "10.2.0",
+      "title": "Explanations",
+      "type": "text"
     }
   ],
   "refresh": "",
-  "schemaVersion": 37,
-  "style": "dark",
+  "schemaVersion": 38,
   "tags": [],
   "templating": {
     "list": [
@@ -1111,10 +1469,12 @@
         "current": {
           "selected": true,
           "text": [
-            "All"
+            "Instance",
+            "BlockStorage"
           ],
           "value": [
-            "$__all"
+            "Instance",
+            "BlockStorage"
           ]
         },
         "datasource": {
