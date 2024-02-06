@@ -44,6 +44,7 @@ pub enum ResourceDetails {
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct InstanceUsage {
     pub average_cpu_load: f64,
+    pub average_ram_load: f64,
     pub usage_duration_seconds: u32,
 }
 

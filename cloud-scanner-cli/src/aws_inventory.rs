@@ -94,7 +94,7 @@ impl AwsInventory {
         let location = UsageLocation::from(self.aws_region.as_str());
 
         // Just to display statistics
-        let cpu_info_timer = Instant::now();
+        let cpu_ram_info_timer = Instant::now();
 
         let mut inventory: Vec<CloudResource> = Vec::new();
         for instance in instances {
@@ -106,16 +106,24 @@ impl AwsInventory {
                 .context("Cannot get CPU load of instance")
                 .unwrap();
 
+            let ramload = self
+                .clone()
+                .get_average_ram(&instance_id)
+                .await
+                .context("Cannot get RAM load of instance")
+                .unwrap();
+
             let usage: InstanceUsage = InstanceUsage {
                 average_cpu_load: cpuload,
+                average_ram_load: ramload,
                 usage_duration_seconds: 300,
             };
 
             let cloud_resource_tags = Self::cloud_resource_tags_from_aws_tags(instance.tags());
 
             info!(
-                "Total time spend querying CPU load of instances: {:?}",
-                cpu_info_timer.elapsed()
+                "Total time spend querying CPU & RAM load of instances: {:?}",
+                cpu_ram_info_timer.elapsed()
             );
 
             let inst = CloudResource {
@@ -302,6 +310,77 @@ impl AwsInventory {
         }
 
         Ok(resources)
+    }
+
+    /// Returns average RAM load of a given instance.
+    ///
+    async fn get_average_ram(self, instance_id: &str) -> Result<f64> {
+        let res = self
+            .get_average_ram_usage_of_last_10_minutes(instance_id)
+            .await
+            .with_context(|| {
+                format!(
+                    "Cannot retrieve average RAM load of instance: {}",
+                    instance_id
+                )
+            })?;
+        if let Some(points) = res.datapoints {
+            if !points.is_empty() {
+                debug!("Averaging ram load data point: {:#?}", points);
+                let mut sum: f64 = 0.0;
+                for x in &points {
+                    sum += x.average().unwrap();
+                }
+                let avg = sum / points.len() as f64;
+                return Ok(avg);
+            }
+        }
+        warn!(
+            "Unable to get RAM load of  instance {}, it is likely stopped, using 0 as load",
+            instance_id
+        );
+        Ok(0 as f64)
+    }
+
+    /// Returns the instance RAM utilization usage on the last 10 minutes
+    async fn get_average_ram_usage_of_last_10_minutes(
+        self,
+        instance_id: &str,
+    ) -> Result<GetMetricStatisticsOutput, aws_sdk_cloudwatch::Error> {
+        // We want statistics about the last 10 minutes using  5min  sample
+        let measure_duration = Duration::minutes(10);
+        let sample_period_seconds = 300; // 5*60 (the default granularity of cloudwatch standard CPU metris)
+        let now: chrono::DateTime<Utc> = Utc::now();
+        let start_time: chrono::DateTime<Utc> = now - measure_duration;
+
+        let ram_metric_name = String::from("MemoryUtilization");
+        let ec2_namespace = "AWS/EC2";
+
+        let dimensions = vec![Dimension::builder()
+            .name("InstanceId")
+            .value(instance_id)
+            .build()];
+
+        let end_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
+            aws_sdk_cloudwatch::primitives::DateTime::from_secs(now.timestamp());
+        let start_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
+            aws_sdk_cloudwatch::primitives::DateTime::from_secs(start_time.timestamp());
+
+        let resp: GetMetricStatisticsOutput = self
+            .cloudwatch_client
+            .get_metric_statistics()
+            .end_time(end_time_aws)
+            .metric_name(ram_metric_name)
+            .namespace(ec2_namespace)
+            .period(sample_period_seconds)
+            .set_dimensions(Some(dimensions))
+            .start_time(start_time_aws)
+            .statistics(Statistic::Average)
+            .unit(StandardUnit::Percent)
+            .send()
+            .await?;
+
+        Ok(resp)
     }
 }
 
