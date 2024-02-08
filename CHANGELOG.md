@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
 - [Release 2.0.3 uses dev Boavizta API URL instead of stable · Issue #425 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/425)
+- Add a prometheus data volume in the docker-compose example [Document how to persist prometheus data when the container is recreated · Issue #434 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/434)
 
 ## [2.0.3]-2024-01-17
 

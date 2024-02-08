@@ -45,6 +45,7 @@ services:
     image: docker.io/prom/prometheus
     volumes:
       - ./dashboard-config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
     ports:
       - "9090:9090"
     networks:
@@ -62,6 +63,7 @@ services:
       - network_boa
 
 volumes:
+  prometheus-data:
   grafana-data:
 
 networks:
