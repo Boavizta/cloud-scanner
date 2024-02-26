@@ -64,19 +64,19 @@ See [Output data - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud
 
 ## ⚠  Perimeter / scope and limits
 
-Cloud scanner _only_ estimates the impacts of your AWS EC2  instances.
+Cloud scanner _only_ estimates the impacts of your AWS EC2  instances and optionally block storage.
 
 The limitations of cloud-scanner are documented in [Limitations - Boavizta cloud scanner 📡](https://boavizta.github.io/cloud-scanner/reference/limits.html)
 
 Several significant aspects of the global impacts of cloud usage are **excluded**:
 
-- only measure _compute_ instances (EC2 VM's)
+- only measure _compute_ instances (EC2 VM's) and optionally block storage.
+- do not take into account PUE.
 - do not account for the surrounding cloud infrastructure (network, control plan)
-- do not account for storage
 - do not take into account the _overcommit_ (mutualization) or _overprovisionning_ that cloud provider may apply to provide the service.
 - do not account managed services (like DB as a service or Containers as a service).
 - do not account serverless (lambda) compute.
-- supported regions (EU and US only for the time being)
+- supported regions (EU and US only for the time being).
 - unsupported instance types returns zero for their impacts.
 - we do not provide (yet) error margins <https://github.com/Boavizta/boaviztapi/issues/147>
 - the manufacturing impacts are not amortized (i.e. values returned for manufacturing impacts do not consider usage duration).

@@ -13,7 +13,7 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 - Add a Prometheus data volume in the docker-compose example [Document how to persist prometheus data when the container is recreated · Issue #434 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/434)
 - [Improve doc about passing AWS credentials · Issue #77 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/77)
 - [Refactor code to make it more readable · Issue #209 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/209)
-- /!\ **Breaking change** Cli and Serverless parameters `--hours_use_time` were renamed into `--use_duration_hours`. Short form remain `-u`. 
+- /!\ **Breaking change**: Cli and Serverless parameters `--hours-use-time` were renamed into `--use-duration-hours`. Short form remain `-u`. 
 
 ## [2.0.3]-2024-01-17
 
