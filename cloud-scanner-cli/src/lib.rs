@@ -32,7 +32,7 @@ pub mod usage_location;
 use anyhow::{Context, Result};
 
 async fn estimate_impacts(
-    hours_use_time: &f32,
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
@@ -47,7 +47,7 @@ async fn estimate_impacts(
 
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let estimated_inventory = api
-        .get_impacts(inventory, hours_use_time, verbose)
+        .get_impacts(inventory, use_duration_hours, verbose)
         .await
         .context("Failure while retrieving impacts")?;
 
@@ -56,7 +56,7 @@ async fn estimate_impacts(
 
 /// Returns default impacts as json string
 pub async fn get_impacts_as_json_string(
-    hours_use_time: &f32,
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
@@ -64,7 +64,7 @@ pub async fn get_impacts_as_json_string(
     include_block_storage: bool,
 ) -> Result<String> {
     let inventory_with_impacts = estimate_impacts(
-        hours_use_time,
+        use_duration_hours,
         tags,
         aws_region,
         api_url,
@@ -79,14 +79,14 @@ pub async fn get_impacts_as_json_string(
 
 /// Returns  impacts as metrics
 pub async fn get_impacts_as_metrics(
-    hours_use_time: &f32,
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
     include_storage: bool,
 ) -> Result<String> {
     let resources_with_impacts = estimate_impacts(
-        hours_use_time,
+        use_duration_hours,
         tags,
         aws_region,
         api_url,
@@ -101,7 +101,7 @@ pub async fn get_impacts_as_metrics(
         String::from(aws_region),
         usage_location.iso_country_code,
         resources_with_impacts.clone(),
-        (*hours_use_time).into(),
+        (*use_duration_hours).into(),
     );
     debug!("Summary: {:#?}", summary);
 
@@ -117,7 +117,7 @@ pub async fn get_impacts_as_metrics(
 
 /// Prints  impacts to standard output in json format
 pub async fn print_default_impacts_as_json(
-    hours_use_time: &f32,
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
@@ -125,7 +125,7 @@ pub async fn print_default_impacts_as_json(
     include_storage: bool,
 ) -> Result<()> {
     let j = get_impacts_as_json_string(
-        hours_use_time,
+        use_duration_hours,
         tags,
         aws_region,
         api_url,
@@ -139,14 +139,14 @@ pub async fn print_default_impacts_as_json(
 
 /// Prints impacts to standard output as metrics in prometheus format
 pub async fn print_default_impacts_as_metrics(
-    hours_use_time: &f32,
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
     include_block_storage: bool,
 ) -> Result<()> {
     let metrics = get_impacts_as_metrics(
-        hours_use_time,
+        use_duration_hours,
         tags,
         aws_region,
         api_url,

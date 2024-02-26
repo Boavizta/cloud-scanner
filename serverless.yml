@@ -46,7 +46,7 @@ functions:
           request:
             parameters:
               querystrings:
-                hours_use_time: true
+                use_duration_hours: true
                 aws_region: false
                 verbose_output: false
                 include_block_storage: false
