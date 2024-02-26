@@ -10,7 +10,7 @@ use crate::{cloud_resource::CloudResource, impact_provider::CloudResourceWithImp
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ExecutionStatistics {
     pub inventory_duration: Duration,
-    pub impact_duration: Duration,
+    pub impact_estimation_duration: Duration,
     pub total_duration: Duration,
 }
 
@@ -21,17 +21,17 @@ impl fmt::Display for ExecutionStatistics {
 }
 
 /// Inventory
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory {
     pub resources: Vec<CloudResource>,
-    pub execution_statistics: ExecutionStatistics,
+    pub execution_statistics: Option<ExecutionStatistics>,
 }
 
 /// Impacts results
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct ResourcesWithImpacts {
-    pub impacts: Vec<CloudResourceWithImpacts>,
-    pub execution_statistics: ExecutionStatistics,
+pub struct EstimatedInventory {
+    pub impacting_resources: Vec<CloudResourceWithImpacts>,
+    pub execution_statistics: Option<ExecutionStatistics>,
 }

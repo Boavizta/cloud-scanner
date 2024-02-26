@@ -1,6 +1,6 @@
 //! A standalone  HTTP endpoint
 
-use crate::model::{Inventory, ResourcesWithImpacts};
+use crate::model::{Inventory, EstimatedInventory};
 use rocket::State;
 use rocket::{get, serde::json::Json};
 use rocket_okapi::{openapi, openapi_get_routes, swagger_ui::*};
@@ -55,7 +55,7 @@ async fn metrics(
     warn!("Getting something on /metrics");
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
     warn!("Filtering on tags {:?}", filter_tags);
-    let metrics = crate::get_default_impacts_as_metrics(
+    let metrics = crate::get_impacts_as_metrics(
         &hours_use_time,
         &filter_tags.unwrap_or_default(),
         aws_region,
@@ -108,7 +108,7 @@ async fn impacts(
     use_duration_hours: Option<f32>,
     verbose_output: Option<bool>,
     include_block_storage: Option<bool>,
-) -> Json<ResourcesWithImpacts> {
+) -> Json<EstimatedInventory> {
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
     //let hours_use_time: f32 = 1.0;
     warn!(
@@ -116,7 +116,7 @@ async fn impacts(
         hours_use_time
     );
     warn!("Filtering on tags {:?}", filter_tags);
-    let res = crate::standard_scan(
+    let res = crate::estimate_impacts(
         &hours_use_time,
         &filter_tags.unwrap_or_default(),
         aws_region,

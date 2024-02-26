@@ -3,7 +3,7 @@
 //!  ⚠ Only ec2 instances are supported  today.
 use std::time::Instant;
 
-use crate::cloud_inventory::CloudInventory;
+use crate::cloud_provider::Inventoriable;
 use crate::cloud_resource::*;
 use crate::usage_location::*;
 
@@ -17,24 +17,25 @@ use aws_sdk_ec2::types::{Instance, InstanceStateName};
 use chrono::Duration;
 use chrono::Utc;
 
+use crate::model::{ExecutionStatistics, Inventory};
 use async_trait::async_trait;
 use aws_types::SdkConfig;
 
 ///  An inventory of AWS resources
 #[derive(Clone, Debug)]
-pub struct AwsInventory {
+pub struct AwsCloudProvider {
     aws_region: String,
     ec2_client: aws_sdk_ec2::Client,
     cloudwatch_client: aws_sdk_cloudwatch::Client,
 }
 
-impl AwsInventory {
+impl AwsCloudProvider {
     /// Creates an AWS inventory.
     /// Initializes it with a specific region and configures the SDK's that will query your account to perform the inventory of resources.
     pub async fn new(aws_region: &str) -> Self {
         let shared_config = Self::load_aws_config(aws_region).await;
 
-        AwsInventory {
+        AwsCloudProvider {
             aws_region: String::from(aws_region),
             ec2_client: aws_sdk_ec2::Client::new(&shared_config),
             cloudwatch_client: aws_sdk_cloudwatch::Client::new(&shared_config),
@@ -322,21 +323,34 @@ impl AwsInventory {
 }
 
 #[async_trait]
-impl CloudInventory for AwsInventory {
+impl Inventoriable for AwsCloudProvider {
     /// list resources
     async fn list_resources(
         &self,
         tags: &[String],
         include_block_storage: bool,
-    ) -> Result<Vec<CloudResource>> {
-        let mut inventory: Vec<CloudResource> = Vec::new();
+    ) -> Result<Inventory> {
+        let start = Instant::now();
+
+        let mut resources: Vec<CloudResource> = Vec::new();
 
         let mut instances = self.clone().get_instances_with_usage_data(tags).await?;
-        inventory.append(&mut instances);
+        resources.append(&mut instances);
         if include_block_storage {
             let mut volumes = self.clone().get_volumes_with_usage_data(tags).await?;
-            inventory.append(&mut volumes);
+            resources.append(&mut volumes);
         }
+        let stats = ExecutionStatistics {
+            inventory_duration: start.elapsed(),
+            impact_estimation_duration: std::time::Duration::from_millis(0),
+            total_duration: start.elapsed(),
+        };
+        warn!("{:?}", stats);
+
+        let inventory = Inventory {
+            resources,
+            execution_statistics: Some(stats),
+        };
         Ok(inventory)
     }
 }
@@ -350,9 +364,9 @@ mod tests {
     #[tokio::test]
     #[ignore]
     async fn inventory_should_return_correct_number_of_instances() {
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
         let filtertags: Vec<String> = Vec::new();
-        let res: Vec<CloudResource> = inventory
+        let res: Vec<CloudResource> = aws
             .get_instances_with_usage_data(&filtertags)
             .await
             .context("Failed to list")
@@ -373,19 +387,19 @@ mod tests {
     #[tokio::test]
     async fn test_create_sdk_config_works_with_wrong_region() {
         let region: &str = "eu-west-3";
-        let config = AwsInventory::load_aws_config(region).await;
+        let config = AwsCloudProvider::load_aws_config(region).await;
         assert_eq!(region, config.region().unwrap().to_string());
 
         let wrong_region: &str = "impossible-region";
-        let config = AwsInventory::load_aws_config(wrong_region).await;
+        let config = AwsCloudProvider::load_aws_config(wrong_region).await;
         assert_eq!(wrong_region, config.region().unwrap().to_string())
     }
 
     #[tokio::test]
     #[ignore]
     async fn get_cpu_usage_metrics_of_running_instance_should_return_right_number_of_data_points() {
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
-        let res = inventory
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
+        let res = aws
             .get_average_cpu_usage_of_last_10_minutes(&RUNNING_INSTANCE_ID)
             .await
             .unwrap();
@@ -402,9 +416,9 @@ mod tests {
     #[tokio::test]
     #[ignore]
     async fn test_get_instance_usage_metrics_of_shutdown_instance() {
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
         let instance_id = "i-03e0b3b1246001382";
-        let res = inventory
+        let res = aws
             .get_average_cpu_usage_of_last_10_minutes(instance_id)
             .await
             .unwrap();
@@ -415,9 +429,9 @@ mod tests {
     #[tokio::test]
     #[ignore]
     async fn test_get_instance_usage_metrics_of_non_existing_instance() {
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
         let instance_id = "IDONOTEXISTS";
-        let res = inventory
+        let res = aws
             .get_average_cpu_usage_of_last_10_minutes(instance_id)
             .await
             .unwrap();
@@ -429,9 +443,9 @@ mod tests {
     #[ignore]
     async fn test_average_cpu_load_of_running_instance_is_not_zero() {
         // This instance  needs to be running for the test to pass
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
 
-        let avg_cpu_load = inventory
+        let avg_cpu_load = aws
             .get_average_cpu(&RUNNING_INSTANCE_ID)
             .await
             .unwrap();
@@ -449,26 +463,26 @@ mod tests {
     #[ignore]
     async fn test_average_cpu_load_of_non_existing_instance_is_zero() {
         let instance_id = "IDONOTEXISTS";
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
-        let res = inventory.get_average_cpu(instance_id).await.unwrap();
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
+        let res = aws.get_average_cpu(instance_id).await.unwrap();
         assert_eq!(0 as f64, res);
     }
 
     #[tokio::test]
     #[ignore]
     async fn test_average_cpu_load_of_shutdown_instance_is_zero() {
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
         let instance_id = "i-03e0b3b1246001382";
-        let res = inventory.get_average_cpu(instance_id).await.unwrap();
+        let res = aws.get_average_cpu(instance_id).await.unwrap();
         assert_eq!(0 as f64, res);
     }
 
     #[tokio::test]
     #[ignore]
     async fn returns_the_right_number_of_volumes() {
-        let inventory: AwsInventory = AwsInventory::new("eu-west-1").await;
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
         let filtertags: Vec<String> = Vec::new();
-        let res = inventory.list_volumes(&filtertags).await.unwrap();
+        let res = aws.list_volumes(&filtertags).await.unwrap();
         assert_eq!(4, res.len());
     }
 }

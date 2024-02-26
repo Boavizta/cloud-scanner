@@ -78,7 +78,7 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
     println!("Using aws_region {}", aws_region);
     println!("Using tag filers {:?}", filter_tags);
 
-    let impacts: String = cloud_scanner_cli::get_default_impacts_as_json_string(
+    let impacts: String = cloud_scanner_cli::get_impacts_as_json_string(
         &hours_use_time,
         &filter_tags,
         aws_region,

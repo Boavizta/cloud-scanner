@@ -60,7 +60,7 @@ async fn summary(event: Request) -> Result<impl IntoResponse, Error> {
     println!("Using tag filers: {:?}", filter_tags);
     println!("Include block storage: {:?}", include_block_storage);
 
-    let impacts: String = cloud_scanner_cli::get_default_impacts_as_metrics(
+    let impacts: String = cloud_scanner_cli::get_impacts_as_metrics(
         &1.0,
         &filter_tags,
         aws_region,

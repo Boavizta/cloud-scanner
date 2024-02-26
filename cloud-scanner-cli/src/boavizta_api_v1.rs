@@ -1,12 +1,14 @@
 //!  Provide access to Boavizta API cloud impacts functions
+use std::time::Instant;
 use crate::cloud_resource::*;
-use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ResourceImpacts};
+use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ImpactsValues};
 use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::component_api;
 use boavizta_api_sdk::apis::configuration;
 
+use crate::model::{EstimatedInventory, ExecutionStatistics, Inventory};
 use boavizta_api_sdk::models::{Cloud, Disk, UsageCloud};
 
 /// Access data of Boavizta API
@@ -191,18 +193,26 @@ impl ImpactProvider for BoaviztaApiV1 {
     /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration.
     async fn get_impacts(
         &self,
-        resources: Vec<CloudResource>,
+        inventory: Inventory,
         usage_duration_hours: &f32,
         verbose: bool,
-    ) -> Result<Vec<CloudResourceWithImpacts>> {
+    ) -> Result<EstimatedInventory> {
+        
         let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
-        for resource in resources.iter() {
+        for resource in inventory.resources.iter() {
             let cri = self
                 .get_resource_with_impacts(resource, usage_duration_hours, verbose)
                 .await;
             v.push(cri.clone());
         }
-        Ok(v)
+        
+        
+        let estimated_inventory: EstimatedInventory = EstimatedInventory {
+            impacting_resources: v,
+            execution_statistics: None
+            //TODO: implement stats
+        };
+        Ok(estimated_inventory)
     }
 }
 
@@ -212,7 +222,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
     raw_result: &Option<serde_json::Value>,
     impacts_duration_hours: &f32,
 ) -> CloudResourceWithImpacts {
-    let resource_impacts: Option<ResourceImpacts>;
+    let resource_impacts: Option<ImpactsValues>;
     if let Some(results) = raw_result {
         debug!("Raw results before conversion: {}", results);
 
@@ -225,7 +235,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
                 instance_type: _,
                 usage: _,
             } => {
-                resource_impacts = Some(ResourceImpacts {
+                resource_impacts = Some(ImpactsValues {
                     adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
                     adp_use_kgsbeq: impacts["adp"]["use"]["value"].as_f64().unwrap(),
                     pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
@@ -242,7 +252,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
             } => {
                 // TODO: handle empty values differently, it could be better to have an option to be explicit about null values.
                 info!("Impacts of the use phase of storage are not counted (only embedded impacts are counted).");
-                resource_impacts = Some(ResourceImpacts {
+                resource_impacts = Some(ImpactsValues {
                     adp_manufacture_kgsbeq: impacts["adp"]["embedded"]["value"].as_f64().unwrap(),
                     adp_use_kgsbeq: 0 as f64,
                     pe_manufacture_megajoules: impacts["pe"]["embedded"]["value"].as_f64().unwrap(),
@@ -265,7 +275,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
     };
     CloudResourceWithImpacts {
         cloud_resource: cloud_resource.clone(),
-        resource_impacts,
+        impacts_values: resource_impacts,
         impacts_duration_hours: impacts_duration_hours.to_owned(),
     }
 }
@@ -433,10 +443,15 @@ mod tests {
         instances.push(instance1);
         instances.push(instance1_1percent);
 
-        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
+        let inventory = Inventory {
+            resources: instances,
+            execution_statistics: None,
+        };
 
-        let r0 = res[0].resource_impacts.clone().unwrap();
-        let r1 = res[1].resource_impacts.clone().unwrap();
+        let res = api.get_impacts(inventory, &one_hour, false).await.unwrap();
+
+        let r0 = res.impacting_resources[0].impacts_values.clone().unwrap();
+        let r1 = res.impacting_resources[1].impacts_values.clone().unwrap();
         assert_eq!(0.212, r0.pe_use_megajoules);
         assert_eq!(0.088, r1.pe_use_megajoules);
     }
@@ -494,20 +509,25 @@ mod tests {
         instances.push(instance3);
         let one_hour = 1.0 as f32;
 
+        let inventory = Inventory {
+            resources: instances,
+            execution_statistics: None,
+        };
+
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let res = api.get_impacts(instances, &one_hour, false).await.unwrap();
+        let res = api.get_impacts(inventory, &one_hour, false).await.unwrap();
 
-        assert_eq!(3, res.len());
-        assert_eq!(res[0].cloud_resource.id, "inst-1");
-        assert_eq!(res[1].cloud_resource.id, "inst-2");
+        assert_eq!(3, res.impacting_resources.len());
+        assert_eq!(res.impacting_resources[0].cloud_resource.id, "inst-1");
+        assert_eq!(res.impacting_resources[1].cloud_resource.id, "inst-2");
 
-        let r0 = res[0].resource_impacts.clone().unwrap();
-        let r1 = res[1].resource_impacts.clone().unwrap();
+        let r0 = res.impacting_resources[0].impacts_values.clone().unwrap();
+        let r1 = res.impacting_resources[1].impacts_values.clone().unwrap();
 
         assert_eq!(0.212, r0.pe_use_megajoules);
         assert_eq!(0.212, r1.pe_use_megajoules);
         assert!(
-            res[2].resource_impacts.clone().is_none(),
+            res.impacting_resources[2].impacts_values.clone().is_none(),
             "This instance should return None impacts because it's type is unknown from API"
         );
     }
@@ -535,14 +555,14 @@ mod tests {
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
         assert!(
-            cloud_resource_with_impacts.resource_impacts.is_some(),
+            cloud_resource_with_impacts.impacts_values.is_some(),
             "Emtpy impacts"
         );
 
         assert_eq!(
             0.212,
             cloud_resource_with_impacts
-                .resource_impacts
+                .impacts_values
                 .as_ref()
                 .unwrap()
                 .pe_use_megajoules
@@ -551,7 +571,7 @@ mod tests {
         assert_eq!(
             0.212,
             cloud_resource_with_impacts
-                .resource_impacts
+                .impacts_values
                 .unwrap()
                 .raw_data
                 .unwrap()["impacts"]["pe"]["use"]["value"]
@@ -582,14 +602,14 @@ mod tests {
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
         assert!(
-            cloud_resource_with_impacts.resource_impacts.is_some(),
+            cloud_resource_with_impacts.impacts_values.is_some(),
             "Emtpy impacts"
         );
 
         assert_eq!(
             0.0005454,
             cloud_resource_with_impacts
-                .resource_impacts
+                .impacts_values
                 .unwrap()
                 .raw_data
                 .unwrap()["verbose"]["CPU-1"]["impacts"]["gwp"]["embedded"]["value"]
