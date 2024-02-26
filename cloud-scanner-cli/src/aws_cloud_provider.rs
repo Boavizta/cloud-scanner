@@ -4,7 +4,6 @@
 use std::time::Instant;
 
 use crate::cloud_provider::Inventoriable;
-use crate::cloud_resource::*;
 use crate::usage_location::*;
 
 use anyhow::{Context, Result};
@@ -17,7 +16,7 @@ use aws_sdk_ec2::types::{Instance, InstanceStateName};
 use chrono::Duration;
 use chrono::Utc;
 
-use crate::model::{ExecutionStatistics, Inventory};
+use crate::model::{CloudProvider, CloudResource, CloudResourceTag, ExecutionStatistics, InstanceState, InstanceUsage, Inventory, ResourceDetails, StorageAttachment, StorageUsage};
 use async_trait::async_trait;
 use aws_types::SdkConfig;
 
@@ -357,6 +356,7 @@ impl Inventoriable for AwsCloudProvider {
 
 #[cfg(test)]
 mod tests {
+    use crate::model::vec_to_map;
     use super::*;
 
     static RUNNING_INSTANCE_ID: &str = "i-03c8f84a6318a8186";

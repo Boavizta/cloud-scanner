@@ -1,6 +1,5 @@
 //!  Provide access to Boavizta API cloud impacts functions
 use std::time::Instant;
-use crate::cloud_resource::*;
 use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ImpactsValues};
 use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
@@ -8,7 +7,7 @@ use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::component_api;
 use boavizta_api_sdk::apis::configuration;
 
-use crate::model::{EstimatedInventory, ExecutionStatistics, Inventory};
+use crate::model::{CloudResource, EstimatedInventory, ExecutionStatistics, Inventory, ResourceDetails};
 use boavizta_api_sdk::models::{Cloud, Disk, UsageCloud};
 
 /// Access data of Boavizta API
@@ -287,6 +286,7 @@ mod tests {
     use crate::UsageLocation;
     use assert_json_diff::assert_json_include;
     use assert_json_diff::{assert_json_matches, CompareMode, Config, NumericMode};
+    use crate::model::{CloudProvider, CloudResource, InstanceState, InstanceUsage, ResourceDetails, StorageUsage};
 
     const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API

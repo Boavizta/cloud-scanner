@@ -5,8 +5,7 @@
 ///
 /// The model of allocation should be internal to boa API
 ///
-use crate::cloud_resource::*;
-use crate::model::{Inventory, EstimatedInventory};
+use crate::model::{CloudResource, EstimatedInventory, Inventory};
 use anyhow::Result;
 use async_trait::async_trait;
 use rocket_okapi::okapi::schemars;

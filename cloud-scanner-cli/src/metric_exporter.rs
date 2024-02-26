@@ -2,7 +2,6 @@
 use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
-use crate::cloud_resource::{InstanceState, ResourceDetails};
 use crate::impact_provider::CloudResourceWithImpacts;
 use prometheus_client::encoding::text::encode;
 use prometheus_client::encoding::{EncodeLabelSet, EncodeLabelValue};
@@ -10,7 +9,7 @@ use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
 
-use crate::model::EstimatedInventory;
+use crate::model::{EstimatedInventory, InstanceState, ResourceDetails};
 use crate::ImpactsSummary;
 
 // Define a type representing a metric label set, i.e. a key value pair.
@@ -329,8 +328,8 @@ fn register_summary_metrics(registry: &mut Registry, summary: &ImpactsSummary) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cloud_resource::{CloudProvider, CloudResource, CloudResourceTag, InstanceUsage};
     use crate::impact_provider::ImpactsValues;
+    use crate::model::{CloudProvider, CloudResource, CloudResourceTag, InstanceUsage};
     use crate::usage_location::UsageLocation;
 
     #[tokio::test]

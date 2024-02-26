@@ -23,7 +23,6 @@ use std::time::{Duration, Instant};
 pub mod aws_cloud_provider;
 pub mod boavizta_api_v1;
 pub mod cloud_provider;
-pub mod cloud_resource;
 pub mod impact_provider;
 pub mod metric_exporter;
 pub mod model;

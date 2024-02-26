@@ -2,7 +2,7 @@ use isocountry::CountryCode;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-/// TODO! the usage location should be part of the cloud_inventory model (region names are tied to a specific cloud provider)
+/// TODO! the usage location should be part of the cloud_provider model (region names are tied to a specific cloud provider)
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct UsageLocation {
