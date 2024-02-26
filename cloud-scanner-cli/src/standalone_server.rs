@@ -1,6 +1,6 @@
 //! A standalone  HTTP endpoint
 
-use crate::model::{Inventory, EstimatedInventory};
+use crate::model::{EstimatedInventory, Inventory};
 use rocket::State;
 use rocket::{get, serde::json::Json};
 use rocket_okapi::{openapi, openapi_get_routes, swagger_ui::*};

@@ -2,9 +2,9 @@
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fmt;
 use std::time::Duration;
-use std::collections::HashMap;
 
 use crate::impact_provider::CloudResourceWithImpacts;
 use crate::usage_location::UsageLocation;
@@ -178,9 +178,9 @@ pub fn vec_to_map(tagv: Vec<CloudResourceTag>) -> HashMap<String, Option<String>
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
     use crate::model::{CloudProvider, CloudResource, CloudResourceTag, ResourceDetails};
     use crate::usage_location::UsageLocation;
+    use std::collections::HashMap;
 
     #[test]
     pub fn a_cloud_resource_can_be_displayed() {

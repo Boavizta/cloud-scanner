@@ -1,13 +1,15 @@
 //!  Provide access to Boavizta API cloud impacts functions
-use std::time::Instant;
 use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ImpactsValues};
 use anyhow::Result;
 /// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::component_api;
 use boavizta_api_sdk::apis::configuration;
+use std::time::{Duration, Instant};
 
-use crate::model::{CloudResource, EstimatedInventory, ExecutionStatistics, Inventory, ResourceDetails};
+use crate::model::{
+    CloudResource, EstimatedInventory, ExecutionStatistics, Inventory, ResourceDetails,
+};
 use boavizta_api_sdk::models::{Cloud, Disk, UsageCloud};
 
 /// Access data of Boavizta API
@@ -196,7 +198,8 @@ impl ImpactProvider for BoaviztaApiV1 {
         usage_duration_hours: &f32,
         verbose: bool,
     ) -> Result<EstimatedInventory> {
-        
+        let impact_query_start_time = Instant::now();
+
         let mut v: Vec<CloudResourceWithImpacts> = Vec::new();
         for resource in inventory.resources.iter() {
             let cri = self
@@ -204,12 +207,21 @@ impl ImpactProvider for BoaviztaApiV1 {
                 .await;
             v.push(cri.clone());
         }
-        
-        
+
+        let mut inventory_duration = Duration::from_millis(0);
+        if let Some(exec_stats) = inventory.execution_statistics {
+            inventory_duration = exec_stats.inventory_duration;
+        }
+        let impact_estimation_duration = impact_query_start_time.elapsed();
+        let execution_statistics = ExecutionStatistics {
+            inventory_duration,
+            impact_estimation_duration,
+            total_duration: inventory_duration + impact_estimation_duration,
+        };
+
         let estimated_inventory: EstimatedInventory = EstimatedInventory {
             impacting_resources: v,
-            execution_statistics: None
-            //TODO: implement stats
+            execution_statistics: Some(execution_statistics),
         };
         Ok(estimated_inventory)
     }
@@ -283,10 +295,12 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 mod tests {
 
     use super::*;
+    use crate::model::{
+        CloudProvider, CloudResource, InstanceState, InstanceUsage, ResourceDetails, StorageUsage,
+    };
     use crate::UsageLocation;
     use assert_json_diff::assert_json_include;
     use assert_json_diff::{assert_json_matches, CompareMode, Config, NumericMode};
-    use crate::model::{CloudProvider, CloudResource, InstanceState, InstanceUsage, ResourceDetails, StorageUsage};
 
     const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API

@@ -3,7 +3,7 @@
 //!  A command line application that performs inventory of your cloud account and combines it with Boavizta API  to return an estimation of its environmental impact.
 //!
 
-use crate::model::{ExecutionStatistics, EstimatedInventory};
+use crate::model::{EstimatedInventory, ExecutionStatistics};
 use crate::usage_location::*;
 use aws_cloud_provider::*;
 use boavizta_api_v1::*;
@@ -39,19 +39,18 @@ async fn estimate_impacts(
     verbose: bool,
     include_block_storage: bool,
 ) -> Result<EstimatedInventory> {
-
     let aws_provider: AwsCloudProvider = AwsCloudProvider::new(aws_region).await;
     let inventory: Inventory = aws_provider
         .list_resources(tags, include_block_storage)
         .await
         .context("Cannot perform resources inventory")?;
-    
+
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let estimated_inventory = api
         .get_impacts(inventory, hours_use_time, verbose)
         .await
         .context("Failure while retrieving impacts")?;
-    
+
     Ok(estimated_inventory)
 }
 

@@ -16,7 +16,10 @@ use aws_sdk_ec2::types::{Instance, InstanceStateName};
 use chrono::Duration;
 use chrono::Utc;
 
-use crate::model::{CloudProvider, CloudResource, CloudResourceTag, ExecutionStatistics, InstanceState, InstanceUsage, Inventory, ResourceDetails, StorageAttachment, StorageUsage};
+use crate::model::{
+    CloudProvider, CloudResource, CloudResourceTag, ExecutionStatistics, InstanceState,
+    InstanceUsage, Inventory, ResourceDetails, StorageAttachment, StorageUsage,
+};
 use async_trait::async_trait;
 use aws_types::SdkConfig;
 
@@ -356,8 +359,8 @@ impl Inventoriable for AwsCloudProvider {
 
 #[cfg(test)]
 mod tests {
-    use crate::model::vec_to_map;
     use super::*;
+    use crate::model::vec_to_map;
 
     static RUNNING_INSTANCE_ID: &str = "i-03c8f84a6318a8186";
 
@@ -445,10 +448,7 @@ mod tests {
         // This instance  needs to be running for the test to pass
         let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await;
 
-        let avg_cpu_load = aws
-            .get_average_cpu(&RUNNING_INSTANCE_ID)
-            .await
-            .unwrap();
+        let avg_cpu_load = aws.get_average_cpu(&RUNNING_INSTANCE_ID).await.unwrap();
         assert_ne!(
             0 as f64, avg_cpu_load,
             "CPU load of instance {} is zero, is it really running ?",
