@@ -25,7 +25,7 @@ Use one (or multiple) `filter_tag` parameter in the query string to restrict res
 #  CustomTagNameForDebug=olivierdemeringoadm
 #     and 
 #  Name=test-boavizta
-https://<EDITED>.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&aws_region=eu-west-1&filter_tag=CustomTagNameForDebug=olivierdemeringoadm&filter_tag=Name=test-boavizta
+https://<EDITED>.execute-api.eu-west-1.amazonaws.com/dev/scan?use_duration_hours=5&aws_region=eu-west-1&filter_tag=CustomTagNameForDebug=olivierdemeringoadm&filter_tag=Name=test-boavizta
 ```
 
 ## Filter metrics

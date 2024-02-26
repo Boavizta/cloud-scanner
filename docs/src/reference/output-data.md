@@ -14,7 +14,7 @@ Cloud scanner returns a json array of instances metadata.
     "instance_id": "i-001dc0ebbf9cb25c0",
     "instance_type": "t2.micro",
     "usage_data": {
-      "hours_use_time": 5,
+      "use_duration_hours": 5,
       "usage_location": "IRL"
     },
     "impacts": {}
@@ -23,7 +23,7 @@ Cloud scanner returns a json array of instances metadata.
     "instance_id": "i-004599844f7c24814",
     "instance_type": "t2.small",
     "usage_data": {
-      "hours_use_time": 5,
+      "use_duration_hours": 5,
       "usage_location": "IRL"
     },
     "impacts": {}
@@ -32,7 +32,7 @@ Cloud scanner returns a json array of instances metadata.
     "instance_id": "i-075444d7293d8bd76",
     "instance_type": "t2.micro",
     "usage_data": {
-      "hours_use_time": 5,
+      "use_duration_hours": 5,
       "usage_location": "IRL"
     },
     "impacts": {}
@@ -41,7 +41,7 @@ Cloud scanner returns a json array of instances metadata.
     "instance_id": "i-033df52f12f30ca66",
     "instance_type": "m6g.xlarge",
     "usage_data": {
-      "hours_use_time": 5,
+      "use_duration_hours": 5,
       "usage_location": "IRL"
     },
     "impacts": {

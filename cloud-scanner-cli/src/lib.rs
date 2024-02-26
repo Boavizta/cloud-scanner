@@ -3,12 +3,11 @@
 //!  A command line application that performs inventory of your cloud account and combines it with Boavizta API  to return an estimation of its environmental impact.
 //!
 
-use crate::model::{ExecutionStatistics, ResourcesWithImpacts};
+use crate::model::{EstimatedInventory, ExecutionStatistics};
 use crate::usage_location::*;
-use aws_inventory::*;
+use aws_cloud_provider::*;
 use boavizta_api_v1::*;
-use cloud_inventory::*;
-use cloud_resource::*;
+use cloud_provider::*;
 use impact_provider::ImpactProvider;
 use impact_provider::ImpactsSummary;
 use metric_exporter::*;
@@ -21,10 +20,9 @@ extern crate log;
 use model::Inventory;
 use pkg_version::*;
 use std::time::{Duration, Instant};
-pub mod aws_inventory;
+pub mod aws_cloud_provider;
 pub mod boavizta_api_v1;
-pub mod cloud_inventory;
-pub mod cloud_resource;
+pub mod cloud_provider;
 pub mod impact_provider;
 pub mod metric_exporter;
 pub mod model;
@@ -33,61 +31,40 @@ pub mod usage_location;
 
 use anyhow::{Context, Result};
 
-async fn standard_scan(
-    hours_use_time: &f32,
+async fn estimate_impacts(
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
     verbose: bool,
     include_block_storage: bool,
-) -> Result<ResourcesWithImpacts> {
-    let start = Instant::now();
-
-    let inventory: AwsInventory = AwsInventory::new(aws_region).await;
-    let cloud_resources: Vec<CloudResource> = inventory
+) -> Result<EstimatedInventory> {
+    let aws_provider: AwsCloudProvider = AwsCloudProvider::new(aws_region).await;
+    let inventory: Inventory = aws_provider
         .list_resources(tags, include_block_storage)
         .await
         .context("Cannot perform resources inventory")?;
 
-    let inventory_duration = start.elapsed();
-
-    let impact_start = Instant::now();
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
-    let vec = api
-        .get_impacts(cloud_resources, hours_use_time, verbose)
+    let estimated_inventory = api
+        .get_impacts(inventory, use_duration_hours, verbose)
         .await
         .context("Failure while retrieving impacts")?;
-    let impact_duration = impact_start.elapsed();
 
-    let total_duration = start.elapsed();
-
-    let stats = ExecutionStatistics {
-        inventory_duration,
-        impact_duration,
-        total_duration,
-    };
-
-    info!("{}", stats);
-
-    let res: ResourcesWithImpacts = ResourcesWithImpacts {
-        impacts: vec,
-        execution_statistics: stats,
-    };
-
-    Ok(res)
+    Ok(estimated_inventory)
 }
 
 /// Returns default impacts as json string
-pub async fn get_default_impacts_as_json_string(
-    hours_use_time: &f32,
+pub async fn get_impacts_as_json_string(
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
     verbose: bool,
     include_block_storage: bool,
 ) -> Result<String> {
-    let instances_with_impacts = standard_scan(
-        hours_use_time,
+    let inventory_with_impacts = estimate_impacts(
+        use_duration_hours,
         tags,
         aws_region,
         api_url,
@@ -97,19 +74,19 @@ pub async fn get_default_impacts_as_json_string(
     .await
     .context("Cannot perform standard scan")?;
 
-    Ok(serde_json::to_string(&instances_with_impacts)?)
+    Ok(serde_json::to_string(&inventory_with_impacts)?)
 }
 
 /// Returns  impacts as metrics
-pub async fn get_default_impacts_as_metrics(
-    hours_use_time: &f32,
+pub async fn get_impacts_as_metrics(
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
     include_storage: bool,
 ) -> Result<String> {
-    let instances_with_impacts = standard_scan(
-        hours_use_time,
+    let resources_with_impacts = estimate_impacts(
+        use_duration_hours,
         tags,
         aws_region,
         api_url,
@@ -123,33 +100,32 @@ pub async fn get_default_impacts_as_metrics(
     let summary: ImpactsSummary = ImpactsSummary::new(
         String::from(aws_region),
         usage_location.iso_country_code,
-        instances_with_impacts.impacts.clone(),
-        (*hours_use_time).into(),
+        resources_with_impacts.clone(),
+        (*use_duration_hours).into(),
     );
     debug!("Summary: {:#?}", summary);
 
-    let all_metrics =
-        get_all_metrics(&summary, instances_with_impacts.impacts).with_context(|| {
-            format!(
-                "Unable to get resource impacts as metrics for region {}",
-                aws_region
-            )
-        })?;
+    let all_metrics = get_all_metrics(&summary, resources_with_impacts).with_context(|| {
+        format!(
+            "Unable to get resource impacts as metrics for region {}",
+            aws_region
+        )
+    })?;
 
     Ok(all_metrics)
 }
 
 /// Prints  impacts to standard output in json format
 pub async fn print_default_impacts_as_json(
-    hours_use_time: &f32,
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
     verbose: bool,
     include_storage: bool,
 ) -> Result<()> {
-    let j = get_default_impacts_as_json_string(
-        hours_use_time,
+    let j = get_impacts_as_json_string(
+        use_duration_hours,
         tags,
         aws_region,
         api_url,
@@ -163,14 +139,14 @@ pub async fn print_default_impacts_as_json(
 
 /// Prints impacts to standard output as metrics in prometheus format
 pub async fn print_default_impacts_as_metrics(
-    hours_use_time: &f32,
+    use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
     api_url: &str,
     include_block_storage: bool,
 ) -> Result<()> {
-    let metrics = get_default_impacts_as_metrics(
-        hours_use_time,
+    let metrics = get_impacts_as_metrics(
+        use_duration_hours,
         tags,
         aws_region,
         api_url,
@@ -187,18 +163,18 @@ pub async fn get_inventory_as_json(
     include_block_storage: bool,
 ) -> Result<String> {
     let start = Instant::now();
-    let inventory: AwsInventory = AwsInventory::new(aws_region).await;
-    let cloud_resources: Vec<CloudResource> = inventory
+    let aws_inventory: AwsCloudProvider = AwsCloudProvider::new(aws_region).await;
+    let inventory: Inventory = aws_inventory
         .list_resources(tags, include_block_storage)
         .await
         .context("Cannot perform inventory.")?;
     let stats = ExecutionStatistics {
         inventory_duration: start.elapsed(),
-        impact_duration: Duration::from_millis(0),
+        impact_estimation_duration: Duration::from_millis(0),
         total_duration: start.elapsed(),
     };
     warn!("{:?}", stats);
-    serde_json::to_string(&cloud_resources).context("Cannot format inventory as json")
+    serde_json::to_string(&inventory.resources).context("Cannot format inventory as json")
 }
 
 pub async fn get_inventory(
@@ -206,23 +182,11 @@ pub async fn get_inventory(
     aws_region: &str,
     include_block_storage: bool,
 ) -> Result<Inventory> {
-    let start = Instant::now();
-    let aws_inventory: AwsInventory = AwsInventory::new(aws_region).await;
-    let cloud_resources: Vec<CloudResource> = aws_inventory
+    let aws_inventory: AwsCloudProvider = AwsCloudProvider::new(aws_region).await;
+    let inventory: Inventory = aws_inventory
         .list_resources(tags, include_block_storage)
         .await
         .context("Cannot perform inventory.")?;
-    let stats = ExecutionStatistics {
-        inventory_duration: start.elapsed(),
-        impact_duration: Duration::from_millis(0),
-        total_duration: start.elapsed(),
-    };
-    warn!("{:?}", stats);
-
-    let inventory = Inventory {
-        resources: cloud_resources,
-        execution_statistics: stats,
-    };
     Ok(inventory)
 }
 
@@ -261,12 +225,17 @@ async fn summary_has_to_contain_a_usage_duration() {
 
     let resources: Vec<CloudResourceWithImpacts> = Vec::new();
 
+    let resources_with_impacts: EstimatedInventory = EstimatedInventory {
+        impacting_resources: resources,
+        execution_statistics: None,
+    };
+
     let usage_duration_hours = 1.5;
 
     let summary: ImpactsSummary = ImpactsSummary::new(
         String::from("eu-west-1"),
         String::from("IRL"),
-        resources,
+        resources_with_impacts,
         usage_duration_hours,
     );
 

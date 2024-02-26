@@ -2,7 +2,6 @@
 use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
-use crate::cloud_resource::{InstanceState, ResourceDetails};
 use crate::impact_provider::CloudResourceWithImpacts;
 use prometheus_client::encoding::text::encode;
 use prometheus_client::encoding::{EncodeLabelSet, EncodeLabelValue};
@@ -10,6 +9,7 @@ use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
 
+use crate::model::{EstimatedInventory, InstanceState, ResourceDetails};
 use crate::ImpactsSummary;
 
 // Define a type representing a metric label set, i.e. a key value pair.
@@ -127,7 +127,7 @@ pub fn register_resource_metrics(
     // Fill up metrics values
     for resource in resources_with_impacts.iter() {
         let resource_labels = build_resource_labels(resource);
-        let impacts = resource.resource_impacts.as_ref().unwrap();
+        let impacts = resource.impacts_values.as_ref().unwrap();
 
         boavizta_resource_duration_of_use_hours
             .get_or_create(&resource_labels)
@@ -177,11 +177,11 @@ pub fn get_summary_metrics(summary: &ImpactsSummary) -> Result<String> {
 
 pub fn get_all_metrics(
     summary: &ImpactsSummary,
-    resources_with_impacts: Vec<CloudResourceWithImpacts>,
+    resources_with_impacts: EstimatedInventory,
 ) -> Result<String> {
     let mut registry = <Registry>::default();
     register_summary_metrics(&mut registry, summary);
-    register_resource_metrics(&mut registry, resources_with_impacts);
+    register_resource_metrics(&mut registry, resources_with_impacts.impacting_resources);
 
     let mut buffer = String::new();
     encode(&mut buffer, &registry).context("Fails to encode impacts into metrics")?;
@@ -328,8 +328,8 @@ fn register_summary_metrics(registry: &mut Registry, summary: &ImpactsSummary) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cloud_resource::{CloudProvider, CloudResource, CloudResourceTag, InstanceUsage};
-    use crate::impact_provider::ResourceImpacts;
+    use crate::impact_provider::ImpactsValues;
+    use crate::model::{CloudProvider, CloudResource, CloudResourceTag, InstanceUsage};
     use crate::usage_location::UsageLocation;
 
     #[tokio::test]
@@ -413,7 +413,7 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 
         let cloud_resource_with_impacts = CloudResourceWithImpacts {
             cloud_resource,
-            resource_impacts: Some(ResourceImpacts {
+            impacts_values: Some(ImpactsValues {
                 adp_manufacture_kgsbeq: 0.1,
                 adp_use_kgsbeq: 0.2,
                 pe_manufacture_megajoules: 0.3,
@@ -427,6 +427,11 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 
         let mut crivec: Vec<CloudResourceWithImpacts> = Vec::new();
         crivec.push(cloud_resource_with_impacts);
+
+        let resources_with_impacts: EstimatedInventory = EstimatedInventory {
+            impacting_resources: crivec,
+            execution_statistics: None,
+        };
 
         let summary: ImpactsSummary = ImpactsSummary {
             number_of_resources_total: 1,
@@ -443,7 +448,7 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
             country: "IRL".to_string(),
         };
 
-        let metrics = get_all_metrics(&summary, crivec).unwrap();
+        let metrics = get_all_metrics(&summary, resources_with_impacts).unwrap();
 
         println!("{}", metrics);
 

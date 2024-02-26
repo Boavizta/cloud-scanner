@@ -13,7 +13,8 @@ Cloud scanner _only_ estimates the impacts of your AWS EC2  instances, and optio
 
 Several significant aspects of the global impacts of cloud usage are **excluded**:
 
-- only estimate impacts of _compute_ instances (EC2 Virtual Machines).
+- only estimate impacts of _compute_ instances (EC2 Virtual Machines) and optionally block storage.
+- do not account PUE.
 - do not account for the surrounding cloud infrastructure (network, control plan).
 - for **storage** (experimental feature), **only** the impacts of **manufacture** are counted. The impacts of the _use_ phase are _not_ counted. Boavizta API returns only the impacts of the _manufacturing_ phase for HDD and SSD. Furthermore the impacts of storage _are likely overestimated_. They are calculated by taking into account the size of the logical volume. In reality, a volume that is not full may not claim the full space on a physical device, which would result in smaller impacts.
 - do not take into account the _over-commit_ (mutualization) or _over-provisioning_(redundancy) that cloud provider may apply to provide the service.
