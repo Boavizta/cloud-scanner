@@ -1,11 +1,16 @@
+//! The location where cloud resources are running.
+
 use isocountry::CountryCode;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-/// TODO! the usage location should be part of the cloud_provider model (region names are tied to a specific cloud provider)
 
+///  The location where cloud resources are running.
+///
+/// TODO! the usage location should be abstracted and vendor specific implementation should be part of the cloud_provider model (region names are tied to a specific cloud provider)
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct UsageLocation {
+    /// The AWS region (like eu-west-1)
     pub aws_region: String,
     /// The 3-letters ISO country code corresponding to the country of the aws_region
     pub iso_country_code: String,
@@ -20,7 +25,9 @@ impl From<&str> for UsageLocation {
     }
 }
 
-/// Converts aws region into country code, returns FRA if not found
+/// Converts AWS region as String into an ISO country code, returns FRA if not found
+///
+/// TODO! : do not convert to FRA by default, should rather fail explicitly if region is not found.
 fn get_country_from_aws_region(aws_region: &str) -> CountryCode {
     let cc: CountryCode = match aws_region {
         "eu-central-1" => CountryCode::DEU,

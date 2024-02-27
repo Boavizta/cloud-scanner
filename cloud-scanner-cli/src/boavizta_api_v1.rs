@@ -1,7 +1,6 @@
-//!  Provide access to Boavizta API cloud impacts functions
+//!  A service to retrieve cloud resource impacts from Boavizta API.
 use crate::impact_provider::{CloudResourceWithImpacts, ImpactProvider, ImpactsValues};
 use anyhow::Result;
-/// Get impacts of cloud resources through Boavizta API
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::component_api;
 use boavizta_api_sdk::apis::configuration;
@@ -17,6 +16,7 @@ pub struct BoaviztaApiV1 {
     configuration: boavizta_api_sdk::apis::configuration::Configuration,
 }
 
+/// Create a new instance of service to access Boavizta API by passing API URL.
 impl BoaviztaApiV1 {
     pub fn new(api_url: &str) -> Self {
         let mut configuration = configuration::Configuration::new();
@@ -24,9 +24,7 @@ impl BoaviztaApiV1 {
         BoaviztaApiV1 { configuration }
     }
 
-    // Returns the raw impacts (json) of an instance from Boavizta API
-    ///
-    /// The manufacture impacts returned represent the entire lifecycle of instance (i.e. it is using the 'Allocation' TOTAL )
+    // Returns the raw impacts (json) of an instance from Boavizta API for the duration of use (hours)
     async fn get_raws_impacts(
         &self,
         cr: CloudResource,

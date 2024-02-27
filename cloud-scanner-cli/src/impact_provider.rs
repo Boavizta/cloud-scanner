@@ -1,10 +1,4 @@
-//! A module to allow retrieving impacts of cloud resources
-//!  It defines an Impact provider  trait that you should use when implementing vendor specific inventory .
-///
-/// The model of impacts goes here (scan result summary ?)
-///
-/// The model of allocation should be internal to boa API
-///
+//! A module to abstract the service used to retrieve impacts of cloud resources.
 use crate::model::{CloudResource, EstimatedInventory, Inventory};
 use anyhow::Result;
 use async_trait::async_trait;
@@ -12,13 +6,11 @@ use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-/// A ImpactProvider trait that yu should implement for a specific impact API
-///
-/// Implementing this trait when creating a new ImpactProvider (for example to support a different version of Boavizta db) ensures that cloud-scanner will be able to use it.
+/// A ImpactProvider trait to implement for a specific impact API/Referential.
 #[async_trait]
 pub trait ImpactProvider {
     /// Returns a list of CloudImpacts.
-    /// The usage_duration_hours parameters allow to retrieve the impacts for a given duration (i.e. project impacts for a specific duration).
+    /// usage_duration_hours allow to retrieve the impacts for a given duration (i.e. project impacts for a specific duration).
     async fn get_impacts(
         &self,
         inventory: Inventory,

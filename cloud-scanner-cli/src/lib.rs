@@ -1,6 +1,8 @@
 //!  # cloud_scanner_cli
 //!
-//!  A command line application that performs inventory of your cloud account and combines it with Boavizta API  to return an estimation of its environmental impact.
+//!  A module that returns an estimation of environmental impact of the resources used in a cloud account.
+//!
+//! It performs inventory of resources of the account and combines it with Boavizta API to return impact data.
 //!
 
 use crate::model::{EstimatedInventory, ExecutionStatistics};
@@ -157,6 +159,7 @@ pub async fn print_default_impacts_as_metrics(
     Ok(())
 }
 
+/// Returns the inventory of cloud resources a as json String
 pub async fn get_inventory_as_json(
     tags: &[String],
     aws_region: &str,
@@ -177,6 +180,7 @@ pub async fn get_inventory_as_json(
     serde_json::to_string(&inventory.resources).context("Cannot format inventory as json")
 }
 
+/// Returns the inventory of cloud resources
 pub async fn get_inventory(
     tags: &[String],
     aws_region: &str,

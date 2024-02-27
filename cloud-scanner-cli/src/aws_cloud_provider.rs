@@ -1,6 +1,4 @@
 //! A module to perform inventory of  AWS cloud resources.
-//!
-//!  ⚠ Only ec2 instances are supported  today.
 use std::time::Instant;
 
 use crate::cloud_provider::Inventoriable;
@@ -23,7 +21,7 @@ use crate::model::{
 use async_trait::async_trait;
 use aws_types::SdkConfig;
 
-///  An inventory of AWS resources
+///  An service to perform inventory of AWS resources.
 #[derive(Clone, Debug)]
 pub struct AwsCloudProvider {
     aws_region: String,
@@ -32,7 +30,8 @@ pub struct AwsCloudProvider {
 }
 
 impl AwsCloudProvider {
-    /// Creates an AWS inventory.
+    /// Creates a service to perform inventory of AWS resources.
+    ///
     /// Initializes it with a specific region and configures the SDK's that will query your account to perform the inventory of resources.
     pub async fn new(aws_region: &str) -> Self {
         let shared_config = Self::load_aws_config(aws_region).await;
@@ -48,6 +47,7 @@ impl AwsCloudProvider {
     ///
     /// - If region is empty, uses a default region.
     /// - ⚠  If the region is invalid, it does **not** return error.
+    // TODO! Better return an error if the region is invalid or empty
     async fn load_aws_config(aws_region: &str) -> SdkConfig {
         if aws_region.is_empty() {
             // Use default region (from env)
@@ -138,7 +138,7 @@ impl AwsCloudProvider {
             } else {
                 debug!("Filtered instance (tags do not match: {:?}", inst);
             }
-            //if cs matches the tags passed in param keep it (push it, otherwise skipp it)
+            //if cs matches the tags passed in param keep it (push it, otherwise skip it)
         }
 
         Ok(inventory)
@@ -326,7 +326,7 @@ impl AwsCloudProvider {
 
 #[async_trait]
 impl Inventoriable for AwsCloudProvider {
-    /// list resources
+    /// List resources whose tags match passed tags
     async fn list_resources(
         &self,
         tags: &[String],

@@ -1,4 +1,4 @@
-//! A standalone  HTTP endpoint
+//! An HTTP endpoint that exposes the results of cloud-scanner like inventory, impacts or metricc.
 
 use crate::model::{EstimatedInventory, Inventory};
 use rocket::State;

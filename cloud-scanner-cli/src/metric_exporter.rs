@@ -1,4 +1,4 @@
-//!  Formatting impacts into Prometheus metrics
+//!  A module to format the results of cloud-scanner into OpenMetrics (Prometheus format) metrics
 use anyhow::{Context, Result};
 use std::sync::atomic::AtomicU64;
 
@@ -165,7 +165,7 @@ pub fn get_resources_metrics(
     Ok(metrics)
 }
 
-/// Return the ImpactsSummary as metrics in the prometheus format
+/// Return an ImpactsSummary as metrics in the prometheus format
 pub fn get_summary_metrics(summary: &ImpactsSummary) -> Result<String> {
     let mut registry = <Registry>::default();
     register_summary_metrics(&mut registry, summary);
