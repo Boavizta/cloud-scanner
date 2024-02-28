@@ -98,7 +98,7 @@ pub async fn get_impacts_as_metrics(
     .await
     .context("Cannot perform standard scan")?;
 
-    let usage_location = UsageLocation::from(aws_region);
+    let usage_location: UsageLocation = UsageLocation::try_from(aws_region)?;
     let summary: ImpactsSummary = ImpactsSummary::new(
         String::from(aws_region),
         usage_location.iso_country_code,

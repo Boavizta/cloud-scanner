@@ -336,7 +336,7 @@ mod tests {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
@@ -365,7 +365,7 @@ mod tests {
             provider: CloudProvider::AWS,
             id: "disk-1".to_string(),
 
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::BlockStorage {
                 storage_type: "st1".to_string(),
                 usage: Some(StorageUsage {
@@ -393,7 +393,7 @@ mod tests {
         let ssd: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "disk-1".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::BlockStorage {
                 storage_type: "gp2".to_string(),
                 usage: Some(StorageUsage {
@@ -421,7 +421,7 @@ mod tests {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
@@ -436,7 +436,7 @@ mod tests {
         let instance1_1percent = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-2".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
@@ -473,7 +473,7 @@ mod tests {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
@@ -488,7 +488,7 @@ mod tests {
         let instance2: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-2".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
@@ -503,7 +503,7 @@ mod tests {
         let instance3: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-3".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "type-not-in-boa".to_string(),
                 usage: Some(InstanceUsage {
@@ -549,7 +549,7 @@ mod tests {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
@@ -568,7 +568,7 @@ mod tests {
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
         assert!(
             cloud_resource_with_impacts.impacts_values.is_some(),
-            "Emtpy impacts"
+            "Empty impacts"
         );
 
         assert_eq!(
@@ -596,7 +596,7 @@ mod tests {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {

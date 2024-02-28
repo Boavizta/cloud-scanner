@@ -187,7 +187,7 @@ mod tests {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-1"),
+            location: UsageLocation::try_from("eu-west-1").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "t2.fictive".to_string(),
                 usage: None,
@@ -238,7 +238,7 @@ mod tests {
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-1"),
+            location: UsageLocation::try_from("eu-west-1").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "t2.fictive".to_string(),
                 usage: None,

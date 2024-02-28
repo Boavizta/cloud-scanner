@@ -34,6 +34,13 @@ impl AwsCloudProvider {
     ///
     /// Initializes it with a specific region and configures the SDK's that will query your account to perform the inventory of resources.
     pub async fn new(aws_region: &str) -> Self {
+        // Create a temporary usage location object as a way to ensure that the region is supported
+        let tmp_reg = UsageLocation::try_from(aws_region);
+        if tmp_reg.is_err() {
+            error!("Cannot initialize AWS client for region ({}).", aws_region);
+            panic!();
+        }
+
         let shared_config = Self::load_aws_config(aws_region).await;
 
         AwsCloudProvider {
@@ -92,7 +99,7 @@ impl AwsCloudProvider {
             .await
             .context("Cannot list instances")
             .unwrap();
-        let location = UsageLocation::from(self.aws_region.as_str());
+        let location = UsageLocation::try_from(self.aws_region.as_str())?;
 
         // Just to display statistics
         let cpu_info_timer = Instant::now();
@@ -280,7 +287,7 @@ impl AwsCloudProvider {
 
     /// Perform inventory of all aws volumes of the region
     async fn get_volumes_with_usage_data(&self, tags: &[String]) -> Result<Vec<CloudResource>> {
-        let location = UsageLocation::from(self.aws_region.as_str());
+        let location = UsageLocation::try_from(self.aws_region.as_str())?;
         let volumes = self.clone().list_volumes(tags).await.unwrap();
         let mut resources: Vec<CloudResource> = Vec::new();
 
