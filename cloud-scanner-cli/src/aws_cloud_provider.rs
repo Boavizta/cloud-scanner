@@ -5,7 +5,6 @@ use crate::cloud_provider::Inventoriable;
 use crate::usage_location::*;
 
 use anyhow::{Context, Result};
-use aws_config::meta::region::RegionProviderChain;
 use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
@@ -34,17 +33,11 @@ impl AwsCloudProvider {
     ///
     /// Initializes it with a specific region and configures the SDK's that will query your account to perform the inventory of resources.
     pub async fn new(aws_region: &str) -> Self {
-        // Create a temporary usage location object as a way to ensure that the region is supported
-        let tmp_reg = UsageLocation::try_from(aws_region);
-        if tmp_reg.is_err() {
-            error!("Cannot initialize AWS client for region ({}).", aws_region);
-            panic!();
-        }
-
         let shared_config = Self::load_aws_config(aws_region).await;
+        let retained_region = Self::get_configured_region_or_exit_if_unsupported(&shared_config);
 
         AwsCloudProvider {
-            aws_region: String::from(aws_region),
+            aws_region: retained_region,
             ec2_client: aws_sdk_ec2::Client::new(&shared_config),
             cloudwatch_client: aws_sdk_cloudwatch::Client::new(&shared_config),
         }
@@ -52,29 +45,45 @@ impl AwsCloudProvider {
 
     /// Initialize a AWS SDK config with default credentials from the environment and  a region passed as argument.
     ///
-    /// - If region is empty, uses a default region.
+    /// - If region is empty, uses the default region from environment.
     /// - ⚠  If the region is invalid, it does **not** return error.
-    // TODO! Better return an error if the region is invalid or empty
     async fn load_aws_config(aws_region: &str) -> SdkConfig {
         if aws_region.is_empty() {
-            // Use default region (from env)
+            // Use default region (from environment, if any)
             let sdk_config = aws_config::load_from_env().await;
             warn!(
-                "Cannot initialize from empty region, falling back to using default region from environment [{}]",
+                "Cannot initialize AWS client from an empty region, falling back to using default region from environment [{}]",
                 sdk_config.region().unwrap()
             );
+
             sdk_config
         } else {
-            // region provider that first checks the passed region,
-            // then checks the default provider chain, then falls back to eu-west-3
-            let region_provider =
-                RegionProviderChain::first_try(Region::new(aws_region.to_string()))
-                    .or_default_provider()
-                    .or_else(Region::new("eu-west-3"));
-
-            let sdk_config = aws_config::from_env().region(region_provider).load().await;
-            info!("Initialized SDK with with region [{}]", aws_region);
+            // Use the region passed in argument
+            let sdk_config = aws_config::from_env()
+                .region(Region::new(aws_region.to_string()))
+                .load()
+                .await;
+            info!("Initialized AWS client with with region [{}]", aws_region);
             sdk_config
+        }
+    }
+
+    /// Util function that panics with error message if the region cannot be set or is not supported by cloud-scanner
+    fn get_configured_region_or_exit_if_unsupported(sdk_config: &SdkConfig) -> String {
+        if let Some(retained_region) = sdk_config.region() {
+            // retained_region.
+            let tmp_reg = UsageLocation::try_from(retained_region.as_ref());
+            if tmp_reg.is_err() {
+                error!(
+                    "Cannot initialize AWS client for region ({}). Exiting.",
+                    retained_region
+                );
+                panic!();
+            }
+            retained_region.to_string().to_owned()
+        } else {
+            error!("Unable to configure AWS client region. You should consider setting a AWS_DEFAULT_REGION as environment variable or pass region as a CLI parameter.... Exiting...");
+            panic!();
         }
     }
 

@@ -15,6 +15,7 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 - [Refactor code to make it more readable · Issue #209 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/209)
 - /!\ **Breaking change**: Cli and Serverless parameters `--hours-use-time` were renamed into `--use-duration-hours`. Short form remain `-u`.
 - [Improve error message when a region is incorrect · Issue #439 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/439)
+- Support all AWS regions [Improve region support · Issue #48 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/48)
 
 ## [2.0.3]-2024-01-17
 
