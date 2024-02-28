@@ -399,7 +399,7 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
         let cloud_resource: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
             id: "inst-1".to_string(),
-            location: UsageLocation::from("eu-west-3"),
+            location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {

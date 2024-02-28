@@ -3,7 +3,7 @@
 
 # About cloud-scanner
 
-[Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances (EC2) usage.
+[Boavizta Cloud-scanner](https://github.com/Boavizta/cloud-scanner) returns environmental impacts of your AWS Instances (EC2) and Storage usage.
 
 ```mermaid
   graph LR;
@@ -42,8 +42,10 @@ This inventory is used to query Boavizta API which returns impact data.
 
 Results are exposed as JSON or metrics.
 
-## ⚠ Alpha version
+## Contributing
 
 Cloud scanner is stable, but with limited functionality.
 
-This is work in progress, and development versions (`dev` branch of the repository) may already implement new functionalities. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues) on this repository.
+Development versions may already provide new functionalities that have not yet be included to a release. So have a look at the [changelog](https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md) and [Issues](https://github.com/Boavizta/cloud-scanner/issues) on this repository.
+
+And most importantly, do not hesitate to ask questions or share your feedback by opening an [Issue](https://github.com/Boavizta/cloud-scanner/issues) or [discussion](https://github.com/Boavizta/cloud-scanner/discussions) on GitHub.

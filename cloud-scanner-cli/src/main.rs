@@ -65,11 +65,7 @@ fn set_region(optional_region: Option<String>) -> String {
             info!("Using region: {}", region_arg);
             region_arg
         }
-        None => {
-            let default_region = "eu-west-1".to_string();
-            warn!("Using default region: {}", default_region);
-            default_region
-        }
+        None => "".to_owned(),
     }
 }
 
