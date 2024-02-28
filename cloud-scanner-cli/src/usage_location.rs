@@ -56,7 +56,6 @@ fn get_country_from_aws_region(aws_region: &str) -> Result<CountryCode, RegionEr
         "cn-northwest-1" => CountryCode::CHN,
         "eu-central-1" => CountryCode::DEU,
         "eu-central-2" => CountryCode::CHE,
-        "eu-east-1" => CountryCode::IRL,
         "eu-north-1" => CountryCode::SWE,
         "eu-south-1" => CountryCode::ITA,
         "eu-south-2" => CountryCode::ESP,
