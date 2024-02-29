@@ -26,7 +26,7 @@ default-features = false
 features = ["apigw_rest", "alb"]
 
 [dependencies.lambda_runtime]
-version = "0.8.1"
+version = "0.10.0"
 
 [dependencies.serde]
 features = ["derive"]
