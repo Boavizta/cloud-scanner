@@ -79,7 +79,7 @@ See  [OpenAPI specification in server mode](./openapi-server-mode.md)
 As CLI application, If using `--as-metrics` or `-m`  option or the `serve` command, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json details.
 This is also the default format of the serverless app `metrics` route.
 
-doWhen using the metric output format, you get 2 sets of metrics
+When using the metric output format, you get 2 sets of metrics
 
 - Metrics named: _boavizta_xxxxx_ are _summary_ metrics (total number of resources, summed impacts, a.s.o)
 - Metrics named _boavizta_resource_yyy_ are specific to individual resources. The metric label can be filtered to identify resource.

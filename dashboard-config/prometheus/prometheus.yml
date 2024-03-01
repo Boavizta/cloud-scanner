@@ -1,6 +1,6 @@
 global:
-  scrape_interval:     30s # By default, scrape targets every 15 seconds.
-  evaluation_interval: 30s # Evaluate rules every 15 seconds.
+  scrape_interval:     30s # By default, scrape targets every 30 seconds.
+  evaluation_interval: 30s # Evaluate rules every 30 seconds.
 
   # Attach these extra labels to all timeseries collected by this Prometheus instance.
   external_labels:
@@ -43,6 +43,30 @@ scrape_configs:
     params:
       aws_region: ['eu-central-1']
       include_block_storage: ['true']
+
+  - job_name: 'cloud-scanner-metrics-us-east-1'
+    scheme: http
+    static_configs:
+      - targets: ['cloud_scanner_boa:8000']
+        labels:
+          group: 'production'
+    metrics_path: '/metrics'
+    params:
+      aws_region: ['us-east-1']
+      include_block_storage: ['true']
+  
+  # Example of adding an additional scrape job to support us-east-2 region
+  #    
+  # - job_name: 'cloud-scanner-metrics-us-east-2'
+  #   scheme: http
+  #   static_configs:
+  #     - targets: ['cloud_scanner_boa:8000']
+  #       labels:
+  #         group: 'production'
+  #   metrics_path: '/metrics'
+  #   params:
+  #     aws_region: ['us-east-2']
+  #     include_block_storage: ['true']
 
 # Optional: push metics to a rem0ote prometheus instance (SAAS prometheus / grafana)
 # You get username and password from your prometheus SAAS dashboard.

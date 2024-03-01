@@ -4,7 +4,7 @@ Visualize the live impacts of you account in a dashboard.
 
 No installation needed, you will run a public docker image of cloud-scanner CLI, Boavizta API, Prometheus and Grafana to get access to a demo dashboard..
 
-All data remain will  local to your environment (this docker-compose stack uses a _private instance_ of Boavizta API).
+All data remain  local to your environment (this docker-compose stack uses a _private instance_ of Boavizta API).
 
 ## Pre-requisites
 
@@ -27,6 +27,14 @@ docker-compose up
 - Select the dashboard in the left menu.
 
 ![Demo dashboard exposing cloud scanner metrics](../images/CS-dashboard.png "A example dashboard rendering cloud scanner metrics")
+
+⚠ The demo docker-compose is preconfigured to generate metrics only for the following regions:
+- eu-west-1
+- eu-west-3
+- eu-central-1
+- us-east-1 
+
+Refer to  [Generating metrics for additional regions](../how-to/set-up-dashboard.md#generating-metrics-for-additional-regions) to retrieve metrics for additional regions.
 
 ## Additional info
 

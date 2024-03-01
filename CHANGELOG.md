@@ -9,13 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
-- [Release 2.0.3 uses dev Boavizta API URL instead of stable · Issue #425 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/425)
+## [2.0.4]-2024-03-01
+
+### Added
+
 - Add a Prometheus data volume in the docker-compose example [Document how to persist prometheus data when the container is recreated · Issue #434 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/434)
-- [Improve doc about passing AWS credentials · Issue #77 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/77)
-- [Refactor code to make it more readable · Issue #209 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/209)
-- /!\ **Breaking change**: Cli and Serverless parameters `--hours-use-time` were renamed into `--use-duration-hours`. Short form remain `-u`.
-- [Improve error message when a region is incorrect · Issue #439 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/439)
 - Support all AWS regions [Improve region support · Issue #48 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/48)
+
+### Breaking change
+
+- Cli and Serverless parameters `--hours-use-time` were renamed into `--use-duration-hours`. Short form remain `-u`.
+
+### Changed
+
+
+- [Refactor code to make it more readable · Issue #209 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/209)
+- [Improve error message when a region is incorrect · Issue #439 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/439)
+- [Release 2.0.3 uses dev Boavizta API URL instead of stable · Issue #425 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/425)
+- [Improve doc about passing AWS credentials · Issue #77 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/77)
+
+### New contributors 
+
+- Thanks to @jnioche for his contribution to testing and documenting issues related to regions !
 
 ## [2.0.3]-2024-01-17
 
