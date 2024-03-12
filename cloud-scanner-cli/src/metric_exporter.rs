@@ -124,6 +124,20 @@ pub fn register_resource_metrics(
         boavizta_resource_gwp_use_kgco2eq.clone(),
     );
 
+    let boavizta_resource_cpu_load = Family::<ResourceLabels, Gauge<f64, AtomicU64>>::default();
+    registry.register(
+        "boavizta_resource_cpu_load",
+        "CPU load of instance",
+        boavizta_resource_cpu_load.clone(),
+    );
+
+    let boavizta_storage_size_gb = Family::<ResourceLabels, Gauge>::default();
+    registry.register(
+        "boavizta_storage_size_gb",
+        "Storage size in GB",
+        boavizta_storage_size_gb.clone(),
+    );
+
     // Fill up metrics values
     for resource in resources_with_impacts.iter() {
         let resource_labels = build_resource_labels(resource);
@@ -150,6 +164,26 @@ pub fn register_resource_metrics(
         boavizta_resource_gwp_embodied_kgco2eq
             .get_or_create(&resource_labels)
             .set(impacts.gwp_manufacture_kgco2eq);
+
+        match &resource.cloud_resource.resource_details {
+            ResourceDetails::Instance { usage, .. } => {
+                if let Some(instance_usage) = usage {
+                    let cpu_load = instance_usage.average_cpu_load;
+                    boavizta_resource_cpu_load
+                        .get_or_create(&resource_labels)
+                        .set(cpu_load);
+                }
+            }
+            ResourceDetails::BlockStorage { usage, .. } => {
+                if let Some(storage_usage) = usage {
+                    let size_gb = storage_usage.size_gb;
+                    boavizta_storage_size_gb
+                        .get_or_create(&resource_labels)
+                        .set(size_gb as i64);
+                }
+            }
+            _ => {}
+        }
     }
 }
 ///
