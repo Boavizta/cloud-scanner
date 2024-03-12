@@ -1,6 +1,6 @@
-//! A standalone  HTTP endpoint
+//! An HTTP endpoint that exposes the results of cloud-scanner like inventory, impacts or metricc.
 
-use crate::model::{Inventory, ResourcesWithImpacts};
+use crate::model::{EstimatedInventory, Inventory};
 use rocket::State;
 use rocket::{get, serde::json::Json};
 use rocket_okapi::{openapi, openapi_get_routes, swagger_ui::*};
@@ -38,9 +38,9 @@ fn index(config: &State<Config>) -> String {
 
 /// # Returns Prometheus metrics.
 ///
-/// Region is mandatory, filter_tags can be an empty string ("").
+/// Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value
 ///
-///  Results are estimated for one hour of use by default.
+/// Results are estimated for one hour of use by default.
 ///
 /// Example query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0&include_storage=true
 #[openapi(tag = "metrics")]
@@ -48,16 +48,16 @@ fn index(config: &State<Config>) -> String {
 async fn metrics(
     config: &State<Config>,
     aws_region: &str,
-    filter_tags: Vec<String>,
+    filter_tags: Option<Vec<String>>,
     use_duration_hours: Option<f32>,
     include_block_storage: Option<bool>,
 ) -> String {
     warn!("Getting something on /metrics");
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
     warn!("Filtering on tags {:?}", filter_tags);
-    let metrics = crate::get_default_impacts_as_metrics(
+    let metrics = crate::get_impacts_as_metrics(
         &hours_use_time,
-        &filter_tags,
+        &filter_tags.unwrap_or_default(),
         aws_region,
         &config.boavizta_url,
         include_block_storage.unwrap_or(false),
@@ -68,7 +68,7 @@ async fn metrics(
 
 /// # Returns the inventory as json.
 ///
-/// Region is mandatory, filter_tags can be an empty string ("").
+/// Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value
 ///
 /// Example query: http://localhost:8000/inventorynew?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
 #[openapi(tag = "inventory")]
@@ -76,14 +76,14 @@ async fn metrics(
 async fn inventory(
     _config: &State<Config>,
     aws_region: &str,
-    filter_tags: Vec<String>,
+    filter_tags: Option<Vec<String>>,
     include_block_storage: Option<bool>,
 ) -> Json<Inventory> {
     warn!("Getting something on /inventory");
     warn!("Filtering on tags {:?}", filter_tags);
     Json(
         crate::get_inventory(
-            &filter_tags,
+            &filter_tags.unwrap_or_default(),
             aws_region,
             include_block_storage.unwrap_or(false),
         )
@@ -94,7 +94,7 @@ async fn inventory(
 
 /// # Returns the impacts (use and embedded) as json.
 ///
-/// Region is mandatory, filter_tags can be an empty string ("").
+/// Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value
 ///
 /// Example query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0
 #[openapi(tag = "impacts")]
@@ -104,11 +104,11 @@ async fn inventory(
 async fn impacts(
     _config: &State<Config>,
     aws_region: &str,
-    filter_tags: Vec<String>,
+    filter_tags: Option<Vec<String>>,
     use_duration_hours: Option<f32>,
     verbose_output: Option<bool>,
     include_block_storage: Option<bool>,
-) -> Json<ResourcesWithImpacts> {
+) -> Json<EstimatedInventory> {
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
     //let hours_use_time: f32 = 1.0;
     warn!(
@@ -116,9 +116,9 @@ async fn impacts(
         hours_use_time
     );
     warn!("Filtering on tags {:?}", filter_tags);
-    let res = crate::standard_scan(
+    let res = crate::estimate_impacts(
         &hours_use_time,
-        &filter_tags,
+        &filter_tags.unwrap_or_default(),
         aws_region,
         &_config.boavizta_url,
         verbose_output.unwrap_or(false),

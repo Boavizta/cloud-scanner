@@ -26,10 +26,6 @@ struct Arguments {
     #[arg(short, long,  action = clap::ArgAction::Count)]
     /// Enable logging and show execution duration, use multiple `v`s to increase logging level warning to debug
     verbosity: u8,
-
-    /// Returns results as OpenMetrics (Prometheus) instead of json
-    #[arg(short = 'm', long)]
-    as_metrics: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -38,7 +34,7 @@ enum SubCommand {
     Estimate {
         #[arg(short = 'u', long)]
         /// The number of hours of use for which we want to estimate the impacts
-        hours_use_time: f32,
+        use_duration_hours: f32,
 
         #[arg(long, short = 'f', action)]
         /// Retrieve and output the details from BoaviztaAPI (equivalent to the verbose flag when querying Boavizta API)
@@ -47,6 +43,10 @@ enum SubCommand {
         #[arg(long, short = 'b', action)]
         /// Experimental feature: estimate impacts of block storage
         include_block_storage: bool,
+
+        /// Returns results as OpenMetrics (Prometheus) instead of json
+        #[arg(short = 'm', long)]
+        as_metrics: bool,
     },
     /// List instances and  their average cpu load for the last 5 minutes (without returning impacts)
     Inventory {
@@ -65,11 +65,7 @@ fn set_region(optional_region: Option<String>) -> String {
             info!("Using region: {}", region_arg);
             region_arg
         }
-        None => {
-            let default_region = "eu-west-1".to_string();
-            warn!("Using default region: {}", default_region);
-            default_region
-        }
+        None => "".to_owned(),
     }
 }
 
@@ -80,7 +76,7 @@ fn set_api_url(optional_url: Option<String>) -> String {
             url_arg
         }
         None => {
-            let default_url = "https://dev.api.boavizta.org".to_string();
+            let default_url = "https://api.boavizta.org".to_string();
             warn!("Using default API at:  {}", default_url);
             default_url
         }
@@ -103,13 +99,14 @@ async fn main() -> Result<()> {
 
     match args.cmd {
         SubCommand::Estimate {
-            hours_use_time,
+            use_duration_hours,
             include_block_storage,
             output_verbose_json,
+            as_metrics,
         } => {
-            if args.as_metrics {
+            if as_metrics {
                 cloud_scanner_cli::print_default_impacts_as_metrics(
-                    &hours_use_time,
+                    &use_duration_hours,
                     &args.filter_tags,
                     &region,
                     &api_url,
@@ -118,7 +115,7 @@ async fn main() -> Result<()> {
                 .await?
             } else {
                 cloud_scanner_cli::print_default_impacts_as_json(
-                    &hours_use_time,
+                    &use_duration_hours,
                     &args.filter_tags,
                     &region,
                     &api_url,

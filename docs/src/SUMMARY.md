@@ -24,6 +24,7 @@
 
 # Reference
 
+- [💡 Common issues and FAQ](reference/common-issues-and-FAQ.md)
 - [CLI options](reference/cli-options.md)
 - [Environment variables](reference/env-vars.md)
 - [OpenAPI specification in server mode](reference/openapi-server-mode.md)

@@ -5,15 +5,77 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased (DEV branch)
+## Unreleased
 
-_This paragraph may describe WIP/unreleased features_
+_This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
+
+- Add CPU usage and Storage size metrics [Expose additional metrics (like cpu usage , disk size)](https://github.com/Boavizta/cloud-scanner/issues/406)
+
+## [2.0.4]-2024-03-01
 
 ### Added
 
+- Add a Prometheus data volume in the docker-compose example [Document how to persist prometheus data when the container is recreated · Issue #434 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/434)
+- Support all AWS regions [Improve region support · Issue #48 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/48)
+
+### Breaking change
+
+- Cli and Serverless parameters `--hours-use-time` were renamed into `--use-duration-hours`. Short form remain `-u`.
+
 ### Changed
 
-## [1.0.1]-2023-10-27
+- [Refactor code to make it more readable · Issue #209 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/209)
+- [Improve error message when a region is incorrect · Issue #439 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/439)
+- [Release 2.0.3 uses dev Boavizta API URL instead of stable · Issue #425 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/425)
+- [Improve doc about passing AWS credentials · Issue #77 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/77)
+
+### New contributors 
+
+- Thanks to @jnioche for his contribution to testing and documenting issues related to regions !
+
+## [2.0.3]-2024-01-17
+
+- [Use Boavizta API v1.2.0 · Issue #416 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/416)
+
+## [2.0.2]-2024-01-17
+
+### Added
+
+- [Revamp demo grafana dashboard to display individual resource metrics · Issue #403 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/403)
+
+### Changed
+
+- Use latest released version of Rust client for Boavizta API v1.0.1
+
+## [2.0.1]-2024-01-17
+
+### Added
+
+- [Expose resource tags in metrics labels · Issue #407 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/407)
+
+### Changed
+
+- Make _filter tags_ optional in the API routes.
+- [Update to latest aws SDK 1.x · Issue #410 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/410)
+
+## [2.0.0-alpha]-2024-01-10
+
+### Added
+
+- Return instance state (either *Running* or *Stopped*) with the inventory: [Add instance state to the inventory](https://github.com/Boavizta/cloud-scanner/issues/396).
+- Return metrics of individual resources: [Expose individual metrics (label metrics with resource id's and other metadata)](https://github.com/Boavizta/cloud-scanner/issues/379)
+
+### Changed
+
+- **Breaking change**: Renamed the count summary metrics (_instances_ become _resources_ because we now take into account additional resources like storage):
+  - `boavizta_number_of_instances_total` becomes `boavizta_number_of_resources_total`
+  - `boavizta_number_of_instances_assessed` becomes `boavizta_number_of_resources_assessed`
+- Use Boavizta API v1.1.0 in docker-compose (this adds support for additional instances): https://github.com/Boavizta/cloud-scanner/issues/386
+- Update logo in documentation: https://github.com/Boavizta/cloud-scanner/pull/381
+- Add link checker when publishing documentation: https://github.com/Boavizta/cloud-scanner/pull/382
+- Add logo in the doc website: https://github.com/Boavizta/cloud-scanner/pull/383
+
+## [1.0.1]-2023-10-28
 
 ### Added
 

@@ -2,10 +2,9 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
-version = "1.0.1"
+version = "2.0.4"
 
 [dependencies]
-aws-types = "0.56.1"
 chrono = "^0.4"
 isocountry = "^0.3"
 log = "0.4"
@@ -18,34 +17,36 @@ serde_json = "^1.0"
 anyhow = "1.0.65"
 async-trait = "0.1.58"
 assert-json-diff = "2.0.2"
-rocket = { version = "0.5.0-rc.3", default-features = false, features = [
+rocket = { version = "0.5.0", default-features = false, features = [
   "json",
 ] }
-rocket_okapi = { version = "0.8.0-rc.3", features = ["swagger", "rapidoc"] }
+rocket_okapi = { version = "0.8.0", features = ["swagger", "rapidoc"] }
+aws-types = "1"
+thiserror = "1.0.57"
 
 [dependencies.boavizta_api_sdk]
-version = "0.3.0-alpha2"
+version = "1.2.0"
 # path = "../../boaviztapi-sdk-rust"
 
 [dependencies.aws-config]
-features = ["rustls"]
-version = "0.56.1"
+features = ["behavior-version-latest", "rustls"]
+version = "1"
 
 [dependencies.aws-sdk-cloudwatch]
-features = ["rustls"]
-version = "0.33.0"
+features = ["behavior-version-latest", "rustls"]
+version = "1"
 
 [dependencies.aws-sdk-ec2]
-features = ["rustls"]
-version = "0.33.1"
+features = ["behavior-version-latest", "rustls"]
+version = "1"
 
 [dependencies.aws-smithy-types-convert]
 features = ["convert-chrono"]
-version = "0.56.1"
+version = "0.60.2"
 
 [dependencies.clap]
 features = ["derive"]
-version = "=4.4.6"
+version = "=4.5.2"
 
 [dependencies.tokio]
 features = ["full"]

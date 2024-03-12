@@ -23,7 +23,7 @@ docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
 docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest inventory
 
 # List instances and standard impacts (for 10 hours of use)
-docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --hours-use-time 10
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --use-duration-hours 10
 
 # Serve metrics
 ``` sh
