@@ -165,22 +165,25 @@ pub fn register_resource_metrics(
             .get_or_create(&resource_labels)
             .set(impacts.gwp_manufacture_kgco2eq);
 
+        // Export CPU usage metrics (for instances) and size metrics (for storage) 
         match &resource.cloud_resource.resource_details {
-            ResourceDetails::Instance { usage, .. } => {
-                if let Some(instance_usage) = usage {
-                    let cpu_load = instance_usage.average_cpu_load;
-                    boavizta_resource_cpu_load
-                        .get_or_create(&resource_labels)
-                        .set(cpu_load);
-                }
+            ResourceDetails::Instance {
+                usage: Some(instance_usage),
+                ..
+            } => {
+                let cpu_load = instance_usage.average_cpu_load;
+                boavizta_resource_cpu_load
+                    .get_or_create(&resource_labels)
+                    .set(cpu_load);
             }
-            ResourceDetails::BlockStorage { usage, .. } => {
-                if let Some(storage_usage) = usage {
-                    let size_gb = storage_usage.size_gb;
-                    boavizta_storage_size_gb
-                        .get_or_create(&resource_labels)
-                        .set(size_gb as i64);
-                }
+            ResourceDetails::BlockStorage {
+                usage: Some(storage_usage),
+                ..
+            } => {
+                let size_gb = storage_usage.size_gb;
+                boavizta_storage_size_gb
+                    .get_or_create(&resource_labels)
+                    .set(size_gb as i64);
             }
             _ => {}
         }
@@ -534,6 +537,11 @@ boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resou
 # HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_resource_gwp_use_kgco2eq gauge
 boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.6
+# HELP boavizta_resource_cpu_load CPU load of instance.
+# TYPE boavizta_resource_cpu_load gauge
+boavizta_resource_cpu_load{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 100.0
+# HELP boavizta_storage_size_gb Storage size in GB.
+# TYPE boavizta_storage_size_gb gauge
 # EOF
 "#;
 
