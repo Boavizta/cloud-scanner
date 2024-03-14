@@ -3,8 +3,8 @@
     "gwp": {
       "embedded": {
         "value": 0.0016,
-        "min": 0.0009013,
-        "max": 0.002547,
+        "min": 0.0008995,
+        "max": 0.002545,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -37,8 +37,8 @@
     "pe": {
       "embedded": {
         "value": 0.021,
-        "min": 0.01188,
-        "max": 0.03333,
+        "min": 0.01186,
+        "max": 0.03331,
         "warnings": [
           "End of life is not included in the calculation"
         ]
