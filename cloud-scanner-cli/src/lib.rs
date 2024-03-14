@@ -82,7 +82,7 @@ pub async fn get_impacts_as_json_string(
         let summary: ImpactsSummary = ImpactsSummary::new(
             String::from(aws_region),
             usage_location.iso_country_code,
-            inventory_with_impacts.clone(),
+            &inventory_with_impacts.clone(),
             (*use_duration_hours).into(),
         );
 
