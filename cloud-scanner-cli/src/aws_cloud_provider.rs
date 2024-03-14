@@ -4,13 +4,13 @@ use std::time::Instant;
 use crate::cloud_provider::Inventoriable;
 use crate::usage_location::*;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Error, Result};
 use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
 use aws_sdk_ec2::types::Volume;
 use aws_sdk_ec2::types::{Instance, InstanceStateName};
-use chrono::Duration;
+use chrono::TimeDelta;
 use chrono::Utc;
 
 use crate::model::{
@@ -234,10 +234,11 @@ impl AwsCloudProvider {
     async fn get_average_cpu_usage_of_last_10_minutes(
         self,
         instance_id: &str,
-    ) -> Result<GetMetricStatisticsOutput, aws_sdk_cloudwatch::Error> {
+    ) -> Result<GetMetricStatisticsOutput, Error> {
         // We want statistics about the last 10 minutes using  5min  sample
-        let measure_duration = Duration::minutes(10);
-        let sample_period_seconds = 300; // 5*60 (the default granularity of cloudwatch standard CPU metris)
+        let measure_duration: chrono::TimeDelta =
+            TimeDelta::try_minutes(10).context("Unsupported duration")?;
+        let sample_period_seconds = 300; // 5*60 (the default granularity of cloudwatch standard CPU metrics)
         let now: chrono::DateTime<Utc> = Utc::now();
         let start_time: chrono::DateTime<Utc> = now - measure_duration;
 
@@ -266,7 +267,8 @@ impl AwsCloudProvider {
             .statistics(Statistic::Average)
             .unit(StandardUnit::Percent)
             .send()
-            .await?;
+            .await
+            .context("Trying to get cloudwatch statistics")?;
 
         Ok(resp)
     }

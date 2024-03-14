@@ -115,7 +115,7 @@ pub async fn get_impacts_as_metrics(
     let summary: ImpactsSummary = ImpactsSummary::new(
         String::from(aws_region),
         usage_location.iso_country_code,
-        resources_with_impacts.clone(),
+        &resources_with_impacts,
         (*use_duration_hours).into(),
     );
     debug!("Summary: {:#?}", summary);
@@ -254,7 +254,7 @@ async fn summary_has_to_contain_a_usage_duration() {
     let summary: ImpactsSummary = ImpactsSummary::new(
         String::from("eu-west-1"),
         String::from("IRL"),
-        resources_with_impacts,
+        &resources_with_impacts,
         usage_duration_hours,
     );
 

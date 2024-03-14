@@ -63,10 +63,10 @@ impl ImpactsSummary {
     pub fn new(
         aws_region: String,
         country: String,
-        resources_with_impacts: EstimatedInventory,
+        resources_with_impacts: &EstimatedInventory,
         duration_of_use_hours: f64,
     ) -> Self {
-        let resources = resources_with_impacts.impacting_resources;
+        let resources = resources_with_impacts.impacting_resources.clone();
 
         let mut summary = ImpactsSummary {
             number_of_resources_total: resources.len(),

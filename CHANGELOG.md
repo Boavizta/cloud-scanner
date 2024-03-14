@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+- Add CPU usage and Storage size metrics [Expose additional metrics (like cpu usage , disk size)](https://github.com/Boavizta/cloud-scanner/issues/406)
+
 ## [2.0.4]-2024-03-01
 
 ### Added
@@ -21,7 +23,6 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 - Cli and Serverless parameters `--hours-use-time` were renamed into `--use-duration-hours`. Short form remain `-u`.
 
 ### Changed
-
 
 - [Refactor code to make it more readable · Issue #209 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/209)
 - [Improve error message when a region is incorrect · Issue #439 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/439)
