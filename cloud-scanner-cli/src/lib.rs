@@ -64,6 +64,7 @@ pub async fn get_impacts_as_json_string(
     api_url: &str,
     verbose: bool,
     include_block_storage: bool,
+    summary_only: bool,
 ) -> Result<String> {
     let inventory_with_impacts = estimate_impacts(
         use_duration_hours,
@@ -75,6 +76,18 @@ pub async fn get_impacts_as_json_string(
     )
     .await
     .context("Cannot perform standard scan")?;
+
+    if summary_only {
+        let usage_location: UsageLocation = UsageLocation::try_from(aws_region)?;
+        let summary: ImpactsSummary = ImpactsSummary::new(
+            String::from(aws_region),
+            usage_location.iso_country_code,
+            inventory_with_impacts.clone(),
+            (*use_duration_hours).into(),
+        );
+
+        return Ok(serde_json::to_string(&summary)?);
+    }
 
     Ok(serde_json::to_string(&inventory_with_impacts)?)
 }
@@ -125,6 +138,7 @@ pub async fn print_default_impacts_as_json(
     api_url: &str,
     verbose: bool,
     include_storage: bool,
+    summary_only: bool,
 ) -> Result<()> {
     let j = get_impacts_as_json_string(
         use_duration_hours,
@@ -133,6 +147,7 @@ pub async fn print_default_impacts_as_json(
         api_url,
         verbose,
         include_storage,
+        summary_only,
     )
     .await?;
     println!("{}", j);

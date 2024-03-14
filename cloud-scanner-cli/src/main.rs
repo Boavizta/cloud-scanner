@@ -47,6 +47,10 @@ enum SubCommand {
         /// Returns results as OpenMetrics (Prometheus) instead of json
         #[arg(short = 'm', long)]
         as_metrics: bool,
+
+        /// Returns only the summary of the impacts as json
+        #[arg(short = 's', long)]
+        summary_only: bool,
     },
     /// List instances and  their average cpu load for the last 5 minutes (without returning impacts)
     Inventory {
@@ -103,6 +107,7 @@ async fn main() -> Result<()> {
             include_block_storage,
             output_verbose_json,
             as_metrics,
+            summary_only,
         } => {
             if as_metrics {
                 cloud_scanner_cli::print_default_impacts_as_metrics(
@@ -121,6 +126,7 @@ async fn main() -> Result<()> {
                     &api_url,
                     output_verbose_json,
                     include_block_storage,
+                    summary_only,
                 )
                 .await?
             }
