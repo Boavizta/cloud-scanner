@@ -17,6 +17,8 @@ COPY . .
 RUN cargo build --release --target x86_64-unknown-linux-musl --bin cloud-scanner-cli
 
 FROM alpine AS runtime
+#update libcrypto3 libssl3 to fix security issues
+RUN apk update && apk add --upgrade libcrypto3 libssl3
 #RUN addgroup -S myuser && adduser -S myuser -G myuser
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/cloud-scanner-cli /usr/local/bin/
 #USER myuser
