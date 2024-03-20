@@ -32,6 +32,7 @@ services:
     volumes:
       - ./dashboard-config/provisioning:/etc/grafana/provisioning
       - ./dashboard-config/provisioning/dashboards/grafana-dashboard-cloud-impacts.template.json:/var/lib/grafana/dashboards/grafana-dashboard-cloud-impacts.template.json
+      - ./dashboard-config/provisioning/dashboards/grafana-dashboard-cloud-K8s.template.json:/var/lib/grafana/dashboards/grafana-dashboard-cloud-K8s.template.json
       - grafana-data:/var/lib/grafana
     networks:
       - network_boa
