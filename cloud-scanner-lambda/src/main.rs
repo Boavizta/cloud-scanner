@@ -74,6 +74,11 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         None => false,
     };
 
+    let summary_only: bool = match query_string_parameters.first("summary_only") {
+        Some(summary_only_string) => summary_only_string.parse().unwrap_or(false),
+        None => false,
+    };
+
     println!("Using use time of {}", use_duration_hours);
     println!("Using aws_region {}", aws_region);
     println!("Using tag filers {:?}", filter_tags);
@@ -85,6 +90,7 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         &config.boavizta_api_url,
         verbose_output,
         include_block_storage,
+        summary_only,
     )
     .await
     .unwrap();
