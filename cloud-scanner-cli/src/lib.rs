@@ -32,6 +32,7 @@ pub mod standalone_server;
 pub mod usage_location;
 
 use anyhow::{Context, Result};
+use prometheus_http_query::Client;
 
 async fn estimate_impacts(
     use_duration_hours: &f32,
@@ -130,6 +131,227 @@ pub async fn get_impacts_as_metrics(
     Ok(all_metrics)
 }
 
+/// Returns deployment impacts as metrics
+pub async fn get_deployment_impacts_as_metrics(
+    use_duration_hours: &f32,
+    tags: &[String],
+    aws_region: &str,
+    api_url: &str,
+    prometheus_input_url: &str,
+    include_storage: bool,
+    namespace_to_scan:&str,
+) -> Result<String> {
+    let resources_with_impacts = estimate_impacts(
+        use_duration_hours,
+        tags,
+        aws_region,
+        api_url,
+        false,
+        include_storage,
+    )
+    .await
+    .context("Cannot perform standard scan")?;
+
+    let client: Client = Client::try_from(prometheus_input_url).unwrap();
+
+    let mut cpu_pod_consumming_by_node =
+        "sum by (node, pod)
+        (kube_pod_container_resource_requests{resource=\"cpu\",node=~\".*\",namespace=~\"".to_owned();
+
+    if namespace_to_scan.is_empty() {
+        warn!("Warning: namespace_to_scan is empty.");
+        cpu_pod_consumming_by_node.push_str(".*\"})");
+    } else {
+        cpu_pod_consumming_by_node.push_str(namespace_to_scan);
+        cpu_pod_consumming_by_node.push_str("\"})");
+    }
+
+    let response = client.query(cpu_pod_consumming_by_node).get().await?;
+    let mut impacts_copy = resources_with_impacts.impacting_resources.clone();
+
+    let mut owned_string: String = "".to_owned();
+    let mut boavizta_resource_pe_embodied_megajoules = "# HELP boavizta_resource_pe_embodied_megajoules Energy consumed for manufacture.\n# TYPE boavizta_resource_pe_embodied_megajoules gauge\n".to_owned();
+    let mut boavizta_resource_pe_use_megajoules = "# HELP boavizta_pe_use_megajoules Energy consumed during use.\n# TYPE boavizta_pe_use_megajoules gauge\n".to_owned();
+    let mut boavizta_resource_adp_embodied_kgsbeq = "# HELP boavizta_resource_adp_embodied_kgsbeq Abiotic resources depletion potential of embodied impacts.\n# TYPE boavizta_resource_adp_embodied_kgsbeq gauge\n".to_owned();
+    let mut boavizta_resource_adp_use_kgsbeq = "# HELP boavizta_resource_adp_use_kgsbeq Abiotic resources depletion potential of use.\n# TYPE boavizta_resource_adp_use_kgsbeq gauge\n".to_owned();
+    let mut boavizta_resource_gwp_embodied_kgco2eq = "# HELP boavizta_resource_gwp_embodied_kgco2eq Global Warming Potential of embodied impacts.\n# TYPE boavizta_resource_gwp_embodied_kgco2eq gauge\n".to_owned();
+    let mut boavizta_resource_gwp_use_kgco2eq = "# HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.\n# TYPE boavizta_resource_gwp_use_kgco2eq gauge\n".to_owned();
+
+    if response.data().is_empty() {
+        warn!("Warning: No data found in the response of cpu_pod_consumming_by_node.");
+    } else {
+        warn!("&response.data().as_vector(): {:#?}", &response.data().as_vector());
+    }
+
+    for vec_instant_vector in &response.data().as_vector() {
+        for instant_vector in vec_instant_vector.into_iter() {
+            match instant_vector.metric().get("node") {
+                Some(private_dns_name) => {
+                    for impact in &mut impacts_copy {
+                        match &impact.cloud_resource.resource_details {
+                            model::ResourceDetails::Instance {
+                                instance_type,
+                                private_ip_dns_name,
+                                usage,
+                            } => {
+                                if private_dns_name.eq(private_ip_dns_name) {
+                                    // (GWP use par pod) = (GWP use par node) x (usage cpu pod par node) / usage cpu par node
+                                    if let Some(impacts) = &impact.impacts_values {
+                                        let usage_temp = usage.as_ref().unwrap();
+
+                                        let pe_use_par_pod =
+                                        &impacts.pe_use_megajoules // GWP use par node
+                                        * &instant_vector.sample().value() // usage cpu pod par node
+                                        / &usage_temp.average_cpu_load; // usage cpu par node
+
+                                        let pe_manufacture_par_pod =
+                                        &impacts.pe_manufacture_megajoules // GWP use par node
+                                        * &instant_vector.sample().value() // usage cpu pod par node
+                                        / &usage_temp.average_cpu_load; // usage cpu par node
+
+                                        let adp_use_par_pod =
+                                        &impacts.adp_use_kgsbeq // GWP use par node
+                                        * &instant_vector.sample().value() // usage cpu pod par node
+                                        / &usage_temp.average_cpu_load; // usage cpu par node
+
+                                        let adp_manufacture_par_pod =
+                                        &impacts.adp_manufacture_kgsbeq // GWP use par node
+                                        * &instant_vector.sample().value() // usage cpu pod par node
+                                        / &usage_temp.average_cpu_load; // usage cpu par node
+
+                                        let gwp_use_par_pod =
+                                            &impacts.adp_use_kgsbeq // GWP use par node
+                                            * &instant_vector.sample().value() // usage cpu pod par node
+                                            / &usage_temp.average_cpu_load; // usage cpu par node
+
+                                        let gwp_manufacture_par_pod =
+                                        &impacts.gwp_manufacture_kgco2eq // GWP use par node
+                                        * &instant_vector.sample().value() // usage cpu pod par node
+                                        / &usage_temp.average_cpu_load; // usage cpu par node
+
+                                        impact.impacts_values = Some(impact_provider::ImpactsValues {
+                                            adp_manufacture_kgsbeq: adp_manufacture_par_pod,
+                                            adp_use_kgsbeq: adp_use_par_pod,
+                                            pe_manufacture_megajoules: pe_manufacture_par_pod,
+                                            pe_use_megajoules: pe_use_par_pod,
+                                            gwp_manufacture_kgco2eq: gwp_manufacture_par_pod,
+                                            gwp_use_kgco2eq: gwp_use_par_pod,
+                                            raw_data: impacts.raw_data.clone(),
+                                        });
+
+                                        if let Some(pod_id) = instant_vector.metric().get("pod") {
+                                            impact.cloud_resource.tags = <Vec<model::CloudResourceTag>>::new();
+                                            impact.cloud_resource.id = pod_id.to_string();
+
+
+                                            let mut boavizta_resource_pe_embodied_megajoules_temp =
+                                            "boavizta_resource_pe_embodied_megajoules{awsregion=\"eu-west-1\",country=\"IRL\",resource_type=\"Pod\",resource_id=\"".to_owned();
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str(pod_id);
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str("\",resource_tags=\"");
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str("private_ip_dns_name:");
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str(private_ip_dns_name);
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str(";");
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str("\",resource_state=\"Running\"} ");
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str(&pe_manufacture_par_pod.to_string());
+                                            boavizta_resource_pe_embodied_megajoules_temp.push_str("\n");
+                                            boavizta_resource_pe_embodied_megajoules.push_str(&boavizta_resource_pe_embodied_megajoules_temp);
+
+                                            let mut boavizta_resource_pe_use_megajoules_temp =
+                                            "boavizta_resource_pe_use_megajoules{awsregion=\"eu-west-1\",country=\"IRL\",resource_type=\"Pod\",resource_id=\"".to_owned();
+                                            boavizta_resource_pe_use_megajoules_temp.push_str(pod_id);
+                                            boavizta_resource_pe_use_megajoules_temp.push_str("\",resource_tags=\"");
+                                            boavizta_resource_pe_use_megajoules_temp.push_str("private_ip_dns_name:");
+                                            boavizta_resource_pe_use_megajoules_temp.push_str(private_ip_dns_name);
+                                            boavizta_resource_pe_use_megajoules_temp.push_str(";");
+                                            boavizta_resource_pe_use_megajoules_temp.push_str("\",resource_state=\"Running\"} ");
+                                            boavizta_resource_pe_use_megajoules_temp.push_str(&pe_use_par_pod.to_string());
+                                            boavizta_resource_pe_use_megajoules_temp.push_str("\n");
+                                            boavizta_resource_pe_use_megajoules.push_str(&boavizta_resource_pe_use_megajoules_temp);
+
+                                            let mut boavizta_resource_adp_embodied_kgsbeq_temp =
+                                            "boavizta_resource_adp_embodied_kgsbeq{awsregion=\"eu-west-1\",country=\"IRL\",resource_type=\"Pod\",resource_id=\"".to_owned();
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str(pod_id);
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str("\",resource_tags=\"");
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str("private_ip_dns_name:");
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str(private_ip_dns_name);
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str(";");
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str("\",resource_state=\"Running\"} ");
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str(&adp_manufacture_par_pod.to_string());
+                                            boavizta_resource_adp_embodied_kgsbeq_temp.push_str("\n");
+                                            boavizta_resource_adp_embodied_kgsbeq.push_str(&boavizta_resource_adp_embodied_kgsbeq_temp);
+
+                                            let mut boavizta_resource_adp_use_kgsbeq_temp =
+                                            "boavizta_resource_adp_use_kgsbeq{awsregion=\"eu-west-1\",country=\"IRL\",resource_type=\"Pod\",resource_id=\"".to_owned();
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str(pod_id);
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str("\",resource_tags=\"");
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str("private_ip_dns_name:");
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str(private_ip_dns_name);
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str(";");
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str("\",resource_state=\"Running\"} ");
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str(&adp_use_par_pod.to_string());
+                                            boavizta_resource_adp_use_kgsbeq_temp.push_str("\n");
+                                            boavizta_resource_adp_use_kgsbeq.push_str(&boavizta_resource_adp_use_kgsbeq_temp);
+
+                                            let mut boavizta_resource_gwp_embodied_kgco2eq_temp =
+                                            "boavizta_resource_gwp_embodied_kgco2eq{awsregion=\"eu-west-1\",country=\"IRL\",resource_type=\"Pod\",resource_id=\"".to_owned();
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str(pod_id);
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str("\",resource_tags=\"");
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str("private_ip_dns_name:");
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str(private_ip_dns_name);
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str(";");
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str("\",resource_state=\"Running\"} ");
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str(&gwp_manufacture_par_pod.to_string());
+                                            boavizta_resource_gwp_embodied_kgco2eq_temp.push_str("\n");
+                                            boavizta_resource_gwp_embodied_kgco2eq.push_str(&boavizta_resource_gwp_embodied_kgco2eq_temp);
+
+                                            let mut boavizta_resource_gwp_use_kgco2eq_temp =
+                                            "boavizta_resource_gwp_use_kgco2eq{awsregion=\"eu-west-1\",country=\"IRL\",resource_type=\"Pod\",resource_id=\"".to_owned();
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str(pod_id);
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str("\",resource_tags=\"");
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str("private_ip_dns_name:");
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str(private_ip_dns_name);
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str(";");
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str("\",resource_state=\"Running\"} ");
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str(&gwp_use_par_pod.to_string());
+                                            boavizta_resource_gwp_use_kgco2eq_temp.push_str("\n");
+                                            boavizta_resource_gwp_use_kgco2eq.push_str(&boavizta_resource_gwp_use_kgco2eq_temp);
+
+                                        }
+                                    };
+
+                                }
+                            }
+
+                            model::ResourceDetails::BlockStorage {
+                                storage_type,
+                                usage,
+                                attached_instances: _,
+                            } => {
+                                warn!("Warning: This type of cloud resource is not supported.");
+                            }
+
+                            _ => {
+                                warn!("Warning: This type of cloud resource is not supported.");
+                            }
+                        }
+                    }
+                }
+                _ => warn!("no match private_ip_dns_name: {:#?}", "private_ip_dns_name"),
+            }
+        }
+    }
+
+   owned_string.push_str(&boavizta_resource_pe_embodied_megajoules);
+   owned_string.push_str(&boavizta_resource_pe_use_megajoules);
+   owned_string.push_str(&boavizta_resource_adp_embodied_kgsbeq);
+   owned_string.push_str(&boavizta_resource_adp_use_kgsbeq);
+   owned_string.push_str(&boavizta_resource_gwp_embodied_kgco2eq);
+   owned_string.push_str(&boavizta_resource_gwp_use_kgco2eq);
+   owned_string.push_str("# EOF\n");
+
+   Ok(owned_string)
+}
+
 /// Prints  impacts to standard output in json format
 pub async fn print_default_impacts_as_json(
     use_duration_hours: &f32,
@@ -222,9 +444,11 @@ pub async fn show_inventory(
 }
 
 /// Starts a server that exposes metrics http like <http://localhost:8000/metrics?aws-region=eu-west-1>
-pub async fn serve_metrics(api_url: &str) -> Result<()> {
+pub async fn serve_metrics(api_url: &str, prometheus_input_url:&str, namespace_to_scan:&str) -> Result<()> {
     let config = standalone_server::Config {
         boavizta_url: api_url.to_string(),
+        prometheus_input_url: prometheus_input_url.to_string(),
+        namespace_to_scan: namespace_to_scan.to_string(),
     };
     warn!("Starting server.");
     standalone_server::run(config).await?;

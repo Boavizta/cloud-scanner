@@ -8,6 +8,8 @@ use rocket_okapi::{openapi, openapi_get_routes, swagger_ui::*};
 ///  Configuration for the metric server
 pub struct Config {
     pub boavizta_url: String,
+    pub prometheus_input_url: String,
+    pub namespace_to_scan: String,
 }
 
 /// Start the server
@@ -44,26 +46,42 @@ fn index(config: &State<Config>) -> String {
 ///
 /// Example query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0&include_storage=true
 #[openapi(tag = "metrics")]
-#[get("/metrics?<aws_region>&<filter_tags>&<use_duration_hours>&<include_block_storage>")]
+#[get("/metrics?<aws_region>&<filter_tags>&<use_duration_hours>&<include_block_storage>&<k8s>")]
 async fn metrics(
     config: &State<Config>,
     aws_region: &str,
     filter_tags: Option<Vec<String>>,
     use_duration_hours: Option<f32>,
     include_block_storage: Option<bool>,
+    k8s: Option<bool>,
 ) -> String {
     warn!("Getting something on /metrics");
     let hours_use_time = use_duration_hours.unwrap_or(1.0);
     warn!("Filtering on tags {:?}", filter_tags);
-    let metrics = crate::get_impacts_as_metrics(
-        &hours_use_time,
-        &filter_tags.unwrap_or_default(),
-        aws_region,
-        &config.boavizta_url,
-        include_block_storage.unwrap_or(false),
-    )
-    .await;
-    metrics.unwrap()
+
+    if k8s.unwrap_or(false) {
+        let metrics = crate::get_deployment_impacts_as_metrics(
+            &hours_use_time,
+            &filter_tags.unwrap_or_default(),
+            aws_region,
+            &config.boavizta_url,
+            &config.prometheus_input_url,
+            include_block_storage.unwrap_or(false),
+            &config.namespace_to_scan,
+        )
+        .await;
+        metrics.unwrap()
+    } else {
+        let metrics = crate::get_impacts_as_metrics(
+            &hours_use_time,
+            &filter_tags.unwrap_or_default(),
+            aws_region,
+            &config.boavizta_url,
+            include_block_storage.unwrap_or(false),
+        )
+        .await;
+        metrics.unwrap()
+    }
 }
 
 /// # Returns the inventory as json.

@@ -80,6 +80,7 @@ pub enum CloudProvider {
 pub enum ResourceDetails {
     Instance {
         instance_type: String,
+        private_ip_dns_name: String,
         usage: Option<InstanceUsage>,
     },
     BlockStorage {
@@ -190,6 +191,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-1").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "t2.fictive".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.fictive".to_string(),
                 usage: None,
             },
             tags: Vec::new(),
@@ -241,6 +243,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-1").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "t2.fictive".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.fictive".to_string(),
                 usage: None,
             },
             tags: instance1tags,

@@ -51,6 +51,7 @@ fn build_resource_labels(resource: &CloudResourceWithImpacts) -> ResourceLabels 
     let resource_state = match resource.clone().cloud_resource.resource_details {
         ResourceDetails::Instance {
             instance_type: _,
+            private_ip_dns_name: _,
             usage,
         } => match usage.unwrap().state {
             InstanceState::Running => ResourceState::Running,
@@ -441,6 +442,7 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,

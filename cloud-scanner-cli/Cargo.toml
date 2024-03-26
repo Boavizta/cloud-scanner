@@ -23,6 +23,8 @@ rocket = { version = "0.5.0", default-features = false, features = [
 rocket_okapi = { version = "0.8.0", features = ["swagger", "rapidoc"] }
 aws-types = "1"
 thiserror = "1.0.57"
+openssl = { version = "0.10", features = ["vendored"] }
+prometheus-http-query = "0.8.2"
 
 [dependencies.boavizta_api_sdk]
 version = "1.2.0"
