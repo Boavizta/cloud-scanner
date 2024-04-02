@@ -37,6 +37,7 @@ impl BoaviztaApiV1 {
         match resource_details {
             ResourceDetails::Instance {
                 instance_type,
+                private_ip_dns_name,
                 usage,
             } => {
                 let mut usage_cloud: UsageCloud = UsageCloud::new();
@@ -242,6 +243,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
         match resource_details {
             ResourceDetails::Instance {
                 instance_type: _,
+                private_ip_dns_name: _,
                 usage: _,
             } => {
                 resource_impacts = Some(ImpactsValues {
@@ -339,6 +341,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
@@ -424,6 +427,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
@@ -439,6 +443,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 1.0,
                     usage_duration_seconds: 3600,
@@ -476,6 +481,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
@@ -491,6 +497,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
@@ -506,6 +513,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "type-not-in-boa".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
@@ -552,6 +560,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,
@@ -599,6 +608,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::Instance {
                 instance_type: "m6g.xlarge".to_string(),
+                private_ip_dns_name: "ip-XXXXXX.eu-west-1.compute.internal".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
                     usage_duration_seconds: 3600,

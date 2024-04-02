@@ -19,6 +19,14 @@ struct Arguments {
     /// Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. https://api.boavizta.org)
     boavizta_api_url: Option<String>,
 
+    #[arg(short, long)]
+    /// Optional Prometheus API URL if you want to use your own instance (URL without the trailing slash, e.g. http://127.0.0.1:46753)
+    prometheus_input_url: Option<String>,
+
+    #[arg(short, long)]
+    /// Optional Namespace name to scan (e.g. "my-namespace")
+    namespace_to_scan: Option<String>,
+
     #[arg(short = 't', long)]
     /// Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
     filter_tags: Vec<String>,
@@ -87,6 +95,31 @@ fn set_api_url(optional_url: Option<String>) -> String {
     }
 }
 
+fn set_prometheus_input_url(optional_url: Option<String>) -> String {
+    match optional_url {
+        Some(url_arg) => {
+            info!("Using prometheus API for input data at:  {}", url_arg);
+            url_arg
+        }
+        None => {
+            let default_url = "http://127.0.0.1:46753".to_string();
+            warn!("Using default prometheus API for input data at:  {}", default_url);
+            default_url
+        }
+    }
+}
+
+fn set_namespace_to_scan(optional_namespace: Option<String>) -> String {
+    match optional_namespace {
+        Some(namespace_arg) => {
+            info!("Using namespace to scan: {}", namespace_arg);
+            namespace_arg
+        }
+        None => "".to_owned(),
+    }
+}
+
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Arguments::parse();
@@ -100,6 +133,10 @@ async fn main() -> Result<()> {
     let region = set_region(args.aws_region);
 
     let api_url: String = set_api_url(args.boavizta_api_url);
+
+    let prometheus_input_url = set_prometheus_input_url(args.prometheus_input_url);
+
+    let namespace_to_scan = set_namespace_to_scan(args.namespace_to_scan);
 
     match args.cmd {
         SubCommand::Estimate {
@@ -138,7 +175,7 @@ async fn main() -> Result<()> {
             cloud_scanner_cli::show_inventory(&args.filter_tags, &region, include_block_storage)
                 .await?
         }
-        SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
+        SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url, &prometheus_input_url, &namespace_to_scan).await?,
     }
     Ok(())
 }

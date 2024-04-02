@@ -55,6 +55,18 @@ scrape_configs:
       aws_region: ['us-east-1']
       include_block_storage: ['true']
   
+  - job_name: 'cloud-scanner-K8S-metrics-irl'
+    scheme: http
+    static_configs:
+      - targets: ['cloud_scanner_boa:8000']
+        labels:
+          group: 'production'
+    metrics_path: '/metrics'
+    params:
+      aws_region: ['eu-west-1']
+      include_block_storage: ['true']
+      k8s: ['true']
+
   # Example of adding an additional scrape job to support us-east-2 region
   #    
   # - job_name: 'cloud-scanner-metrics-us-east-2'

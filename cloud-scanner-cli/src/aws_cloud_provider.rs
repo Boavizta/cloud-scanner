@@ -142,6 +142,7 @@ impl AwsCloudProvider {
                 location: location.clone(),
                 resource_details: ResourceDetails::Instance {
                     instance_type: instance.instance_type().unwrap().as_str().to_owned(),
+                    private_ip_dns_name: instance.private_dns_name.unwrap().as_str().to_owned(),
                     usage: Some(usage),
                 },
 
