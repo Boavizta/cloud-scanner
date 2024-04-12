@@ -9,7 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
-- Add CPU usage and Storage size metrics [Expose additional metrics (like cpu usage , disk size)](https://github.com/Boavizta/cloud-scanner/issues/406)
+## [2.0.5]-2024-04-12
+
+## Added
+
+- 406 expose additional metrics like CPU usage and storage size by @demeringo in https://github.com/Boavizta/cloud-scanner/pull/464
+- Add -summary option to estimate command  by @jnioche in https://github.com/Boavizta/cloud-scanner/pull/466
+
+## What's Changed
+
+- Organises the dashboard into rows: Intro / PE / GWP / ADP by @jnioche in https://github.com/Boavizta/cloud-scanner/pull/457
+- chore: dependencies by @demeringo in https://github.com/Boavizta/cloud-scanner/pull/459
+- 460 update serverless framework dependencies by @demeringo in https://github.com/Boavizta/cloud-scanner/pull/461
+- Remove old dashboard from the docker-compose example, fixes #438 by @jnioche in https://github.com/Boavizta/cloud-scanner/pull/449
+- chore: dependencies updates by @demeringo in https://github.com/Boavizta/cloud-scanner/pull/463
+- test: adapt tests values to BoaviztAPI v1.2.4 by @demeringo in https://github.com/Boavizta/cloud-scanner/pull/468
+- Update image version for Boavizta API in docker-compose by @jnioche in https://github.com/Boavizta/cloud-scanner/pull/470
+- Update image version for Boavizta API to 1.2.4 in docker-compose by @demeringo in https://github.com/Boavizta/cloud-scanner/pull/472
+- 474-High Security issues status "Unapproved" in latest alpine docker image by @damienfernandes in https://github.com/Boavizta/cloud-scanner/pull/475
+- Explicit versions of images in docker compose by @jnioche in https://github.com/Boavizta/cloud-scanner/pull/481
+- Missing param summary_only in cloud_scanner_lambda, fixes #473 by @jnioche in https://github.com/Boavizta/cloud-scanner/pull/478
+- New version of dashboard by @jnioche in https://github.com/Boavizta/cloud-scanner/pull/480
+
+## New Contributors
+
+- @jnioche made their first contribution in https://github.com/Boavizta/cloud-scanner/pull/457
+
+**Full Changelog**: https://github.com/Boavizta/cloud-scanner/compare/v2.0.4...v2.0.5
+
 
 ## [2.0.4]-2024-03-01
 
