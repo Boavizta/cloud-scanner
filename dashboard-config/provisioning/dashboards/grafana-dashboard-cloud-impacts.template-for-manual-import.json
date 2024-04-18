@@ -1,4 +1,53 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_CLOUD-SCANNER-PROMETHEUS",
+      "label": "cloud-scanner-prometheus",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.4.1"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": [
       {
@@ -80,7 +129,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "fieldConfig": {
             "defaults": {
@@ -159,7 +208,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "cloud-scanner-prometheus-demo-uid"
+                "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
               },
               "editorMode": "builder",
               "expr": "boavizta_number_of_resources_assessed",
@@ -200,7 +249,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "fieldConfig": {
             "defaults": {
@@ -252,7 +301,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "cloud-scanner-prometheus-demo-uid"
+                "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
               },
               "disableTextWrap": false,
               "editorMode": "code",
@@ -272,7 +321,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "fieldConfig": {
             "defaults": {
@@ -324,7 +373,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "cloud-scanner-prometheus-demo-uid"
+                "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -344,7 +393,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "fieldConfig": {
             "defaults": {
@@ -396,7 +445,7 @@
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "cloud-scanner-prometheus-demo-uid"
+                "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -433,7 +482,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -486,7 +535,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -506,7 +555,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -557,7 +606,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -575,7 +624,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -596,7 +645,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -676,7 +725,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -694,7 +743,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -715,7 +764,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -766,7 +815,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -784,7 +833,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -818,7 +867,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -878,7 +927,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -898,7 +947,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -957,7 +1006,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -973,7 +1022,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "builder",
@@ -994,7 +1043,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1081,7 +1130,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1097,7 +1146,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1118,7 +1167,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1176,7 +1225,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1192,7 +1241,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1226,7 +1275,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "description": "",
       "fieldConfig": {
@@ -1314,7 +1363,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1330,7 +1379,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1351,7 +1400,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "cloud-scanner-prometheus-demo-uid"
+        "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
       },
       "description": "",
       "fieldConfig": {
@@ -1439,7 +1488,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1455,7 +1504,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "cloud-scanner-prometheus-demo-uid"
+            "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -1483,7 +1532,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "cloud-scanner-prometheus-demo-uid"
+          "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
         },
         "definition": "label_values(awsregion)",
         "hide": 0,
@@ -1507,7 +1556,7 @@
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "cloud-scanner-prometheus-demo-uid"
+          "uid": "${DS_CLOUD-SCANNER-PROMETHEUS}"
         },
         "definition": "label_values(resource_type)",
         "hide": 0,
