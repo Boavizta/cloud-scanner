@@ -6,6 +6,7 @@ datasources:
     # Access mode - proxy (server in the UI) or direct (browser in the UI).
     access: proxy
     url: http://prometheus_boa:9090
+    uid: cloud-scanner-prometheus-demo-uid
 
     jsonData:
       httpMethod: POST
