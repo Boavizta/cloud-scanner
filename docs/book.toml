@@ -27,6 +27,7 @@ additional-js = ["mermaid.min.js", "mermaid-init.js"]
 [preprocessor]
 
 [preprocessor.mermaid]
+# cargo install mdbook-mermaid
 command = "mdbook-mermaid"
 #site-url = "/example-book/"
 #cname = "myproject.rs"
