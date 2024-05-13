@@ -1,3 +1,4 @@
+use std::path::{PathBuf};
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 #[macro_use]
@@ -51,6 +52,10 @@ enum SubCommand {
         /// Returns only the summary of the impacts as json
         #[arg(short = 's', long)]
         summary_only: bool,
+
+        /// Estimate impacts of an existing json inventory file (instead of performing live inventory)
+        #[arg(short, long)]
+        inventory_file: Option<PathBuf>,
     },
     /// List instances and  their average cpu load for the last 5 minutes (without returning impacts)
     Inventory {
@@ -108,6 +113,7 @@ async fn main() -> Result<()> {
             output_verbose_json,
             as_metrics,
             summary_only,
+            inventory_file,
         } => {
             if as_metrics {
                 cloud_scanner_cli::print_default_impacts_as_metrics(
@@ -119,16 +125,26 @@ async fn main() -> Result<()> {
                 )
                 .await?
             } else {
-                cloud_scanner_cli::print_default_impacts_as_json(
-                    &use_duration_hours,
-                    &args.filter_tags,
-                    &region,
-                    &api_url,
-                    output_verbose_json,
-                    include_block_storage,
-                    summary_only,
-                )
-                .await?
+                match inventory_file {
+                    Some(path) => {let i = cloud_scanner_cli::estimate_impacts_of_inventory_file( &use_duration_hours,
+                                                                                         &api_url,
+                                                                                         output_verbose_json,&path).await?;
+                        println!("{}", serde_json::to_string(&i)?);
+
+                    },
+                  None => cloud_scanner_cli::print_default_impacts_as_json(
+                      &use_duration_hours,
+                      &args.filter_tags,
+                      &region,
+                      &api_url,
+                      output_verbose_json,
+                      include_block_storage,
+                      summary_only
+                  ).await?,
+                }
+
+
+
             }
         }
         SubCommand::Inventory {

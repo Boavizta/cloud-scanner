@@ -70,7 +70,7 @@ async fn metrics(
 ///
 /// Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value
 ///
-/// Example query: http://localhost:8000/inventorynew?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
+/// Example query: http://localhost:8000/inventory?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
 #[openapi(tag = "inventory")]
 #[get("/inventory?<aws_region>&<filter_tags>&<include_block_storage>")]
 async fn inventory(
