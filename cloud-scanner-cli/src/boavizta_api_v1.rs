@@ -341,7 +341,6 @@ mod tests {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -368,10 +367,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::BlockStorage {
                 storage_type: "st1".to_string(),
-                usage: Some(StorageUsage {
-                    size_gb: 1000,
-                    usage_duration_seconds: 0,
-                }),
+                usage: Some(StorageUsage { size_gb: 1000 }),
                 attached_instances: None,
             },
             tags: Vec::new(),
@@ -396,10 +392,7 @@ mod tests {
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::BlockStorage {
                 storage_type: "gp2".to_string(),
-                usage: Some(StorageUsage {
-                    size_gb: 1000,
-                    usage_duration_seconds: 3600,
-                }),
+                usage: Some(StorageUsage { size_gb: 1000 }),
                 attached_instances: None,
             },
             tags: Vec::new(),
@@ -426,7 +419,6 @@ mod tests {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -441,7 +433,6 @@ mod tests {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 1.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -478,7 +469,6 @@ mod tests {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -493,7 +483,6 @@ mod tests {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -508,7 +497,6 @@ mod tests {
                 instance_type: "type-not-in-boa".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -554,7 +542,6 @@ mod tests {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -601,7 +588,6 @@ mod tests {
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },

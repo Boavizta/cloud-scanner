@@ -125,7 +125,6 @@ impl AwsCloudProvider {
 
             let usage: InstanceUsage = InstanceUsage {
                 average_cpu_load: cpuload,
-                usage_duration_seconds: 300,
                 state: Self::aws_state_to_generic(instance.clone()),
             };
 
@@ -307,7 +306,6 @@ impl AwsCloudProvider {
 
             let usage: StorageUsage = StorageUsage {
                 size_gb: volume.size().unwrap(),
-                usage_duration_seconds: 3600,
             };
 
             let volume_type: String = volume.volume_type().unwrap().as_str().to_string();

@@ -1,6 +1,6 @@
-use std::path::{PathBuf};
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
+use std::path::PathBuf;
 #[macro_use]
 extern crate log;
 extern crate loggerv;
@@ -126,25 +126,29 @@ async fn main() -> Result<()> {
                 .await?
             } else {
                 match inventory_file {
-                    Some(path) => {let i = cloud_scanner_cli::estimate_impacts_of_inventory_file( &use_duration_hours,
-                                                                                         &api_url,
-                                                                                         output_verbose_json,&path).await?;
+                    Some(path) => {
+                        let i = cloud_scanner_cli::estimate_impacts_of_inventory_file(
+                            &use_duration_hours,
+                            &api_url,
+                            output_verbose_json,
+                            &path,
+                        )
+                        .await?;
                         println!("{}", serde_json::to_string(&i)?);
-
-                    },
-                  None => cloud_scanner_cli::print_default_impacts_as_json(
-                      &use_duration_hours,
-                      &args.filter_tags,
-                      &region,
-                      &api_url,
-                      output_verbose_json,
-                      include_block_storage,
-                      summary_only
-                  ).await?,
+                    }
+                    None => {
+                        cloud_scanner_cli::print_default_impacts_as_json(
+                            &use_duration_hours,
+                            &args.filter_tags,
+                            &region,
+                            &api_url,
+                            output_verbose_json,
+                            include_block_storage,
+                            summary_only,
+                        )
+                        .await?
+                    }
                 }
-
-
-
             }
         }
         SubCommand::Inventory {

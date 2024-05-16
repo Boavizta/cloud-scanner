@@ -5,9 +5,7 @@
 //! It performs inventory of resources of the account and combines it with Boavizta API to return impact data.
 //!
 
-use std::fs;
-use std::path::Path;
-use crate::model::{EstimatedInventory, ExecutionStatistics};
+use crate::model::{load_inventory_from_file, EstimatedInventory, ExecutionStatistics};
 use crate::usage_location::*;
 use aws_cloud_provider::*;
 use boavizta_api_v1::*;
@@ -15,6 +13,7 @@ use cloud_provider::*;
 use impact_provider::ImpactProvider;
 use impact_provider::ImpactsSummary;
 use metric_exporter::*;
+use std::path::Path;
 
 #[macro_use]
 extern crate rocket;
@@ -65,7 +64,9 @@ pub async fn estimate_impacts_of_inventory_file(
     verbose: bool,
     inventory_file: &Path,
 ) -> Result<EstimatedInventory> {
-    let inventory = load_inventory_from_file(inventory_file).await.context("Failed to load inventory file.")?;
+    let inventory = load_inventory_from_file(inventory_file)
+        .await
+        .context("Failed to load inventory file.")?;
 
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let estimated_inventory = api
@@ -74,20 +75,6 @@ pub async fn estimate_impacts_of_inventory_file(
         .context("Failure while retrieving impacts")?;
 
     Ok(estimated_inventory)
-}
-
-/// Load inventory from a file
-///
-/// TODO: may be better implemented as a try_from on the inventory model
-pub async fn load_inventory_from_file(inventory_file_path: &Path) -> Result<Inventory> {
-    let content = fs::read_to_string(inventory_file_path).context("cannot read inventory file")?;
-    Ok(load_inventory(content.as_ref()).await?)
-}
-
-/// TODO: may be better implemented as a try_from on the inventory model
-pub async fn load_inventory(json_inventory: &str) -> Result<Inventory> {
-    let inventory: Inventory = serde_json::from_str(json_inventory).context("malformed json inventory data")?;
-    Ok(inventory)
 }
 
 /// Returns default impacts as json string
@@ -296,20 +283,23 @@ async fn summary_has_to_contain_a_usage_duration() {
         summary.duration_of_use_hours, usage_duration_hours,
         "Duration of summary should match"
     );
-
 }
-    #[tokio::test]
-    async fn test_read_inventory_data() {
-        const INVENTORY: &str =
-            include_str!("../test-data/AWS_INVENTORY.json");
-        let result = crate::load_inventory(INVENTORY).await.unwrap();
-        assert_eq!(result.resources.len(), 4);
-    }
+#[tokio::test]
+async fn test_load_inventory_from_json() {
+    const INVENTORY: &str = include_str!("../test-data/AWS_INVENTORY.json");
+    let result = crate::model::load_inventory_fom_json(INVENTORY)
+        .await
+        .unwrap();
+    assert_eq!(result.resources.len(), 4);
+}
 
 #[tokio::test]
-async fn test_read_inventory_file() {
+async fn test_load_inventory_from_file() {
     let inventory_file_path: &Path = Path::new("./test-data/AWS_INVENTORY.json");
-    let inventory: Inventory = crate::load_inventory_from_file(inventory_file_path).await.unwrap();
-    assert_eq!(inventory.resources.len(), 4, "Wrong number of resources in the inventory file");
-
+    let inventory: Inventory = load_inventory_from_file(inventory_file_path).await.unwrap();
+    assert_eq!(
+        inventory.resources.len(),
+        4,
+        "Wrong number of resources in the inventory file"
+    );
 }
