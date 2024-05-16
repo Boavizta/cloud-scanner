@@ -5,8 +5,7 @@
 //! It performs inventory of resources of the account and combines it with Boavizta API to return impact data.
 //!
 
-use crate::model::{load_inventory_from_file, EstimatedInventory, ExecutionStatistics};
-use crate::usage_location::*;
+use crate::model::{load_inventory_from_file, EstimatedInventory};
 use aws_cloud_provider::*;
 use boavizta_api_v1::*;
 use cloud_provider::*;
@@ -22,19 +21,23 @@ extern crate rocket;
 extern crate log;
 use model::Inventory;
 use pkg_version::*;
-use std::time::{Duration, Instant};
+
 pub mod aws_cloud_provider;
 pub mod boavizta_api_v1;
 pub mod cloud_provider;
+pub mod estimated_inventory_exporter;
 pub mod impact_provider;
+pub mod inventory_exporter;
 pub mod metric_exporter;
 pub mod model;
 pub mod standalone_server;
 pub mod usage_location;
 
+use crate::estimated_inventory_exporter::build_impact_summary;
 use anyhow::{Context, Result};
 
-async fn estimate_impacts(
+/// Returns estimated impacts as the result of a live inventory.
+pub async fn estimate_impacts(
     use_duration_hours: &f32,
     tags: &[String],
     aws_region: &str,
@@ -67,7 +70,6 @@ pub async fn estimate_impacts_of_inventory_file(
     let inventory = load_inventory_from_file(inventory_file)
         .await
         .context("Failed to load inventory file.")?;
-
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let estimated_inventory = api
         .get_impacts(inventory, use_duration_hours, verbose)
@@ -77,43 +79,7 @@ pub async fn estimate_impacts_of_inventory_file(
     Ok(estimated_inventory)
 }
 
-/// Returns default impacts as json string
-pub async fn get_impacts_as_json_string(
-    use_duration_hours: &f32,
-    tags: &[String],
-    aws_region: &str,
-    api_url: &str,
-    verbose: bool,
-    include_block_storage: bool,
-    summary_only: bool,
-) -> Result<String> {
-    let inventory_with_impacts = estimate_impacts(
-        use_duration_hours,
-        tags,
-        aws_region,
-        api_url,
-        verbose,
-        include_block_storage,
-    )
-    .await
-    .context("Cannot perform standard scan")?;
-
-    if summary_only {
-        let usage_location: UsageLocation = UsageLocation::try_from(aws_region)?;
-        let summary: ImpactsSummary = ImpactsSummary::new(
-            String::from(aws_region),
-            usage_location.iso_country_code,
-            &inventory_with_impacts.clone(),
-            (*use_duration_hours).into(),
-        );
-
-        return Ok(serde_json::to_string(&summary)?);
-    }
-
-    Ok(serde_json::to_string(&inventory_with_impacts)?)
-}
-
-/// Returns  impacts as metrics
+/// Returns impacts of a live inventory as metrics
 pub async fn get_impacts_as_metrics(
     use_duration_hours: &f32,
     tags: &[String],
@@ -132,13 +98,8 @@ pub async fn get_impacts_as_metrics(
     .await
     .context("Cannot perform standard scan")?;
 
-    let usage_location: UsageLocation = UsageLocation::try_from(aws_region)?;
-    let summary: ImpactsSummary = ImpactsSummary::new(
-        String::from(aws_region),
-        usage_location.iso_country_code,
-        &resources_with_impacts,
-        (*use_duration_hours).into(),
-    );
+    let summary: ImpactsSummary =
+        build_impact_summary(&resources_with_impacts, aws_region, use_duration_hours).await?;
     debug!("Summary: {:#?}", summary);
 
     let all_metrics = get_all_metrics(&summary, resources_with_impacts).with_context(|| {
@@ -151,72 +112,7 @@ pub async fn get_impacts_as_metrics(
     Ok(all_metrics)
 }
 
-/// Prints  impacts to standard output in json format
-pub async fn print_default_impacts_as_json(
-    use_duration_hours: &f32,
-    tags: &[String],
-    aws_region: &str,
-    api_url: &str,
-    verbose: bool,
-    include_storage: bool,
-    summary_only: bool,
-) -> Result<()> {
-    let j = get_impacts_as_json_string(
-        use_duration_hours,
-        tags,
-        aws_region,
-        api_url,
-        verbose,
-        include_storage,
-        summary_only,
-    )
-    .await?;
-    println!("{}", j);
-    Ok(())
-}
-
-/// Prints impacts to standard output as metrics in prometheus format
-pub async fn print_default_impacts_as_metrics(
-    use_duration_hours: &f32,
-    tags: &[String],
-    aws_region: &str,
-    api_url: &str,
-    include_block_storage: bool,
-) -> Result<()> {
-    let metrics = get_impacts_as_metrics(
-        use_duration_hours,
-        tags,
-        aws_region,
-        api_url,
-        include_block_storage,
-    )
-    .await?;
-    println!("{}", metrics);
-    Ok(())
-}
-
-/// Returns the inventory of cloud resources as json String
-pub async fn get_inventory_as_json(
-    tags: &[String],
-    aws_region: &str,
-    include_block_storage: bool,
-) -> Result<String> {
-    let start = Instant::now();
-    let aws_inventory: AwsCloudProvider = AwsCloudProvider::new(aws_region).await;
-    let inventory: Inventory = aws_inventory
-        .list_resources(tags, include_block_storage)
-        .await
-        .context("Cannot perform inventory.")?;
-    let stats = ExecutionStatistics {
-        inventory_duration: start.elapsed(),
-        impact_estimation_duration: Duration::from_millis(0),
-        total_duration: start.elapsed(),
-    };
-    warn!("{:?}", stats);
-    serde_json::to_string(&inventory).context("Cannot format inventory as json")
-}
-
-/// Returns the inventory of cloud resources
+/// Returns a live inventory of cloud resources
 pub async fn get_inventory(
     tags: &[String],
     aws_region: &str,
@@ -228,18 +124,6 @@ pub async fn get_inventory(
         .await
         .context("Cannot perform inventory.")?;
     Ok(inventory)
-}
-
-/// List instances and metadata to standard output
-pub async fn show_inventory(
-    tags: &[String],
-    aws_region: &str,
-    include_block_storage: bool,
-) -> Result<()> {
-    let json_inventory: String =
-        get_inventory_as_json(tags, aws_region, include_block_storage).await?;
-    println!("{}", json_inventory);
-    Ok(())
 }
 
 /// Starts a server that exposes metrics http like <http://localhost:8000/metrics?aws-region=eu-west-1>
@@ -282,24 +166,5 @@ async fn summary_has_to_contain_a_usage_duration() {
     assert_eq!(
         summary.duration_of_use_hours, usage_duration_hours,
         "Duration of summary should match"
-    );
-}
-#[tokio::test]
-async fn test_load_inventory_from_json() {
-    const INVENTORY: &str = include_str!("../test-data/AWS_INVENTORY.json");
-    let result = crate::model::load_inventory_fom_json(INVENTORY)
-        .await
-        .unwrap();
-    assert_eq!(result.resources.len(), 4);
-}
-
-#[tokio::test]
-async fn test_load_inventory_from_file() {
-    let inventory_file_path: &Path = Path::new("./test-data/AWS_INVENTORY.json");
-    let inventory: Inventory = load_inventory_from_file(inventory_file_path).await.unwrap();
-    assert_eq!(
-        inventory.resources.len(),
-        4,
-        "Wrong number of resources in the inventory file"
     );
 }

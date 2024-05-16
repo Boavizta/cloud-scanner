@@ -296,7 +296,7 @@ mod tests {
     use crate::model::{
         CloudProvider, CloudResource, InstanceState, InstanceUsage, ResourceDetails, StorageUsage,
     };
-    use crate::UsageLocation;
+    use crate::usage_location::UsageLocation;
     use assert_json_diff::assert_json_include;
     use assert_json_diff::{assert_json_matches, CompareMode, Config, NumericMode};
 

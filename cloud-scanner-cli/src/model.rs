@@ -191,9 +191,13 @@ pub fn vec_to_map(tagv: Vec<CloudResourceTag>) -> HashMap<String, Option<String>
 
 #[cfg(test)]
 mod tests {
-    use crate::model::{CloudProvider, CloudResource, CloudResourceTag, ResourceDetails};
+    use crate::model::{
+        load_inventory_from_file, CloudProvider, CloudResource, CloudResourceTag, Inventory,
+        ResourceDetails,
+    };
     use crate::usage_location::UsageLocation;
     use std::collections::HashMap;
+    use std::path::Path;
 
     #[test]
     pub fn a_cloud_resource_can_be_displayed() {
@@ -362,6 +366,26 @@ mod tests {
         assert_eq!(
             "name1:value1;name2:value2;", tag_label_value,
             "could not convert tags to metric label values"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_load_inventory_from_json() {
+        const INVENTORY: &str = include_str!("../test-data/AWS_INVENTORY.json");
+        let result = crate::model::load_inventory_fom_json(INVENTORY)
+            .await
+            .unwrap();
+        assert_eq!(result.resources.len(), 4);
+    }
+
+    #[tokio::test]
+    async fn test_load_inventory_from_file() {
+        let inventory_file_path: &Path = Path::new("./test-data/AWS_INVENTORY.json");
+        let inventory: Inventory = load_inventory_from_file(inventory_file_path).await.unwrap();
+        assert_eq!(
+            inventory.resources.len(),
+            4,
+            "Wrong number of resources in the inventory file"
         );
     }
 }
