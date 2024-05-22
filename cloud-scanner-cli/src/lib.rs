@@ -70,6 +70,20 @@ pub async fn estimate_impacts_of_inventory_file(
     let inventory = load_inventory_from_file(inventory_file)
         .await
         .context("Failed to load inventory file.")?;
+    let estimated_inventory =
+        estimate_impacts_of_inventory(use_duration_hours, api_url, verbose, inventory)
+            .await
+            .context("Cannot get estimations")?;
+    Ok(estimated_inventory)
+}
+
+/// Returns impacts for and existing inventory
+pub async fn estimate_impacts_of_inventory(
+    use_duration_hours: &f32,
+    api_url: &str,
+    verbose: bool,
+    inventory: Inventory,
+) -> Result<EstimatedInventory> {
     let api: BoaviztaApiV1 = BoaviztaApiV1::new(api_url);
     let estimated_inventory = api
         .get_impacts(inventory, use_duration_hours, verbose)
