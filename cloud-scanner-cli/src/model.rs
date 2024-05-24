@@ -1,10 +1,12 @@
 //!  Business Entities of cloud Scanner
+use anyhow::Context;
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fmt;
+use std::path::Path;
 use std::time::Duration;
+use std::{fmt, fs};
 
 use crate::impact_provider::CloudResourceWithImpacts;
 use crate::usage_location::UsageLocation;
@@ -29,6 +31,19 @@ impl fmt::Display for ExecutionStatistics {
 pub struct Inventory {
     pub resources: Vec<CloudResource>,
     pub execution_statistics: Option<ExecutionStatistics>,
+}
+
+/// Load inventory from a file
+pub async fn load_inventory_from_file(inventory_file_path: &Path) -> anyhow::Result<Inventory> {
+    let content = fs::read_to_string(inventory_file_path).context("cannot read inventory file")?;
+    load_inventory_fom_json(&content).await
+}
+
+/// Load an inventory from its json representation
+pub async fn load_inventory_fom_json(json_inventory: &str) -> anyhow::Result<Inventory> {
+    let inventory: Inventory =
+        serde_json::from_str(json_inventory).context("malformed json inventory data")?;
+    Ok(inventory)
 }
 
 /// An estimated inventory: impacting resources with their estimated impacts
@@ -93,7 +108,6 @@ pub enum ResourceDetails {
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct InstanceUsage {
     pub average_cpu_load: f64,
-    pub usage_duration_seconds: u32,
     pub state: InstanceState,
 }
 
@@ -107,7 +121,6 @@ pub enum InstanceState {
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct StorageUsage {
     pub size_gb: i32,
-    pub usage_duration_seconds: u32,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -178,9 +191,13 @@ pub fn vec_to_map(tagv: Vec<CloudResourceTag>) -> HashMap<String, Option<String>
 
 #[cfg(test)]
 mod tests {
-    use crate::model::{CloudProvider, CloudResource, CloudResourceTag, ResourceDetails};
+    use crate::model::{
+        load_inventory_from_file, CloudProvider, CloudResource, CloudResourceTag, Inventory,
+        ResourceDetails,
+    };
     use crate::usage_location::UsageLocation;
     use std::collections::HashMap;
+    use std::path::Path;
 
     #[test]
     pub fn a_cloud_resource_can_be_displayed() {
@@ -349,6 +366,26 @@ mod tests {
         assert_eq!(
             "name1:value1;name2:value2;", tag_label_value,
             "could not convert tags to metric label values"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_load_inventory_from_json() {
+        const INVENTORY: &str = include_str!("../test-data/AWS_INVENTORY.json");
+        let result = crate::model::load_inventory_fom_json(INVENTORY)
+            .await
+            .unwrap();
+        assert_eq!(result.resources.len(), 4);
+    }
+
+    #[tokio::test]
+    async fn test_load_inventory_from_file() {
+        let inventory_file_path: &Path = Path::new("./test-data/AWS_INVENTORY.json");
+        let inventory: Inventory = load_inventory_from_file(inventory_file_path).await.unwrap();
+        assert_eq!(
+            inventory.resources.len(),
+            4,
+            "Wrong number of resources in the inventory file"
         );
     }
 }

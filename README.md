@@ -23,7 +23,7 @@
 Cloud scanner combines real time _inventory_ and _usage_ data from your AWS account with [Boavizta API](https://github.com/Boavizta/boaviztapi/) to offer a  view of your impacts on a given region.
 
 - multi criteria: Primary Energy consumption (PE), Abiotic resource depletion potential (ADP), and Global Warming Potential (GWP)
-- multi stage: separate impacts of ressources Usage and Manufacture
+- multi stage: separate impacts of resources Usage and Manufacture
 
 This is similar to what you can get from [Datavizta](http://datavizta.boavizta.org/cloudimpact) but with automated inventory.
 

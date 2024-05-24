@@ -189,7 +189,9 @@ pub fn register_resource_metrics(
         }
     }
 }
+/// Returns metrics related to individual resources as String
 ///
+/// - Individual resource metrics are prefixed with: `boavizta_resource_`
 pub fn get_resources_metrics(
     resources_with_impacts: Vec<CloudResourceWithImpacts>,
 ) -> Result<String> {
@@ -203,6 +205,8 @@ pub fn get_resources_metrics(
 }
 
 /// Return an ImpactsSummary as metrics in the prometheus format
+///
+/// - Summary metrics are prefixed with: `boavizta_`
 pub fn get_summary_metrics(summary: &ImpactsSummary) -> Result<String> {
     let mut registry = <Registry>::default();
     register_summary_metrics(&mut registry, summary);
@@ -212,6 +216,10 @@ pub fn get_summary_metrics(summary: &ImpactsSummary) -> Result<String> {
     Ok(metrics)
 }
 
+/// Returns all metrics as string: both aggregated metrics (summary) as well a metrics of individual resources
+///
+/// - Summary metrics are prefixed with: `boavizta_`
+/// - Individual resource metrics are prefixed with: `boavizta_resource_`
 pub fn get_all_metrics(
     summary: &ImpactsSummary,
     resources_with_impacts: EstimatedInventory,
@@ -443,7 +451,6 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
                 instance_type: "m6g.xlarge".to_string(),
                 usage: Some(InstanceUsage {
                     average_cpu_load: 100.0,
-                    usage_duration_seconds: 3600,
                     state: InstanceState::Running,
                 }),
             },
@@ -555,10 +562,7 @@ boavizta_resource_cpu_load{awsregion="eu-west-3",country="FRA",resource_type="In
             location: UsageLocation::try_from("eu-west-3").unwrap(),
             resource_details: ResourceDetails::BlockStorage {
                 storage_type: "arbitrary-type".to_string(),
-                usage: Some(StorageUsage {
-                    size_gb: 42,
-                    usage_duration_seconds: 10,
-                }),
+                usage: Some(StorageUsage { size_gb: 42 }),
                 attached_instances: None,
             },
             tags: vec![tag1, tag2],

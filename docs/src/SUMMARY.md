@@ -14,6 +14,8 @@
 
 # How-to guides
 
+- [Estimate the impacts of an existing inventory](how-to/estimate-from-existing-inventory-file.md)
+- [Simulate impacts of an inventory](how-to/simulate-impacts-of-an-inventory.md)
 - [Building CLI](how-to/building-cli.md)
 - [Run as docker](how-to/docker-guide.md)
 - [Deploy serverless](how-to/deploy-sls.md)

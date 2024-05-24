@@ -1,5 +1,10 @@
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
+use cloud_scanner_cli::estimated_inventory_exporter::get_estimated_inventory_as_json;
+use cloud_scanner_cli::inventory_exporter::print_inventory;
+use cloud_scanner_cli::model::EstimatedInventory;
+use std::path::PathBuf;
+
 #[macro_use]
 extern crate log;
 extern crate loggerv;
@@ -30,7 +35,7 @@ struct Arguments {
 
 #[derive(Subcommand, Debug)]
 enum SubCommand {
-    /// Get estimation of impacts for a given usage duration
+    /// Get estimation of impacts for a given usage duration as json
     Estimate {
         #[arg(short = 'u', long)]
         /// The number of hours of use for which we want to estimate the impacts
@@ -44,15 +49,25 @@ enum SubCommand {
         /// Experimental feature: estimate impacts of block storage
         include_block_storage: bool,
 
-        /// Returns results as OpenMetrics (Prometheus) instead of json
-        #[arg(short = 'm', long)]
-        as_metrics: bool,
-
         /// Returns only the summary of the impacts as json
         #[arg(short = 's', long)]
         summary_only: bool,
+
+        /// Estimate impacts of an existing json inventory file (instead of performing live inventory)
+        #[arg(short, long)]
+        inventory_file: Option<PathBuf>,
     },
-    /// List instances and  their average cpu load for the last 5 minutes (without returning impacts)
+    /// Get estimation of impacts for a given usage duration as OpenMetrics (Prometheus) instead of json
+    Metrics {
+        #[arg(short = 'u', long)]
+        /// The number of hours of use for which we want to estimate the impacts
+        use_duration_hours: f32,
+
+        #[arg(long, short = 'b', action)]
+        /// Experimental feature: estimate impacts of block storage
+        include_block_storage: bool,
+    },
+    /// List resources (and instances average cpu load for the last 5 minutes) without returning impacts
     Inventory {
         #[arg(long, short = 'b', action)]
         /// Experimental feature: include block storage in the inventory
@@ -90,7 +105,6 @@ fn set_api_url(optional_url: Option<String>) -> String {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Arguments::parse();
-
     loggerv::init_with_verbosity(args.verbosity.into()).context("Cannot initialize logger")?;
     info!(
         "Starting cloud scanner {}",
@@ -106,37 +120,60 @@ async fn main() -> Result<()> {
             use_duration_hours,
             include_block_storage,
             output_verbose_json,
-            as_metrics,
             summary_only,
-        } => {
-            if as_metrics {
-                cloud_scanner_cli::print_default_impacts_as_metrics(
+            inventory_file,
+        } => match inventory_file {
+            Some(path) => {
+                info!("Providing estimation for inventory file");
+                let i = cloud_scanner_cli::estimate_impacts_of_inventory_file(
                     &use_duration_hours,
-                    &args.filter_tags,
-                    &region,
                     &api_url,
-                    include_block_storage,
+                    output_verbose_json,
+                    &path,
                 )
-                .await?
-            } else {
-                cloud_scanner_cli::print_default_impacts_as_json(
+                .await?;
+                println!("{}", serde_json::to_string(&i)?);
+            }
+            None => {
+                info!("Providing estimation for live inventory");
+                let i: EstimatedInventory = cloud_scanner_cli::estimate_impacts(
                     &use_duration_hours,
                     &args.filter_tags,
                     &region,
                     &api_url,
                     output_verbose_json,
                     include_block_storage,
-                    summary_only,
                 )
-                .await?
+                .await?;
+                let result =
+                    get_estimated_inventory_as_json(&i, &region, &use_duration_hours, summary_only)
+                        .await?;
+                println!("{}", result);
             }
+        },
+        SubCommand::Metrics {
+            use_duration_hours,
+            include_block_storage,
+        } => {
+            // Produce metrics
+            let metrics = cloud_scanner_cli::get_impacts_as_metrics(
+                &use_duration_hours,
+                &args.filter_tags,
+                &region,
+                &api_url,
+                include_block_storage,
+            )
+            .await?;
+            println!("{}", metrics);
         }
         SubCommand::Inventory {
             include_block_storage,
         } => {
             info!("Using filter tags {:?}", &args.filter_tags);
-            cloud_scanner_cli::show_inventory(&args.filter_tags, &region, include_block_storage)
-                .await?
+            let inventory =
+                cloud_scanner_cli::get_inventory(&args.filter_tags, &region, include_block_storage)
+                    .await?;
+            print_inventory(&inventory).await?;
         }
         SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
     }

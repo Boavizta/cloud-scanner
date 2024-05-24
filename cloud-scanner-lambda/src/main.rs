@@ -83,18 +83,25 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
     println!("Using aws_region {}", aws_region);
     println!("Using tag filers {:?}", filter_tags);
 
-    let impacts: String = cloud_scanner_cli::get_impacts_as_json_string(
+    let estimated_inventory = cloud_scanner_cli::estimate_impacts(
         &use_duration_hours,
         &filter_tags,
         aws_region,
         &config.boavizta_api_url,
         verbose_output,
         include_block_storage,
-        summary_only,
     )
-    .await
-    .unwrap();
-    Ok(response(StatusCode::OK, impacts))
+    .await?;
+    let json_impacts =
+        cloud_scanner_cli::estimated_inventory_exporter::get_estimated_inventory_as_json(
+            &estimated_inventory,
+            &aws_region,
+            &use_duration_hours,
+            summary_only,
+        )
+        .await?;
+
+    Ok(response(StatusCode::OK, json_impacts))
 }
 
 /// Return current version of cloud-scanner-lambda

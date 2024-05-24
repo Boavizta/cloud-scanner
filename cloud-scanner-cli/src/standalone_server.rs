@@ -1,4 +1,4 @@
-//! An HTTP endpoint that exposes the results of cloud-scanner like inventory, impacts or metricc.
+//! An HTTP endpoint that exposes the results of cloud-scanner like inventory, impacts or metrics.
 
 use crate::model::{EstimatedInventory, Inventory};
 use rocket::State;
@@ -13,7 +13,16 @@ pub struct Config {
 /// Start the server
 pub async fn run(config: Config) -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
-        .mount("/", openapi_get_routes![index, metrics, inventory, impacts])
+        .mount(
+            "/",
+            openapi_get_routes![
+                index,
+                metrics,
+                inventory,
+                impacts,
+                impacts_from_arbitrary_inventory
+            ],
+        )
         .mount(
             "/swagger-ui/",
             make_swagger_ui(&SwaggerUIConfig {
@@ -66,11 +75,11 @@ async fn metrics(
     metrics.unwrap()
 }
 
-/// # Returns the inventory as json.
+/// # Returns current inventory.
 ///
 /// Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value
 ///
-/// Example query: http://localhost:8000/inventorynew?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
+/// Example query: http://localhost:8000/inventory?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value
 #[openapi(tag = "inventory")]
 #[get("/inventory?<aws_region>&<filter_tags>&<include_block_storage>")]
 async fn inventory(
@@ -92,7 +101,7 @@ async fn inventory(
     )
 }
 
-/// # Returns the impacts (use and embedded) as json.
+/// # Returns the impacts of current inventory.
 ///
 /// Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value
 ///
@@ -123,6 +132,37 @@ async fn impacts(
         &_config.boavizta_url,
         verbose_output.unwrap_or(false),
         include_block_storage.unwrap_or(false),
+    )
+    .await
+    .unwrap();
+    Json(res)
+}
+/*
+#[post(
+"/impacts-from-json?<aws_region>&<use_duration_hours>", data = "<task>"
+)]*/
+/// # Retrieve the impacts of arbitrary inventory.
+///
+/// This can be used to evaluate impacts of a not yet implemented architecture.
+///
+/// The inventory is passed as json data in the request body.
+#[openapi(tag = "impacts")]
+#[post(
+    "/impacts-from-arbitrary-inventory?<use_duration_hours>&<verbose_output>",
+    data = "<inventory>"
+)]
+async fn impacts_from_arbitrary_inventory(
+    _config: &State<Config>,
+    use_duration_hours: Option<f32>,
+    verbose_output: Option<bool>,
+    inventory: Json<Inventory>,
+) -> Json<EstimatedInventory> {
+    let hours_use_time = use_duration_hours.unwrap_or(1.0);
+    let res = crate::estimate_impacts_of_inventory(
+        &hours_use_time,
+        &_config.boavizta_url,
+        verbose_output.unwrap_or(false),
+        inventory.into_inner(),
     )
     .await
     .unwrap();
