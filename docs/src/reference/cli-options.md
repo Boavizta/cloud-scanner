@@ -6,8 +6,9 @@ List aws instances and their environmental impact (from Boavizta API)
 Usage: cloud-scanner-cli [OPTIONS] <COMMAND>
 
 Commands:
-  estimate   Get estimation of impacts for a given usage duration
-  inventory  List instances and  their average cpu load for the last 5 minutes (without returning impacts)
+  estimate   Get estimation of impacts for a given usage duration as json
+  metrics    Get estimation of impacts for a given usage duration as OpenMetrics (Prometheus) instead of json
+  inventory  List resources (and instances average cpu load for the last 5 minutes) without returning impacts
   serve      Run as a standalone server. Access metrics (e.g. http://localhost:8000/metrics?aws_region=eu-west-3), inventory or impacts (see http://localhost:8000/swagger-ui)
   help       Print this message or the help of the given subcommand(s)
 
@@ -23,6 +24,7 @@ Options:
   -h, --help
           Print help
   -V, --version
+          Print version
 ```
 
 ## Experimental feature: estimate block storage
