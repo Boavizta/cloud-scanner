@@ -20,9 +20,9 @@ export AWS_PROFILE='<YOUR_PROFILE_NAME>'
 # Get impacts of 10 hours of use (on your default account region)
 cargo run estimate --use-duration-hours 10 | jq
 
-# Same thing but as metrics
-cargo run -- --as-metrics estimate --use-duration-hours 10
+# Get impacts of 10 hours of use, for a explicit region. Results as JSON 
+cargo run -- --aws-region eu-west-1 estimate --use-duration-hours 10 | jq
 
-# Same query for explicit region
-cargo run -- --aws-region eu-west-3 estimate --use-duration-hours 10 | jq
+# Get impacts of 10 hours of use, for a explicit region. Results as Prometheus metrics 
+cargo run -- --aws-region eu-west-1 metrics --use-duration-hours 10
 ```

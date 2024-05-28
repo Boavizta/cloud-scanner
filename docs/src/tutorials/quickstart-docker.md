@@ -26,12 +26,11 @@ docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFIL
 docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --use-duration-hours 10
 
 # Serve metrics
-``` sh
-# Note that we need to provide ca certificates and bind  listen address to 0.0.0.0.
+# /!\ Note that we need to provide CA certificates and bind listen address to 0.0.0.0.
 docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE='myprofile'  ghcr.io/boavizta/cloud-scanner-cli:latest serve
 ```
 
-⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the role of the instance that execute the container to manage authentication of the cli.
+⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the **role of the instance** that execute the container to manage authentication of the cli.
 
 ⚠ Running metric server in container require setting  extra variables:
 
