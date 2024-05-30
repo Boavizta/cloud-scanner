@@ -398,4 +398,15 @@ mod tests {
             "Wrong number of resources in the inventory file"
         );
     }
+
+    #[tokio::test]
+    async fn test_load_inventory_from_formatted_file() {
+        let inventory_file_path: &Path = Path::new("./test-data/AWS_INVENTORY_FORMATTED.json");
+        let inventory: Inventory = load_inventory_from_file(inventory_file_path).await.unwrap();
+        assert_eq!(
+            inventory.resources.len(),
+            2,
+            "Wrong number of resources in the inventory file"
+        );
+    }
 }

@@ -1,0 +1,57 @@
+{
+  "metadata": {},
+  "resources": [
+    {
+      "provider": "AWS",
+      "id": "instance-1",
+      "location": {
+        "aws_region": "eu-west-1",
+        "iso_country_code": "IRL"
+      },
+      "resource_details": {
+        "Instance": {
+          "instance_type": "a1.medium",
+          "usage": {
+            "average_cpu_load": 0.3,
+            "usage_duration_seconds": 300,
+            "state": "Running"
+          }
+        }
+      },
+      "tags": []
+    },
+    {
+      "provider": "AWS",
+      "id": "instance-2",
+      "location": {
+        "aws_region": "eu-west-1",
+        "iso_country_code": "IRL"
+      },
+      "resource_details": {
+        "Instance": {
+          "instance_type": "m6g.xlarge",
+          "usage": {
+            "average_cpu_load": 0,
+            "usage_duration_seconds": 300,
+            "state": "Stopped"
+          }
+        }
+      },
+      "tags": []
+    }
+  ],
+  "executionStatistics": {
+    "inventory_duration": {
+      "secs": 0,
+      "nanos": 669819838
+    },
+    "impact_estimation_duration": {
+      "secs": 0,
+      "nanos": 0
+    },
+    "total_duration": {
+      "secs": 0,
+      "nanos": 669820304
+    }
+  }
+}
