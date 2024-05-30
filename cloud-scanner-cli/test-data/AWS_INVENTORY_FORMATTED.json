@@ -16,7 +16,6 @@
           "instance_type": "a1.medium",
           "usage": {
             "average_cpu_load": 0.3,
-            "usage_duration_seconds": 300,
             "state": "Running"
           }
         }
@@ -35,7 +34,6 @@
           "instance_type": "m6g.xlarge",
           "usage": {
             "average_cpu_load": 0,
-            "usage_duration_seconds": 300,
             "state": "Stopped"
           }
         }
