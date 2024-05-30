@@ -45,7 +45,7 @@ pub async fn estimate_impacts(
     verbose: bool,
     include_block_storage: bool,
 ) -> Result<EstimatedInventory> {
-    let aws_provider: AwsCloudProvider = AwsCloudProvider::new(aws_region).await;
+    let aws_provider: AwsCloudProvider = AwsCloudProvider::new(aws_region).await?;
     let inventory: Inventory = aws_provider
         .list_resources(tags, include_block_storage)
         .await
@@ -132,7 +132,7 @@ pub async fn get_inventory(
     aws_region: &str,
     include_block_storage: bool,
 ) -> Result<Inventory> {
-    let aws_inventory: AwsCloudProvider = AwsCloudProvider::new(aws_region).await;
+    let aws_inventory: AwsCloudProvider = AwsCloudProvider::new(aws_region).await?;
     let inventory: Inventory = aws_inventory
         .list_resources(tags, include_block_storage)
         .await

@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "inventoryDate": "2024-05-30 12:21:03.0Z",
+    "description": "A test inventory"
+  },
+  "resources": [
+    {
+      "provider": "AWS",
+      "id": "instance-1",
+      "location": {
+        "aws_region": "eu-west-1",
+        "iso_country_code": "IRL"
+      },
+      "resource_details": {
+        "Instance": {
+          "instance_type": "a1.medium",
+          "usage": {
+            "average_cpu_load": 0.3,
+            "state": "Running"
+          }
+        }
+      },
+      "tags": []
+    },
+    {
+      "provider": "AWS",
+      "id": "instance-2",
+      "location": {
+        "aws_region": "eu-west-1",
+        "iso_country_code": "IRL"
+      },
+      "resource_details": {
+        "Instance": {
+          "instance_type": "m6g.xlarge",
+          "usage": {
+            "average_cpu_load": 0,
+            "state": "Stopped"
+          }
+        }
+      },
+      "tags": []
+    }
+  ]
+}
