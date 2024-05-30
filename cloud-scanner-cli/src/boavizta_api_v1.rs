@@ -294,7 +294,8 @@ mod tests {
 
     use super::*;
     use crate::model::{
-        CloudProvider, CloudResource, InstanceState, InstanceUsage, ResourceDetails, StorageUsage,
+        CloudProvider, CloudResource, InstanceState, InstanceUsage, InventoryMetadata,
+        ResourceDetails, StorageUsage,
     };
     use crate::usage_location::UsageLocation;
     use assert_json_diff::assert_json_include;
@@ -447,6 +448,10 @@ mod tests {
         instances.push(instance1_1percent);
 
         let inventory = Inventory {
+            metadata: InventoryMetadata {
+                inventory_date: None,
+                description: None,
+            },
             resources: instances,
             execution_statistics: None,
         };
@@ -510,6 +515,10 @@ mod tests {
         let one_hour = 1.0 as f32;
 
         let inventory = Inventory {
+            metadata: InventoryMetadata {
+                inventory_date: None,
+                description: None,
+            },
             resources: instances,
             execution_statistics: None,
         };

@@ -8,14 +8,12 @@ use anyhow::{Context, Error, Result};
 use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
-use aws_sdk_ec2::types::Volume;
-use aws_sdk_ec2::types::{Instance, InstanceStateName};
-use chrono::TimeDelta;
-use chrono::Utc;
+use aws_sdk_ec2::types::{Instance, InstanceStateName, Volume};
+use chrono::{TimeDelta, Utc};
 
 use crate::model::{
     CloudProvider, CloudResource, CloudResourceTag, ExecutionStatistics, InstanceState,
-    InstanceUsage, Inventory, ResourceDetails, StorageAttachment, StorageUsage,
+    InstanceUsage, Inventory, InventoryMetadata, ResourceDetails, StorageAttachment, StorageUsage,
 };
 use async_trait::async_trait;
 use aws_types::SdkConfig;
@@ -365,7 +363,13 @@ impl Inventoriable for AwsCloudProvider {
         };
         warn!("{:?}", stats);
 
+        let metadata = InventoryMetadata {
+            inventory_date: Some(Utc::now()),
+            description: Some(String::from("About this inventory")),
+        };
+
         let inventory = Inventory {
+            metadata,
             resources,
             execution_statistics: Some(stats),
         };

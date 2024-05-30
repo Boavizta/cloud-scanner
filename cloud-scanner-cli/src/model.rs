@@ -1,5 +1,6 @@
 //!  Business Entities of cloud Scanner
 use anyhow::Context;
+use chrono::{DateTime, Utc};
 use rocket_okapi::okapi::schemars;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -29,8 +30,17 @@ impl fmt::Display for ExecutionStatistics {
 #[derive(Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory {
+    pub metadata: InventoryMetadata,
     pub resources: Vec<CloudResource>,
     pub execution_statistics: Option<ExecutionStatistics>,
+}
+
+/// Details about the inventory
+#[derive(Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct InventoryMetadata {
+    pub inventory_date: Option<DateTime<Utc>>,
+    pub description: Option<String>,
 }
 
 /// Load inventory from a file
