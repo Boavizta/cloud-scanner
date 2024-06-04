@@ -12,11 +12,11 @@
         "iso_country_code": "IRL"
       },
       "resource_details": {
-        "Instance": {
+        "instance": {
           "instance_type": "a1.medium",
           "usage": {
             "average_cpu_load": 0.3,
-            "state": "Running"
+            "state": "running"
           }
         }
       },
@@ -30,11 +30,11 @@
         "iso_country_code": "IRL"
       },
       "resource_details": {
-        "Instance": {
+        "instance": {
           "instance_type": "m6g.xlarge",
           "usage": {
             "average_cpu_load": 0,
-            "state": "Stopped"
+            "state": "stopped"
           }
         }
       },
