@@ -1,12 +1,14 @@
 # Output data
 
-Cloud scanner CLI and serverless application return data as _json_ or _Open Metrics_ (Prometheus) format.
+The _inventory_ is always returned as JSON.
 
-## JSON CLI impacts output
+The _estimated inventory_ (i.e. inventory with impacts data ) is either returned as _json_ or as a set of _Open Metrics_ (Prometheus).
 
-Cloud scanner returns a json array of instances metadata.
+## Format of the estimated inventory as JSON
 
-⚠ Returns _empty_ impacts when the _instance type_ is not known in Boavizta database
+Cloud scanner returns a json array of *impacting_resources*. Each resource contains `resource_details` as well as `impact_values`. 
+
+⚠  Cloud scanner returns _empty_ impacts_values when the _instance type_ is not known in Boavizta database
 
 ```json
 {
@@ -123,7 +125,7 @@ Cloud scanner returns a json array of instances metadata.
 
 ## Schema of the json output
 
-A schema described the format of the JSON output  (as part of theOpenAPI specification).
+A schema describe the format of the JSON estimated inventory  (as part of theOpenAPI specification).
 
 To access it:
 
