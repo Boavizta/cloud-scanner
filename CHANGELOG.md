@@ -9,16 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
-## [3.0.0]-2024-05-30
+## [3.0.0]-2024-06-05
 
 ## What's Changed
 
 - [352 estimate impacts of an existing inventory by demeringo · Pull Request #505 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/pull/505). ⚠ This introduces breaking changes on the CLI options. The option to get results as metrics (using the flag `--as-metrics` on the 'estimate' command is replaced by a direct command name `metrics`).
+- [JSON output: use snake_case for all keys. · Issue #521 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/521)
 
 ## Added
 
 - [Add metadata to the inventory · Issue #508 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/508)
-- [JSON output: use snake_case for all keys. · Issue #521 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/521)
 
 ## [2.0.5]-2024-04-12
 
