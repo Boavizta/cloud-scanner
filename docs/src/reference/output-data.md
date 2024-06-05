@@ -2,91 +2,151 @@
 
 Cloud scanner CLI and serverless application return data as _json_ or _Open Metrics_ (Prometheus) format.
 
-## JSON CLI output (the default)
+## JSON CLI impacts output
 
 Cloud scanner returns a json array of instances metadata.
 
 ⚠ Returns _empty_ impacts when the _instance type_ is not known in Boavizta database
 
 ```json
-[
-  {
-    "instance_id": "i-001dc0ebbf9cb25c0",
-    "instance_type": "t2.micro",
-    "usage_data": {
-      "use_duration_hours": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {}
-  },
-  {
-    "instance_id": "i-004599844f7c24814",
-    "instance_type": "t2.small",
-    "usage_data": {
-      "use_duration_hours": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {}
-  },
-  {
-    "instance_id": "i-075444d7293d8bd76",
-    "instance_type": "t2.micro",
-    "usage_data": {
-      "use_duration_hours": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {}
-  },
-  {
-    "instance_id": "i-033df52f12f30ca66",
-    "instance_type": "m6g.xlarge",
-    "usage_data": {
-      "use_duration_hours": 5,
-      "usage_location": "IRL"
-    },
-    "impacts": {
-      "adp": {
-        "manufacture": 0.0084,
-        "unit": "kgSbeq",
-        "use": 1.7e-9
+{
+  "impacting_resources": [
+    {
+      "cloud_resource": {
+        "provider": "AWS",
+        "id": "instance-F",
+        "location": {
+          "aws_region": "eu-west-1",
+          "iso_country_code": "IRL"
+        },
+        "resource_details": {
+          "instance": {
+            "instance_type": "FICTIVE-INSTANCE-TYPE",
+            "usage": {
+              "average_cpu_load": 100,
+              "state": "running"
+            }
+          }
+        },
+        "tags": []
       },
-      "gwp": {
-        "manufacture": 87,
-        "unit": "kgCO2eq",
-        "use": 0.029
+      "impacts_values": null,
+      "impacts_duration_hours": 5
+    },
+    {
+      "cloud_resource": {
+        "provider": "AWS",
+        "id": "instance-1",
+        "location": {
+          "aws_region": "eu-west-1",
+          "iso_country_code": "IRL"
+        },
+        "resource_details": {
+          "instance": {
+            "instance_type": "a1.medium",
+            "usage": {
+              "average_cpu_load": 0.3,
+              "state": "running"
+            }
+          }
+        },
+        "tags": []
       },
-      "pe": {
-        "manufacture": 1100,
-        "unit": "MJ",
-        "use": 0.82
-      }
+      "impacts_values": {
+        "adp_manufacture_kgsbeq": 8.8e-07,
+        "adp_use_kgsbeq": 1.29e-10,
+        "pe_manufacture_megajoules": 0.057,
+        "pe_use_megajoules": 0.063,
+        "gwp_manufacture_kgco2eq": 0.0041,
+        "gwp_use_kgco2eq": 0.00226,
+        "raw_data": {
+          "impacts": {
+            "adp": {
+              "description": "Use of minerals and fossil ressources",
+              "embedded": {
+                "max": 1.261e-06,
+                "min": 5.808e-07,
+                "value": 8.8e-07,
+                "warnings": [
+                  "End of life is not included in the calculation"
+                ]
+              },
+              "unit": "kgSbeq",
+              "use": {
+                "max": 1.552e-10,
+                "min": 1.164e-10,
+                "value": 1.29e-10
+              }
+            },
+            "gwp": {
+              "description": "Total climate change",
+              "embedded": {
+                "max": 0.005669,
+                "min": 0.002324,
+                "value": 0.0041,
+                "warnings": [
+                  "End of life is not included in the calculation"
+                ]
+              },
+              "unit": "kgCO2eq",
+              "use": {
+                "max": 0.002718,
+                "min": 0.002038,
+                "value": 0.00226
+              }
+            },
+            "pe": {
+              "description": "Consumption of primary energy",
+              "embedded": {
+                "max": 0.07877,
+                "min": 0.03178,
+                "value": 0.057,
+                "warnings": [
+                  "End of life is not included in the calculation"
+                ]
+              },
+              "unit": "MJ",
+              "use": {
+                "max": 0.07577,
+                "min": 0.05683,
+                "value": 0.063
+              }
+            }
+          }
+        }
+      },
+      "impacts_duration_hours": 5
     }
-  }
-]
+  ]
+}
 ```
 
-## Server mode json results
+## Schema of the json output
 
-The format of the json results is slightly more complex in server mode.
+A schema described the format of the JSON output  (as part of theOpenAPI specification).
 
-When run in server mode, the server exposes an OpenAPI specification at <http://127.0.0.1:8000/openapi.json> and a swagger-ui:
+To access it:
+
+1. start a server (`cloud-scanner-cli serve`)
+2. access the OpenAPI specification at <http://127.0.0.1:8000/openapi.json> and a swagger-ui at
 <http://127.0.0.1:8000/swagger-ui/>
 
 See  [OpenAPI specification in server mode](./openapi-server-mode.md)
 
 ## OpenMetrics/Prometheus output
 
-As CLI application, If using `--as-metrics` or `-m`  option or the `serve` command, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json details.
-This is also the default format of the serverless app `metrics` route.
+As CLI application, when using the  `metrics` or  `serve` command, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json.
+This is also the default format of the serverless application `metrics` route.
 
 When using the metric output format, you get 2 sets of metrics
 
-- Metrics named: _boavizta_xxxxx_ are _summary_ metrics (total number of resources, summed impacts, a.s.o)
-- Metrics named _boavizta_resource_yyy_ are specific to individual resources. The metric label can be filtered to identify resource.
+- Metrics named _boavizta_xxxxx_ are _summary_ metrics (total number of resources, summed impacts, a.s.o)
+- Metrics named _boavizta_resource_yyy_ are specific to _individual resources_. The metric labels can be filtered to identify resource.
 
 ```sh
-cargo run -- --as-metrics estimate -u 1 
+cargo run metrics -u 1
 ```
+
 Returns:
 
 ```sh

@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "cloud-scanner-cli",
-    "version": "2.0.4"
+    "version": "2.0.5"
   },
   "paths": {
     "/metrics": {
@@ -70,8 +70,8 @@
         "tags": [
           "inventory"
         ],
-        "summary": "Returns the inventory as json.",
-        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nExample query: http://localhost:8000/inventorynew?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value",
+        "summary": "Returns current inventory.",
+        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nExample query: http://localhost:8000/inventory?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value",
         "operationId": "inventory",
         "parameters": [
           {
@@ -121,7 +121,7 @@
         "tags": [
           "impacts"
         ],
-        "summary": "Returns the impacts (use and embedded) as json.",
+        "summary": "Returns the impacts of current inventory.",
         "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nExample query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0",
         "operationId": "impacts",
         "parameters": [
@@ -183,6 +183,57 @@
           }
         }
       }
+    },
+    "/impacts-from-arbitrary-inventory": {
+      "post": {
+        "tags": [
+          "impacts"
+        ],
+        "summary": "Retrieve the impacts of arbitrary inventory.",
+        "description": "This can be used to evaluate impacts of a not yet implemented architecture.\n\nThe inventory is passed as json data in the request body.",
+        "operationId": "impacts_from_arbitrary_inventory",
+        "parameters": [
+          {
+            "name": "use_duration_hours",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          },
+          {
+            "name": "verbose_output",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Inventory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedInventory"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -191,21 +242,40 @@
         "description": "Inventory: a list of resources",
         "type": "object",
         "required": [
+          "metadata",
           "resources"
         ],
         "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/InventoryMetadata"
+          },
           "resources": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CloudResource"
             }
           },
-          "executionStatistics": {
+          "execution_statistics": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/ExecutionStatistics"
               }
             ],
+            "nullable": true
+          }
+        }
+      },
+      "InventoryMetadata": {
+        "description": "Details about the inventory",
+        "type": "object",
+        "properties": {
+          "inventory_date": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
             "nullable": true
           }
         }
@@ -271,16 +341,16 @@
           {
             "type": "string",
             "enum": [
-              "ObjectStorage"
+              "object_storage"
             ]
           },
           {
             "type": "object",
             "required": [
-              "Instance"
+              "instance"
             ],
             "properties": {
-              "Instance": {
+              "instance": {
                 "type": "object",
                 "required": [
                   "instance_type"
@@ -305,10 +375,10 @@
           {
             "type": "object",
             "required": [
-              "BlockStorage"
+              "block_storage"
             ],
             "properties": {
-              "BlockStorage": {
+              "block_storage": {
                 "type": "object",
                 "required": [
                   "storage_type"
@@ -343,18 +413,12 @@
         "type": "object",
         "required": [
           "average_cpu_load",
-          "state",
-          "usage_duration_seconds"
+          "state"
         ],
         "properties": {
           "average_cpu_load": {
             "type": "number",
             "format": "double"
-          },
-          "usage_duration_seconds": {
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
           },
           "state": {
             "$ref": "#/components/schemas/InstanceState"
@@ -364,25 +428,19 @@
       "InstanceState": {
         "type": "string",
         "enum": [
-          "Running",
-          "Stopped"
+          "running",
+          "stopped"
         ]
       },
       "StorageUsage": {
         "type": "object",
         "required": [
-          "size_gb",
-          "usage_duration_seconds"
+          "size_gb"
         ],
         "properties": {
           "size_gb": {
             "type": "integer",
             "format": "int32"
-          },
-          "usage_duration_seconds": {
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
           }
         }
       },
@@ -456,16 +514,16 @@
         "description": "An estimated inventory: impacting resources with their estimated impacts",
         "type": "object",
         "required": [
-          "impactingResources"
+          "impacting_resources"
         ],
         "properties": {
-          "impactingResources": {
+          "impacting_resources": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CloudResourceWithImpacts"
             }
           },
-          "executionStatistics": {
+          "execution_statistics": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/ExecutionStatistics"
