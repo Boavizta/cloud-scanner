@@ -14,6 +14,7 @@ use crate::usage_location::UsageLocation;
 
 ///  Statistics about program execution
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub struct ExecutionStatistics {
     pub inventory_duration: Duration,
     pub impact_estimation_duration: Duration,
@@ -28,7 +29,7 @@ impl fmt::Display for ExecutionStatistics {
 
 /// Inventory: a list of resources
 #[derive(Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct Inventory {
     pub metadata: InventoryMetadata,
     pub resources: Vec<CloudResource>,
@@ -37,7 +38,7 @@ pub struct Inventory {
 
 /// Details about the inventory
 #[derive(Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct InventoryMetadata {
     pub inventory_date: Option<DateTime<Utc>>,
     pub description: Option<String>,
@@ -58,7 +59,7 @@ pub async fn load_inventory_fom_json(json_inventory: &str) -> anyhow::Result<Inv
 
 /// An estimated inventory: impacting resources with their estimated impacts
 #[derive(Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "snake_case")]
 pub struct EstimatedInventory {
     pub impacting_resources: Vec<CloudResourceWithImpacts>,
     pub execution_statistics: Option<ExecutionStatistics>,
@@ -102,6 +103,7 @@ pub enum CloudProvider {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub enum ResourceDetails {
     Instance {
         instance_type: String,
@@ -116,12 +118,14 @@ pub enum ResourceDetails {
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub struct InstanceUsage {
     pub average_cpu_load: f64,
     pub state: InstanceState,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub enum InstanceState {
     #[default]
     Running,
@@ -129,17 +133,20 @@ pub enum InstanceState {
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub struct StorageUsage {
     pub size_gb: i32,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub struct StorageAttachment {
     pub instance_id: String,
 }
 
 /// A tag (just a mandatory key + optional value)
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub struct CloudResourceTag {
     pub key: String,
     pub value: Option<String>,
@@ -153,7 +160,7 @@ impl TryFrom<String> for CloudResourceTag {
     fn try_from(key_value: String) -> Result<Self, Self::Error> {
         let t: Vec<&str> = key_value.split('=').collect();
         if t.is_empty() {
-            Err("Cannot split the tag name from value (missing equal sign?)")
+            Err("Cannot split the tag name from value. Maybe a missing equal ('=') sign between tag names and values ?")
         } else {
             let key = t.first().unwrap().to_string();
             if let Some(val) = t.get(1) {

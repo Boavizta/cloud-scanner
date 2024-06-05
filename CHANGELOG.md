@@ -18,6 +18,7 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 ## Added
 
 - [Add metadata to the inventory · Issue #508 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/508)
+- [JSON output: use snake_case for all keys. · Issue #521 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/521)
 
 ## [2.0.5]-2024-04-12
 
