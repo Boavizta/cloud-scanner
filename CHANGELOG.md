@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+- https://github.com/Boavizta/cloud-scanner/issues/519 Add cloud-scanner version to inventory metadata
+
 ## [3.0.0]-2024-06-05
 
 ## What's Changed
