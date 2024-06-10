@@ -207,7 +207,7 @@ impl ImpactProvider for BoaviztaApiV1 {
         }
 
         let mut inventory_duration = Duration::from_millis(0);
-        if let Some(exec_stats) = inventory.execution_statistics {
+        if let Some(exec_stats) = inventory.metadata.execution_statistics {
             inventory_duration = exec_stats.inventory_duration;
         }
         let impact_estimation_duration = impact_query_start_time.elapsed();
@@ -453,9 +453,9 @@ mod tests {
                 inventory_date: None,
                 description: None,
                 cloud_scanner_version: Some(get_version()),
+                execution_statistics: None,
             },
             resources: instances,
-            execution_statistics: None,
         };
 
         let res = api.get_impacts(inventory, &one_hour, false).await.unwrap();
@@ -521,9 +521,9 @@ mod tests {
                 inventory_date: None,
                 description: None,
                 cloud_scanner_version: Some(get_version()),
+                execution_statistics: None,
             },
             resources: instances,
-            execution_statistics: None,
         };
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
