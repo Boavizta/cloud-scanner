@@ -42,6 +42,8 @@ pub struct Inventory {
 pub struct InventoryMetadata {
     pub inventory_date: Option<DateTime<Utc>>,
     pub description: Option<String>,
+    /// The version of the cloud scanner that generated the inventory
+    pub cloud_scanner_version: Option<String>,
 }
 
 /// Load inventory from a file

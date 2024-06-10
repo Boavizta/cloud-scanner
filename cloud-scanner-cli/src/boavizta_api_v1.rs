@@ -293,6 +293,7 @@ pub fn boa_impacts_to_cloud_resource_with_impacts(
 mod tests {
 
     use super::*;
+    use crate::get_version;
     use crate::model::{
         CloudProvider, CloudResource, InstanceState, InstanceUsage, InventoryMetadata,
         ResourceDetails, StorageUsage,
@@ -451,6 +452,7 @@ mod tests {
             metadata: InventoryMetadata {
                 inventory_date: None,
                 description: None,
+                cloud_scanner_version: Some(get_version()),
             },
             resources: instances,
             execution_statistics: None,
@@ -518,6 +520,7 @@ mod tests {
             metadata: InventoryMetadata {
                 inventory_date: None,
                 description: None,
+                cloud_scanner_version: Some(get_version()),
             },
             resources: instances,
             execution_statistics: None,

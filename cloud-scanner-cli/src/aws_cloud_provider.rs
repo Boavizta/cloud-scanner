@@ -2,6 +2,7 @@
 use std::time::Instant;
 
 use crate::cloud_provider::Inventoriable;
+use crate::get_version;
 use crate::usage_location::*;
 
 use anyhow::{Context, Error, Result};
@@ -370,6 +371,7 @@ impl Inventoriable for AwsCloudProvider {
         let metadata = InventoryMetadata {
             inventory_date: Some(Utc::now()),
             description: Some(String::from("About this inventory")),
+            cloud_scanner_version: Some(get_version()),
         };
 
         let inventory = Inventory {
