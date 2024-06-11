@@ -33,7 +33,6 @@ impl fmt::Display for ExecutionStatistics {
 pub struct Inventory {
     pub metadata: InventoryMetadata,
     pub resources: Vec<CloudResource>,
-    pub execution_statistics: Option<ExecutionStatistics>,
 }
 
 /// Details about the inventory
@@ -44,6 +43,7 @@ pub struct InventoryMetadata {
     pub description: Option<String>,
     /// The version of the cloud scanner that generated the inventory
     pub cloud_scanner_version: Option<String>,
+    pub execution_statistics: Option<ExecutionStatistics>,
 }
 
 /// Load inventory from a file

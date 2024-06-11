@@ -372,12 +372,12 @@ impl Inventoriable for AwsCloudProvider {
             inventory_date: Some(Utc::now()),
             description: Some(String::from("About this inventory")),
             cloud_scanner_version: Some(get_version()),
+            execution_statistics: Some(stats),
         };
 
         let inventory = Inventory {
             metadata,
             resources,
-            execution_statistics: Some(stats),
         };
         Ok(inventory)
     }
