@@ -2,9 +2,9 @@
 
 # Tutorials 🚀
 
-- [Quickstart - using CLI docker 🐳](tutorials/quickstart-docker.md)
-- [Quickstart - dashboard using docker 🐳](tutorials/quickstart-dashboard-docker.md)
-- [Quickstart - using cargo 🦀](tutorials/quickstart-rust-cli.md)
+- [Quickstart - CLI (docker 🐳)](tutorials/quickstart-docker.md)
+- [Quickstart - Dashboard (docker 🐳)](tutorials/quickstart-dashboard-docker.md)
+- [Quickstart - CLI (cargo 🦀)](tutorials/quickstart-rust-cli.md)
 - [Quickstart as serverless ⚡](tutorials/quickstart-serverless.md)
 
 # Explanations
@@ -26,7 +26,8 @@
 
 # Reference
 
-- [💡 Common issues and FAQ](reference/common-issues-and-FAQ.md)
+- [FAQ 💡](reference/FAQ.md)
+- [Common issues 🧰](reference/common-issues.md)
 - [CLI options](reference/cli-options.md)
 - [Environment variables](reference/env-vars.md)
 - [OpenAPI specification in server mode](reference/openapi-server-mode.md)
