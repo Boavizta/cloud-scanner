@@ -749,7 +749,7 @@ checksum = "4b82cf0babdbd58558212896d1a4272303a57bdb245c2bf1147185fb45640e70"
 
 [[package]]
 name = "cloud-scanner-cli"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "anyhow",
  "assert-json-diff",
@@ -779,7 +779,7 @@ dependencies = [
 
 [[package]]
 name = "cloud-scanner-lambda"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "cloud-scanner-cli",
  "envy",
