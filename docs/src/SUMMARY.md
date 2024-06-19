@@ -25,7 +25,7 @@
 - [Filtering by tags](how-to/filter-by-tags.md)
 - [Using a private instance of Boavizta API](how-to/using-private-boaviztapi.md)
 
-# Referen
+# Reference
 
 - [FAQ 💡](reference/FAQ.md)
 - [Common issues 🧰](reference/common-issues.md)
