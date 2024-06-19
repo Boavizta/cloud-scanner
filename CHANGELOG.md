@@ -20,6 +20,7 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 - [Add cloud-scanner version to inventory metadata · Issue #519 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/519)
 - [Document how cloud scanner provides estimations for Block storage (EBS) · Issue #532 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/532)
 - [Support AWS io1 io2 and standard EBS volumes · Issue #535 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/535)
+- [Doc(faq): explicit the positioning of cloud scanner compared to API and datavizta · Issue #528 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/528)
 
 ## [3.0.0]-2024-06-05
 
