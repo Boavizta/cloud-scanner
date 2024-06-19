@@ -511,6 +511,6 @@ mod tests {
         let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await.unwrap();
         let filtertags: Vec<String> = Vec::new();
         let res = aws.list_volumes(&filtertags).await.unwrap();
-        assert_eq!(4, res.len());
+        assert_eq!(6, res.len());
     }
 }

@@ -92,7 +92,7 @@ impl BoaviztaApiV1 {
                 };
 
                 match storage_type.as_str() {
-                    "st1" | "sc1" => {
+                    "st1" | "sc1" | "standard" => {
                         // This is a HDD
                         let res = component_api::disk_impact_bottom_up_v1_component_hdd_post(
                             &self.configuration,
@@ -107,14 +107,14 @@ impl BoaviztaApiV1 {
                             Ok(res) => Some(res),
                             Err(e) => {
                                 warn!(
-                                    "Warning: Cannot get HHD impact from API for type {}: {}",
+                                    "Warning: Cannot get HHD impact from API for storage type {}: {}",
                                     storage_type, e
                                 );
                                 None
                             }
                         }
                     }
-                    "gp2" | "gp3" => {
+                    "gp2" | "gp3" | "io1" | "io2" => {
                         // Use impacts of an SSD
                         let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
                             &self.configuration,
@@ -129,7 +129,7 @@ impl BoaviztaApiV1 {
                             Ok(res) => Some(res),
                             Err(e) => {
                                 warn!(
-                                    "Warning: Cannot get SSD impact from API for type {}: {}",
+                                    "Warning: Cannot get SSD impact from API for storage type {}: {}",
                                     storage_type, e
                                 );
                                 None
@@ -138,7 +138,7 @@ impl BoaviztaApiV1 {
                     }
                     _ => {
                         warn!(
-                            "Unknown disk type ({:?}), we use impacts of an ssd {:?}",
+                            "Unknown storage type ({:?}), defaulting to using impacts of an SSD {:?}",
                             storage_type.as_str(),
                             disk
                         );

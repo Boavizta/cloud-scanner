@@ -11,6 +11,7 @@
 
 - [Methodology](explanations/methodology.md)
 - [How we process workload](explanations/processing-workload.md)
+- [Estimating Block Storage ](explanations/block-storage.md)
 
 # How-to guides
 
@@ -24,7 +25,7 @@
 - [Filtering by tags](how-to/filter-by-tags.md)
 - [Using a private instance of Boavizta API](how-to/using-private-boaviztapi.md)
 
-# Reference
+# Referen
 
 - [FAQ 💡](reference/FAQ.md)
 - [Common issues 🧰](reference/common-issues.md)
