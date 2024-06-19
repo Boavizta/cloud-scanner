@@ -9,7 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+## [3.0.1]-2024-06-19
+
+## What's Changed
+
 - [JSON inventory: move the execution statistics to the metadata section. · Issue #520 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/520)
+
+## Added
+
 - [Add cloud-scanner version to inventory metadata · Issue #519 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/519)
 - [Document how cloud scanner provides estimations for Block storage (EBS) · Issue #532 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/532)
 - [Support AWS io1 io2 and standard EBS volumes · Issue #535 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/535)
