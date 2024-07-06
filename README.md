@@ -38,6 +38,10 @@ Cloud-scanner can be used:
 
 How it works:
 
+Cloud scanner follows Boavizta approach.
+
+> Thibault Simon, David Ekchajzer, Adrien Berthelot, Eric Fourboul, Samuel Rince, et al.. BoaviztAPI: a bottom-up model to assess the environmental impacts of cloud services. HotCarbon'24. Workshop on Sustainable Computer Systems, Jul 2024, Santa Cruz, United States. [⟨hal-04621947v1⟩](https://hal.science/hal-04621947v1)
+
 ![System in context diagram of cloud scanner](docs/src/images/cloud-scanner-system-in-context.png "System in context diagram of cloud scanner")
 
 ## Usage and documentation
