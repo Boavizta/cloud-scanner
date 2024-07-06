@@ -12,6 +12,8 @@ Impact data is retrieved from [BOAVIZTA reference data API](https://github.com/B
 
 Cloud scanner estimates impacts according to the duration of use of cloud resources. It also considers the "intensity" of use (like the type of instance and CPU load for a VM or size of a disk for storage). The region of use is also considered to take into account the electricity mix of the region (carbon intensity).
 
+> Thibault Simon, David Ekchajzer, Adrien Berthelot, Eric Fourboul, Samuel Rince, et al.. BoaviztAPI: a bottom-up model to assess the environmental impacts of cloud services. HotCarbon'24. Workshop on Sustainable Computer Systems, Jul 2024, Santa Cruz, United States. [⟨hal-04621947v1⟩](https://hal.science/hal-04621947v1)
+
 The general approach is to map cloud vendor specific ressources, either to Boavizta *cloud resources* (like for VM instances) or to more generic components (Block storage volumes are approximated as Boavizta HDD or SSD).
 
 But this approach means that **a large portion** of the cloud provider infrastructure **is excluded from the estimation**.
