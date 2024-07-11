@@ -12,7 +12,7 @@ use std::{fmt, fs};
 use crate::impact_provider::CloudResourceWithImpacts;
 use crate::usage_location::UsageLocation;
 
-///  Statistics about program execution
+/// Statistics about program execution
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct ExecutionStatistics {
@@ -27,7 +27,7 @@ impl fmt::Display for ExecutionStatistics {
     }
 }
 
-/// Inventory: a list of resources
+/// A list of cloud resources and metadata that describes the inventory itself
 #[derive(Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct Inventory {
@@ -39,10 +39,13 @@ pub struct Inventory {
 #[derive(Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct InventoryMetadata {
+    /// The date when the inventory was generated
     pub inventory_date: Option<DateTime<Utc>>,
+    /// A free text description of the inventory
     pub description: Option<String>,
     /// The version of the cloud scanner that generated the inventory
     pub cloud_scanner_version: Option<String>,
+    /// Statistics about program execution
     pub execution_statistics: Option<ExecutionStatistics>,
 }
 
@@ -67,11 +70,12 @@ pub struct EstimatedInventory {
     pub execution_statistics: Option<ExecutionStatistics>,
 }
 
-///  A cloud resource (could be an instance, function or any other resource)
+///  A cloud resource (could be an instance, block storage or any other resource)
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CloudResource {
     pub provider: CloudProvider,
     pub id: String,
+    ///  The location where cloud resources are running.
     pub location: UsageLocation,
     pub resource_details: ResourceDetails,
     pub tags: Vec<CloudResourceTag>,

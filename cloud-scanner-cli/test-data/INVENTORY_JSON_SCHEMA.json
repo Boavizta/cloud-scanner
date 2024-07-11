@@ -1,0 +1,305 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Inventory",
+  "description": "A list of cloud resources and metadata that describes the inventory itself",
+  "type": "object",
+  "required": [
+    "metadata",
+    "resources"
+  ],
+  "properties": {
+    "metadata": {
+      "$ref": "#/definitions/InventoryMetadata"
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CloudResource"
+      }
+    }
+  },
+  "definitions": {
+    "InventoryMetadata": {
+      "description": "Details about the inventory",
+      "type": "object",
+      "properties": {
+        "inventory_date": {
+          "description": "The date when the inventory was generated",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "description": {
+          "description": "A free text description of the inventory",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cloud_scanner_version": {
+          "description": "The version of the cloud scanner that generated the inventory",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "execution_statistics": {
+          "description": "Statistics about program execution",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ExecutionStatistics"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ExecutionStatistics": {
+      "description": "Statistics about program execution",
+      "type": "object",
+      "required": [
+        "impact_estimation_duration",
+        "inventory_duration",
+        "total_duration"
+      ],
+      "properties": {
+        "inventory_duration": {
+          "$ref": "#/definitions/Duration"
+        },
+        "impact_estimation_duration": {
+          "$ref": "#/definitions/Duration"
+        },
+        "total_duration": {
+          "$ref": "#/definitions/Duration"
+        }
+      }
+    },
+    "Duration": {
+      "type": "object",
+      "required": [
+        "nanos",
+        "secs"
+      ],
+      "properties": {
+        "secs": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "nanos": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      }
+    },
+    "CloudResource": {
+      "description": "A cloud resource (could be an instance, block storage or any other resource)",
+      "type": "object",
+      "required": [
+        "id",
+        "location",
+        "provider",
+        "resource_details",
+        "tags"
+      ],
+      "properties": {
+        "provider": {
+          "$ref": "#/definitions/CloudProvider"
+        },
+        "id": {
+          "type": "string"
+        },
+        "location": {
+          "description": "The location where cloud resources are running.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/UsageLocation"
+            }
+          ]
+        },
+        "resource_details": {
+          "$ref": "#/definitions/ResourceDetails"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CloudResourceTag"
+          }
+        }
+      }
+    },
+    "CloudProvider": {
+      "type": "string",
+      "enum": [
+        "AWS",
+        "OVH"
+      ]
+    },
+    "UsageLocation": {
+      "description": "The location where cloud resources are running.\n\nTODO! the usage location should be abstracted and vendor specific implementation should be part of the cloud_provider model (region names are tied to a specific cloud provider)",
+      "type": "object",
+      "required": [
+        "aws_region",
+        "iso_country_code"
+      ],
+      "properties": {
+        "aws_region": {
+          "description": "The AWS region (like eu-west-1)",
+          "type": "string"
+        },
+        "iso_country_code": {
+          "description": "The 3-letters ISO country code corresponding to the country of the aws_region",
+          "type": "string"
+        }
+      }
+    },
+    "ResourceDetails": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "object_storage"
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
+            "instance"
+          ],
+          "properties": {
+            "instance": {
+              "type": "object",
+              "required": [
+                "instance_type"
+              ],
+              "properties": {
+                "instance_type": {
+                  "type": "string"
+                },
+                "usage": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/InstanceUsage"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "block_storage"
+          ],
+          "properties": {
+            "block_storage": {
+              "type": "object",
+              "required": [
+                "storage_type"
+              ],
+              "properties": {
+                "storage_type": {
+                  "type": "string"
+                },
+                "usage": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/StorageUsage"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "attached_instances": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "$ref": "#/definitions/StorageAttachment"
+                  }
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "InstanceUsage": {
+      "type": "object",
+      "required": [
+        "average_cpu_load",
+        "state"
+      ],
+      "properties": {
+        "average_cpu_load": {
+          "type": "number",
+          "format": "double"
+        },
+        "state": {
+          "$ref": "#/definitions/InstanceState"
+        }
+      }
+    },
+    "InstanceState": {
+      "type": "string",
+      "enum": [
+        "running",
+        "stopped"
+      ]
+    },
+    "StorageUsage": {
+      "type": "object",
+      "required": [
+        "size_gb"
+      ],
+      "properties": {
+        "size_gb": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "StorageAttachment": {
+      "type": "object",
+      "required": [
+        "instance_id"
+      ],
+      "properties": {
+        "instance_id": {
+          "type": "string"
+        }
+      }
+    },
+    "CloudResourceTag": {
+      "description": "A tag (just a mandatory key + optional value)",
+      "type": "object",
+      "required": [
+        "key"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}
