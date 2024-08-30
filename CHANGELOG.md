@@ -11,6 +11,7 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 
 - [Doc: reference Boavizta methodology paper. · Issue #552 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/552)
 - [Expose the json schema of the inventory format · Issue #558 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/558). Use `cargo run inventory --print-json-schema` with CLI to get the schema on stdout.
+- [chore: update to Rust 1.80.1 · Issue #564 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/564)
 
 ## [3.0.1]-2024-06-19
 
