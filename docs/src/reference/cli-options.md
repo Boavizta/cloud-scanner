@@ -38,6 +38,13 @@ Use the `--include-block-storage` command line flag or parameter to consider blo
 cargo run estimate --use-duration-hours 1 --include-block-storage --output-verbose-json
 ```
 
+## Print the JSON schema of the inventory file
+
+```sh
+# Print the JSON schema of an inventory file (without producing the inventory)
+cargo run inventory --print-json-schema
+```
+
 ## Display statistics
 
 Use `-v` will display statistics on std error.

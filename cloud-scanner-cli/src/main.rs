@@ -72,6 +72,10 @@ enum SubCommand {
         #[arg(long, short = 'b', action)]
         /// Experimental feature: include block storage in the inventory
         include_block_storage: bool,
+
+        /// Print the json schema of the inventory (instead of performing inventory)
+        #[arg(short = 's', long)]
+        print_json_schema: bool,
     },
     ///  Run as a standalone server.
     /// Access metrics (e.g. http://localhost:8000/metrics?aws_region=eu-west-3), inventory or impacts (see http://localhost:8000/swagger-ui)
@@ -168,12 +172,20 @@ async fn main() -> Result<()> {
         }
         SubCommand::Inventory {
             include_block_storage,
+            print_json_schema,
         } => {
-            info!("Using filter tags {:?}", &args.filter_tags);
-            let inventory =
-                cloud_scanner_cli::get_inventory(&args.filter_tags, &region, include_block_storage)
-                    .await?;
-            print_inventory(&inventory).await?;
+            if print_json_schema {
+                cloud_scanner_cli::inventory_exporter::print_inventory_schema()?;
+            } else {
+                info!("Using filter tags {:?}", &args.filter_tags);
+                let inventory = cloud_scanner_cli::get_inventory(
+                    &args.filter_tags,
+                    &region,
+                    include_block_storage,
+                )
+                .await?;
+                print_inventory(&inventory).await?;
+            }
         }
         SubCommand::Serve {} => cloud_scanner_cli::serve_metrics(&api_url).await?,
     }
