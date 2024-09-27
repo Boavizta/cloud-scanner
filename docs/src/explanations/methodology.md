@@ -6,7 +6,7 @@ It performs an inventory of the resources used in a cloud account. It then retur
 
 ## The source of impact data
 
-Impact data is retrieved from [BOAVIZTA reference data API](https://github.com/Boavizta/boaviztapi/) v1.2.x.
+Impact data is retrieved from [BOAVIZTA reference data API](https://github.com/Boavizta/boaviztapi/) v1.3.x.
 
 ## General approach and limits
 
