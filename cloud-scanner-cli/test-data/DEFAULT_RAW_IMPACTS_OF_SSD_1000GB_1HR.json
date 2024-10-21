@@ -29,8 +29,8 @@
     "pe": {
       "embedded": {
         "value": 0.022,
-        "min": 0.01104,
-        "max": 0.06627,
+        "min": 0.01093,
+        "max": 0.06616,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -71,8 +71,8 @@
       "pe": {
         "embedded": {
           "value": 0.022,
-          "min": 0.01104,
-          "max": 0.06627,
+          "min": 0.01093,
+          "max": 0.06616,
           "warnings": [
             "End of life is not included in the calculation"
           ]
