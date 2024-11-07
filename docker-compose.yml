@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   cloud_scanner:
     container_name: "cloud_scanner_boa"

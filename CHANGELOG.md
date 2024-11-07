@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+- [Display cpu and storage size metrics in the demo dashboard · Issue #465 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/465)
 - [Update version of Boavizta API to 1.3 and Grafana to 11.2.3 in docker-compose](https://github.com/Boavizta/cloud-scanner/issues/576)
 - [Doc: reference Boavizta methodology paper. · Issue #552 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/552)
 - [Expose the json schema of the inventory format · Issue #558 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/558). Use `cargo run inventory --print-json-schema` with CLI to get the schema on stdout.
