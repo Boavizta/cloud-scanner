@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "serverless": "^3.38.0",
+    "serverless": "^4.4.9",
     "serverless-rust": "^0.3.8"
   },
   "name": "boavizta-cloud-scanner",
