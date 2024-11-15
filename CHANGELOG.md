@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+- [chore: update to Rust 1.82 · Issue #609 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/609)
+
 ## [3.1.0]-2024-11-07
 
 ## What's Changed
