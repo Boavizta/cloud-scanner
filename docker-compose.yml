@@ -1,9 +1,8 @@
-version: "3.8"
 services:
   cloud_scanner:
     container_name: "cloud_scanner_boa"
     hostname: cloud_scanner
-    image: ghcr.io/boavizta/cloud-scanner-cli:3.0.1
+    image: ghcr.io/boavizta/cloud-scanner-cli:3.1.0
     command: 
       - -b http://boavizta_api:5000
       - -vv
@@ -26,7 +25,7 @@ services:
   grafana:
     container_name: "grafana_boa"
     hostname: grafana
-    image: docker.io/grafana/grafana:10.4.1
+    image: docker.io/grafana/grafana:11.2.3
     ports:
       - "3001:3000"
     volumes:
@@ -55,7 +54,7 @@ services:
   boavizta_api:
     container_name: "boavizta_api"
     hostname: boavizta
-    image:  ghcr.io/boavizta/boaviztapi:1.2.4
+    image:  ghcr.io/boavizta/boaviztapi:1.3
     ports:
       - "5000:5000"
     networks:

@@ -42,21 +42,21 @@ impl BoaviztaApiV1 {
                 let mut usage_cloud: UsageCloud = UsageCloud::new();
 
                 //usage_cloud.hours_life_time = Some(usage_duration_hours.to_owned());
-                usage_cloud.usage_location = Some(cr.location.iso_country_code.to_owned());
+                usage_cloud.usage_location = Some(Some(cr.location.iso_country_code.to_owned()));
 
                 if let Some(instance_usage) = usage {
-                    usage_cloud.time_workload = Some(instance_usage.average_cpu_load as f32);
+                    usage_cloud.time_workload = Some(instance_usage.average_cpu_load);
                 }
 
                 let mut cloud: Cloud = Cloud::new();
-                cloud.provider = Some(String::from("aws"));
-                cloud.instance_type = Some(instance_type.clone());
-                cloud.usage = Some(Box::new(usage_cloud));
+                cloud.provider = Some(Some(String::from("aws")));
+                cloud.instance_type = Some(Some(instance_type.clone()));
+                cloud.usage = Some(Some(Box::new(usage_cloud)));
 
                 let res = cloud_api::instance_cloud_impact_v1_cloud_instance_post(
                     &self.configuration,
                     Some(verbose),
-                    Some(usage_duration_hours.to_owned()),
+                    Some(usage_duration_hours.to_owned().into()),
                     Some(criteria),
                     Some(cloud),
                 )
@@ -81,7 +81,7 @@ impl BoaviztaApiV1 {
             } => {
                 //let duration: f32 = usage.unwrap().usage_duration_seconds.into();
                 let disk = Disk {
-                    capacity: Some(usage.unwrap().size_gb),
+                    capacity: Some(Some(usage.unwrap().size_gb)),
                     units: None,
                     usage: None,
                     r#type: None,
@@ -97,7 +97,7 @@ impl BoaviztaApiV1 {
                         let res = component_api::disk_impact_bottom_up_v1_component_hdd_post(
                             &self.configuration,
                             Some(verbose),
-                            Some(usage_duration_hours.to_owned()),
+                            Some(usage_duration_hours.to_owned().into()),
                             Some("DEFAULT"),
                             Some(criteria),
                             Some(disk),
@@ -119,7 +119,7 @@ impl BoaviztaApiV1 {
                         let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
                             &self.configuration,
                             Some(verbose),
-                            Some(usage_duration_hours.to_owned()),
+                            Some(usage_duration_hours.to_owned().into()),
                             Some("DEFAULT"),
                             Some(criteria),
                             Some(disk),
@@ -146,7 +146,7 @@ impl BoaviztaApiV1 {
                         let res = component_api::disk_impact_bottom_up_v1_component_ssd_post(
                             &self.configuration,
                             Some(verbose),
-                            Some(usage_duration_hours.to_owned()),
+                            Some(usage_duration_hours.to_owned().into()),
                             Some("DEFAULT"),
                             Some(criteria),
                             Some(disk),

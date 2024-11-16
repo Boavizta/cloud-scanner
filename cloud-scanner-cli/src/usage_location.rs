@@ -1,10 +1,19 @@
 //! The location where cloud resources are running.
-
-use isocountry::CountryCode;
-use rocket_okapi::okapi::schemars;
+use csv::ReaderBuilder;
+use log::error;
+use once_cell::sync::Lazy;
 use rocket_okapi::okapi::schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::error::Error;
+use std::sync::Mutex;
 use thiserror::Error;
+
+// Use of static to load the region-country map once
+static REGION_COUNTRY_MAP: Lazy<Mutex<HashMap<String, String>>> = Lazy::new(|| {
+    let map = load_region_country_map().unwrap_or_default();
+    Mutex::new(map)
+});
 
 #[derive(Error, Debug)]
 pub enum RegionError {
@@ -28,57 +37,45 @@ impl TryFrom<&str> for UsageLocation {
         let cc = get_country_from_aws_region(aws_region)?;
         Ok(UsageLocation {
             aws_region: String::from(aws_region),
-            iso_country_code: cc.alpha3().to_owned(),
+            iso_country_code: cc,
         })
     }
     type Error = RegionError;
 }
 
+/// Load the region-country map from a CSV file
+fn load_region_country_map() -> Result<HashMap<String, String>, Box<dyn Error>> {
+    let csv_content = include_str!("../csv/cloud_providers_regions.csv");
+
+    let mut reader = ReaderBuilder::new()
+        .has_headers(true)
+        .from_reader(csv_content.as_bytes());
+
+    let mut region_country_map = HashMap::new();
+
+    for result in reader.records() {
+        let record = result?;
+        let region = &record[1]; // AWS region
+        let country_code = &record[2]; // country code
+        region_country_map.insert(region.to_string(), country_code.to_string());
+    }
+
+    Ok(region_country_map)
+}
+
 /// Converts AWS region as String into an ISO country code, returns FRA if not found
-///
-/// TODO! : do not convert to FRA by default, should rather fail explicitly if region is not found.
-fn get_country_from_aws_region(aws_region: &str) -> Result<CountryCode, RegionError> {
-    let cc: CountryCode = match aws_region {
-        "af-south-1" => CountryCode::ZAF,
-        "ap-east-1" => CountryCode::HKG,
-        "ap-northeast-1" => CountryCode::JPN,
-        "ap-northeast-2" => CountryCode::KOR,
-        "ap-northeast-3" => CountryCode::JPN,
-        "ap-south-1" => CountryCode::IND,
-        "ap-south-2" => CountryCode::IND,
-        "ap-southeast-1" => CountryCode::SGP,
-        "ap-southeast-2" => CountryCode::AUS,
-        "ap-southeast-3" => CountryCode::IDN,
-        "ap-southeast-4" => CountryCode::AUS,
-        "ca-central-1" => CountryCode::CAN,
-        "ca-west-1" => CountryCode::CAN,
-        "cn-north-1" => CountryCode::CHN,
-        "cn-northwest-1" => CountryCode::CHN,
-        "eu-central-1" => CountryCode::DEU,
-        "eu-central-2" => CountryCode::CHE,
-        "eu-north-1" => CountryCode::SWE,
-        "eu-south-1" => CountryCode::ITA,
-        "eu-south-2" => CountryCode::ESP,
-        "eu-west-1" => CountryCode::IRL,
-        "eu-west-2" => CountryCode::GBR,
-        "eu-west-3" => CountryCode::FRA,
-        "il-central-1" => CountryCode::ISR,
-        "me-central-1" => CountryCode::ARE,
-        "me-south-1" => CountryCode::BHR,
-        "sa-east-1" => CountryCode::BRA,
-        "us-east-1" => CountryCode::USA,
-        "us-east-2" => CountryCode::USA,
-        "us-west-1" => CountryCode::USA,
-        "us-west-2" => CountryCode::USA,
-        _ => {
+fn get_country_from_aws_region(aws_region: &str) -> Result<String, RegionError> {
+    let map = REGION_COUNTRY_MAP.lock().unwrap();
+    match map.get(aws_region) {
+        Some(country_code) => Ok(country_code.to_string()),
+        None => {
             error!(
                 "Unsupported region: unable to match aws region [{}] to country code",
                 aws_region
             );
             return Err(RegionError::UnsupportedRegion(String::from(aws_region)));
         }
-    };
-    Ok(cc)
+    }
 }
 
 #[cfg(test)]

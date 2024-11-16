@@ -2,9 +2,9 @@
   "impacts": {
     "gwp": {
       "embedded": {
-        "value": 0.001183,
-        "min": 0.001183,
-        "max": 0.001183,
+        "value": 0.001184,
+        "min": 0.001184,
+        "max": 0.001184,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -44,9 +44,9 @@
     "impacts": {
       "gwp": {
         "embedded": {
-          "value": 0.001183,
-          "min": 0.001183,
-          "max": 0.001183,
+          "value": 0.001184,
+          "min": 0.001184,
+          "max": 0.001184,
           "warnings": [
             "End of life is not included in the calculation"
           ]

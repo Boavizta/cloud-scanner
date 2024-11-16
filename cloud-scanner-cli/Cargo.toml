@@ -2,13 +2,15 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
-version = "3.0.1"
+version = "3.1.0"
 
 [dependencies]
 chrono = { version = "^0.4", features = ["serde"] }
+csv = "1.3.0"
 isocountry = "^0.3"
 log = "0.4"
 loggerv = "0.7"
+once_cell = "1.20.2"
 pkg-version = "*"
 prometheus-client = "*"
 serde = "^1.0"
@@ -26,7 +28,7 @@ aws-types = "1"
 thiserror = "1.0.57"
 
 [dependencies.boavizta_api_sdk]
-version = "1.2.0"
+version = "1.3.0"
 # path = "../../boaviztapi-sdk-rust"
 
 [dependencies.aws-config]
