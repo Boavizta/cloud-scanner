@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
-
+- [docker-compose: use 'default' profile by default](https://github.com/Boavizta/cloud-scanner/issues/616)
 - [chore: update to Rust 1.82 · Issue #609 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/609)
 
 ## [3.1.0]-2024-11-07
