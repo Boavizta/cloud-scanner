@@ -12,6 +12,9 @@ _This paragraph may describe WIP/unreleased features. They are merged to main br
 - [chore(deps): bump serde from 1.0.214 to 1.0.215](https://github.com/Boavizta/cloud-scanner/issues/606)
 - [bump serverless from 3.38.0 to 4.4.10](https://github.com/Boavizta/cloud-scanner/issues/613)
 - [Generate multi platform Docker images](https://github.com/Boavizta/cloud-scanner/issues/608)
+- [Bugfix: Lack of available impact data from the API crashes the scanner](https://github.com/Boavizta/cloud-scanner/issues/622)
+- [Bugfix(dashboard) Apply filters for 'Primary Energy (Use) for 1 hour'](https://github.com/Boavizta/cloud-scanner/issues/618)
+- [docker-compose: use 'default' profile by default](https://github.com/Boavizta/cloud-scanner/issues/616)
 - [chore: update to Rust 1.82 · Issue #609 · Boavizta/cloud-scanner](https://github.com/Boavizta/cloud-scanner/issues/609)
 
 ## [3.1.0]-2024-11-07

@@ -491,7 +491,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum by(country) (boavizta_resource_pe_use_megajoules{resource_tags=~\".*$tags_to_include.*\"}) * 0.277778",
+          "expr": "sum by(country) (boavizta_resource_pe_use_megajoules{awsregion=~\"$region\", resource_type=~\"$resource_type\",resource_tags=~\".*$tags_to_include.*\"}) * 0.277778",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1204,7 +1204,7 @@
               "useBackend": false
             }
           ],
-          "title": "🔥 GWP (Embodied) - by region (Kg Co2 eq)  - projection for 1 year",
+          "title": "🔥 GWP (Embodied) - by region (Kg Co2 eq)  - projected for 1 year",
           "type": "bargauge"
         }
       ],
