@@ -141,29 +141,33 @@ pub fn register_resource_metrics(
     // Fill up metrics values
     for resource in resources_with_impacts.iter() {
         let resource_labels = build_resource_labels(resource);
-        let impacts = resource.impacts_values.as_ref().unwrap();
+        let impacts = resource.impacts_values.as_ref();
 
-        boavizta_resource_duration_of_use_hours
-            .get_or_create(&resource_labels)
-            .set(resource.impacts_duration_hours.into());
-        boavizta_resource_pe_use_megajoules
-            .get_or_create(&resource_labels)
-            .set(impacts.pe_use_megajoules);
-        boavizta_resource_pe_embodied_megajoules
-            .get_or_create(&resource_labels)
-            .set(impacts.pe_manufacture_megajoules);
-        boavizta_resource_adp_use_kgsbeq
-            .get_or_create(&resource_labels)
-            .set(impacts.adp_use_kgsbeq);
-        boavizta_resource_adp_embodied_kgsbeq
-            .get_or_create(&resource_labels)
-            .set(impacts.adp_manufacture_kgsbeq);
-        boavizta_resource_gwp_use_kgco2eq
-            .get_or_create(&resource_labels)
-            .set(impacts.gwp_use_kgco2eq);
-        boavizta_resource_gwp_embodied_kgco2eq
-            .get_or_create(&resource_labels)
-            .set(impacts.gwp_manufacture_kgco2eq);
+        // the impacts can be missing
+        if impacts.is_some() {
+            let impact_values = impacts.unwrap();
+            boavizta_resource_duration_of_use_hours
+                .get_or_create(&resource_labels)
+                .set(resource.impacts_duration_hours.into());
+            boavizta_resource_pe_use_megajoules
+                .get_or_create(&resource_labels)
+                .set(impact_values.pe_use_megajoules);
+            boavizta_resource_pe_embodied_megajoules
+                .get_or_create(&resource_labels)
+                .set(impact_values.pe_manufacture_megajoules);
+            boavizta_resource_adp_use_kgsbeq
+                .get_or_create(&resource_labels)
+                .set(impact_values.adp_use_kgsbeq);
+            boavizta_resource_adp_embodied_kgsbeq
+                .get_or_create(&resource_labels)
+                .set(impact_values.adp_manufacture_kgsbeq);
+            boavizta_resource_gwp_use_kgco2eq
+                .get_or_create(&resource_labels)
+                .set(impact_values.gwp_use_kgco2eq);
+            boavizta_resource_gwp_embodied_kgco2eq
+                .get_or_create(&resource_labels)
+                .set(impact_values.gwp_manufacture_kgco2eq);
+        }
 
         // Export CPU usage metrics (for instances) and size metrics (for storage)
         match &resource.cloud_resource.resource_details {
