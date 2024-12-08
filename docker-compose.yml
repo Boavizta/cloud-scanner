@@ -32,6 +32,9 @@ services:
       - ./dashboard-config/provisioning:/etc/grafana/provisioning
       - ./dashboard-config/provisioning/dashboards/grafana-dashboard-cloud-impacts.template.json:/var/lib/grafana/dashboards/grafana-dashboard-cloud-impacts.template.json
       - grafana-data:/var/lib/grafana
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/grafana-dashboard-cloud-impacts.template.json
     networks:
       - network_boa
     depends_on:
