@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
+
+- [Mark next version post release with -SNAPSHOT](https://github.com/Boavizta/cloud-scanner/issues/624)
 - [(dashboard) Minor dashboard improvements and facilitate access to it](https://github.com/Boavizta/cloud-scanner/issues/630)
 - [Bugfix: Lack of available impact data from the API crashes the scanner](https://github.com/Boavizta/cloud-scanner/issues/622)
 - [Bugfix(dashboard) Apply filters for 'Primary Energy (Use) for 1 hour'](https://github.com/Boavizta/cloud-scanner/issues/618)
