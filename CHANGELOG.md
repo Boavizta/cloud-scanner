@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
-
+- [chore(deps): bump serde_json from 1.0.132 to 1.0.133](https://github.com/Boavizta/cloud-scanner/issues/#614)
+- [chore(deps): bump tokio from 1.41.1 to 1.42.0](https://github.com/Boavizta/cloud-scanner/issues/#628)
 - [Mark next version post release with -SNAPSHOT](https://github.com/Boavizta/cloud-scanner/issues/624)
 - [chore(deps): bump serde from 1.0.214 to 1.0.215](https://github.com/Boavizta/cloud-scanner/issues/606)
-- [bump serverless from 3.38.0 to 4.4.10](https://github.com/Boavizta/cloud-scanner/issues/613)
+- [bump serverless from 3.38.0 to 4.4.15](https://github.com/Boavizta/cloud-scanner/issues/613) and https://github.com/Boavizta/cloud-scanner/issues/632
 - [Generate multi platform Docker images](https://github.com/Boavizta/cloud-scanner/issues/608)
 - [(dashboard) Minor dashboard improvements and facilitate access to it](https://github.com/Boavizta/cloud-scanner/issues/630)
 - [Bugfix: Lack of available impact data from the API crashes the scanner](https://github.com/Boavizta/cloud-scanner/issues/622)
