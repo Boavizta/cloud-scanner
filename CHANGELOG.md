@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
 
+- [Mark next version post release with -SNAPSHOT](https://github.com/Boavizta/cloud-scanner/issues/624)
 - [chore(deps): bump serde from 1.0.214 to 1.0.215](https://github.com/Boavizta/cloud-scanner/issues/606)
 - [bump serverless from 3.38.0 to 4.4.10](https://github.com/Boavizta/cloud-scanner/issues/613)
 - [Generate multi platform Docker images](https://github.com/Boavizta/cloud-scanner/issues/608)
