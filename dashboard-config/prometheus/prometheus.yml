@@ -1,6 +1,7 @@
 global:
   scrape_interval:     30s # By default, scrape targets every 30 seconds.
   evaluation_interval: 30s # Evaluate rules every 30 seconds.
+  scrape_timeout: 10s # Default to 10s, increase when the number of instances is large
 
   # Attach these extra labels to all timeseries collected by this Prometheus instance.
   external_labels:
