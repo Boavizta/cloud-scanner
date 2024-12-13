@@ -28,7 +28,7 @@ aws-types = "1"
 thiserror = "1.0.57"
 
 [dependencies.boavizta_api_sdk]
-version = "1.3.0"
+version = "1.3.3"
 # path = "../../boaviztapi-sdk-rust"
 
 [dependencies.aws-config]
