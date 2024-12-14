@@ -4,10 +4,13 @@ use anyhow::Result;
 use boavizta_api_sdk::apis::cloud_api;
 use boavizta_api_sdk::apis::component_api;
 use boavizta_api_sdk::apis::configuration;
+use boavizta_api_sdk::apis::utils_api;
+use chrono::Utc;
 use std::time::{Duration, Instant};
 
 use crate::model::{
-    CloudResource, EstimatedInventory, ExecutionStatistics, Inventory, ResourceDetails,
+    CloudResource, EstimatedInventory, EstimationMetadata, ExecutionStatistics, Inventory,
+    ResourceDetails,
 };
 use boavizta_api_sdk::models::{Cloud, Disk, UsageCloud};
 
@@ -22,6 +25,17 @@ impl BoaviztaApiV1 {
         let mut configuration = configuration::Configuration::new();
         configuration.base_path = api_url.to_string();
         BoaviztaApiV1 { configuration }
+    }
+
+    // Returns the version of Boavizta API
+    async fn get_api_version(&self) -> Option<String> {
+        let res = utils_api::version_v1_utils_version_get(&self.configuration).await;
+        if let Ok(serde_json::Value::String(v)) = res {
+            Some(v)
+        } else {
+            error!("Cannot fetch API version");
+            None
+        }
     }
 
     // Returns the raw impacts (json) of an instance from Boavizta API for the duration of use (hours)
@@ -219,7 +233,13 @@ impl ImpactProvider for BoaviztaApiV1 {
 
         let estimated_inventory: EstimatedInventory = EstimatedInventory {
             impacting_resources: v,
-            execution_statistics: Some(execution_statistics),
+            metadata: EstimationMetadata {
+                estimation_date: Some(Utc::now()),
+                description: Some("Estimation using Boavizta API".to_string()),
+                cloud_scanner_version: Some(crate::get_version()),
+                boavizta_api_version: self.get_api_version().await,
+                execution_statistics: Some(execution_statistics),
+            },
         };
         Ok(estimated_inventory)
     }
@@ -331,6 +351,14 @@ mod tests {
         .await
         .unwrap();
         println!("{:?}", res);
+    }
+
+    #[tokio::test]
+    async fn get_api_version() {
+        let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
+        let version = api.get_api_version().await;
+        let expected = Some("1.3.6".to_owned());
+        assert_eq!(version, expected, "Versions do not match");
     }
 
     #[tokio::test]

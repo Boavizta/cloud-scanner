@@ -66,7 +66,23 @@ pub async fn load_inventory_fom_json(json_inventory: &str) -> anyhow::Result<Inv
 #[derive(Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct EstimatedInventory {
+    pub metadata: EstimationMetadata,
     pub impacting_resources: Vec<CloudResourceWithImpacts>,
+}
+
+/// Details about the estimation
+#[derive(Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct EstimationMetadata {
+    /// The date when the estimation was generated
+    pub estimation_date: Option<DateTime<Utc>>,
+    /// A free text description of the estimation
+    pub description: Option<String>,
+    /// The version of the cloud scanner that provided the estimation
+    pub cloud_scanner_version: Option<String>,
+    /// The version of the Boavizta api that provided the estimation
+    pub boavizta_api_version: Option<String>,
+    /// Statistics about program execution
     pub execution_statistics: Option<ExecutionStatistics>,
 }
 

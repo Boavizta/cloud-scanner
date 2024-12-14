@@ -73,7 +73,7 @@ fn get_country_from_aws_region(aws_region: &str) -> Result<String, RegionError> 
                 "Unsupported region: unable to match aws region [{}] to country code",
                 aws_region
             );
-            return Err(RegionError::UnsupportedRegion(String::from(aws_region)));
+            Err(RegionError::UnsupportedRegion(String::from(aws_region)))
         }
     }
 }
