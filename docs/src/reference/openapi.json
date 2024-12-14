@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "cloud-scanner-cli",
-    "version": "2.0.5"
+    "version": "3.2.0-SNAPSHOT"
   },
   "paths": {
     "/metrics": {
@@ -239,7 +239,7 @@
   "components": {
     "schemas": {
       "Inventory": {
-        "description": "Inventory: a list of resources",
+        "description": "A list of cloud resources and metadata that describes the inventory itself",
         "type": "object",
         "required": [
           "metadata",
@@ -254,8 +254,31 @@
             "items": {
               "$ref": "#/components/schemas/CloudResource"
             }
+          }
+        }
+      },
+      "InventoryMetadata": {
+        "description": "Details about the inventory",
+        "type": "object",
+        "properties": {
+          "inventory_date": {
+            "description": "The date when the inventory was generated",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "description": "A free text description of the inventory",
+            "type": "string",
+            "nullable": true
+          },
+          "cloud_scanner_version": {
+            "description": "The version of the cloud scanner that generated the inventory",
+            "type": "string",
+            "nullable": true
           },
           "execution_statistics": {
+            "description": "Statistics about program execution",
             "allOf": [
               {
                 "$ref": "#/components/schemas/ExecutionStatistics"
@@ -265,23 +288,47 @@
           }
         }
       },
-      "InventoryMetadata": {
-        "description": "Details about the inventory",
+      "ExecutionStatistics": {
+        "description": "Statistics about program execution",
         "type": "object",
+        "required": [
+          "impact_estimation_duration",
+          "inventory_duration",
+          "total_duration"
+        ],
         "properties": {
-          "inventory_date": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
+          "inventory_duration": {
+            "$ref": "#/components/schemas/Duration"
           },
-          "description": {
-            "type": "string",
-            "nullable": true
+          "impact_estimation_duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "total_duration": {
+            "$ref": "#/components/schemas/Duration"
+          }
+        }
+      },
+      "Duration": {
+        "type": "object",
+        "required": [
+          "nanos",
+          "secs"
+        ],
+        "properties": {
+          "secs": {
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
+          },
+          "nanos": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
           }
         }
       },
       "CloudResource": {
-        "description": "A cloud resource (could be an instance, function or any other resource)",
+        "description": "A cloud resource (could be an instance, block storage or any other resource)",
         "type": "object",
         "required": [
           "id",
@@ -298,7 +345,12 @@
             "type": "string"
           },
           "location": {
-            "$ref": "#/components/schemas/UsageLocation"
+            "description": "The location where cloud resources are running.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UsageLocation"
+              }
+            ]
           },
           "resource_details": {
             "$ref": "#/components/schemas/ResourceDetails"
@@ -471,59 +523,52 @@
           }
         }
       },
-      "ExecutionStatistics": {
-        "description": "Statistics about program execution",
-        "type": "object",
-        "required": [
-          "impact_estimation_duration",
-          "inventory_duration",
-          "total_duration"
-        ],
-        "properties": {
-          "inventory_duration": {
-            "$ref": "#/components/schemas/Duration"
-          },
-          "impact_estimation_duration": {
-            "$ref": "#/components/schemas/Duration"
-          },
-          "total_duration": {
-            "$ref": "#/components/schemas/Duration"
-          }
-        }
-      },
-      "Duration": {
-        "type": "object",
-        "required": [
-          "nanos",
-          "secs"
-        ],
-        "properties": {
-          "secs": {
-            "type": "integer",
-            "format": "uint64",
-            "minimum": 0.0
-          },
-          "nanos": {
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
-          }
-        }
-      },
       "EstimatedInventory": {
         "description": "An estimated inventory: impacting resources with their estimated impacts",
         "type": "object",
         "required": [
-          "impacting_resources"
+          "impacting_resources",
+          "metadata"
         ],
         "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/EstimationMetadata"
+          },
           "impacting_resources": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CloudResourceWithImpacts"
             }
+          }
+        }
+      },
+      "EstimationMetadata": {
+        "description": "Details about the estimation",
+        "type": "object",
+        "properties": {
+          "estimation_date": {
+            "description": "The date when the estimation was generated",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "description": "A free text description of the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "cloud_scanner_version": {
+            "description": "The version of the cloud scanner that provided the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "boavizta_api_version": {
+            "description": "The version of the Boavizta api that provided the estimation",
+            "type": "string",
+            "nullable": true
           },
           "execution_statistics": {
+            "description": "Statistics about program execution",
             "allOf": [
               {
                 "$ref": "#/components/schemas/ExecutionStatistics"

@@ -157,28 +157,40 @@ pub fn get_version() -> String {
     format!("{}.{}.{}", MAJOR, MINOR, PATCH)
 }
 
-#[tokio::test]
-async fn summary_has_to_contain_a_usage_duration() {
-    use crate::impact_provider::CloudResourceWithImpacts;
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::EstimationMetadata;
 
-    let resources: Vec<CloudResourceWithImpacts> = Vec::new();
+    #[tokio::test]
+    async fn summary_has_to_contain_a_usage_duration() {
+        use crate::impact_provider::CloudResourceWithImpacts;
 
-    let resources_with_impacts: EstimatedInventory = EstimatedInventory {
-        impacting_resources: resources,
-        execution_statistics: None,
-    };
+        let resources: Vec<CloudResourceWithImpacts> = Vec::new();
 
-    let usage_duration_hours = 1.5;
+        let resources_with_impacts: EstimatedInventory = EstimatedInventory {
+            impacting_resources: resources,
+            metadata: EstimationMetadata {
+                description: None,
+                boavizta_api_version: Some("v1.2.3".to_owned()),
+                cloud_scanner_version: Some("acb".to_owned()),
+                estimation_date: None,
+                execution_statistics: None,
+            },
+        };
 
-    let summary: ImpactsSummary = ImpactsSummary::new(
-        String::from("eu-west-1"),
-        String::from("IRL"),
-        &resources_with_impacts,
-        usage_duration_hours,
-    );
+        let usage_duration_hours = 1.5;
 
-    assert_eq!(
-        summary.duration_of_use_hours, usage_duration_hours,
-        "Duration of summary should match"
-    );
+        let summary: ImpactsSummary = ImpactsSummary::new(
+            String::from("eu-west-1"),
+            String::from("IRL"),
+            &resources_with_impacts,
+            usage_duration_hours,
+        );
+
+        assert_eq!(
+            summary.duration_of_use_hours, usage_duration_hours,
+            "Duration of summary should match"
+        );
+    }
 }

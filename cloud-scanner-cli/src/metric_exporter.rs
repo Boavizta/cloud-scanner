@@ -379,7 +379,8 @@ mod tests {
     use super::*;
     use crate::impact_provider::ImpactsValues;
     use crate::model::{
-        CloudProvider, CloudResource, CloudResourceTag, InstanceUsage, StorageUsage,
+        CloudProvider, CloudResource, CloudResourceTag, EstimationMetadata, InstanceUsage,
+        StorageUsage,
     };
     use crate::usage_location::UsageLocation;
 
@@ -476,8 +477,14 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
         };
 
         let estimated_inventory: EstimatedInventory = EstimatedInventory {
+            metadata: EstimationMetadata {
+                description: None,
+                boavizta_api_version: Some("v1.2.3".to_owned()),
+                cloud_scanner_version: Some("acb".to_owned()),
+                estimation_date: None,
+                execution_statistics: None,
+            },
             impacting_resources: vec![cloud_resource_with_impacts],
-            execution_statistics: None,
         };
 
         let summary = ImpactsSummary::new(
@@ -587,8 +594,14 @@ boavizta_resource_cpu_load{awsregion="eu-west-3",country="FRA",resource_type="In
         };
 
         let estimated_inventory: EstimatedInventory = EstimatedInventory {
+            metadata: EstimationMetadata {
+                description: None,
+                boavizta_api_version: Some("v1.2.3".to_owned()),
+                cloud_scanner_version: Some("acb".to_owned()),
+                estimation_date: None,
+                execution_statistics: None,
+            },
             impacting_resources: vec![cloud_resource_with_impacts],
-            execution_statistics: None,
         };
 
         let summary = ImpactsSummary::new(
