@@ -26,7 +26,7 @@ docker-compose up
 - Log in with user admin/admin
 - Select the dashboard in the left menu.
 
-![Demo dashboard exposing cloud scanner metrics](../images/CS-dashboard.png "A example dashboard rendering cloud scanner metrics")
+![Demo dashboard exposing cloud scanner metrics](../images/cloud-scanner-dashboard-clear.png "A example dashboard rendering cloud scanner metrics")
 
 ⚠ The demo docker-compose is preconfigured to generate metrics only for the following regions:
 - eu-west-1
