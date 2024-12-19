@@ -57,7 +57,7 @@ services:
   boavizta_api:
     container_name: "boavizta_api"
     hostname: boavizta
-    image:  ghcr.io/boavizta/boaviztapi:1.3
+    image:  ghcr.io/boavizta/boaviztapi:1.3.7
     ports:
       - "5000:5000"
     networks:

@@ -2,9 +2,9 @@
   "impacts": {
     "gwp": {
       "embedded": {
-        "value": 0.0016,
-        "min": 0.0008995,
-        "max": 0.002545,
+        "value": 0.001,
+        "min": 0.0005997,
+        "max": 0.001697,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -19,9 +19,9 @@
     },
     "adp": {
       "embedded": {
-        "value": 2.1e-7,
-        "min": 1.448e-7,
-        "max": 3.105e-7,
+        "value": 1.4e-7,
+        "min": 9.656e-8,
+        "max": 2.07e-7,
         "warnings": [
           "End of life is not included in the calculation"
         ]
@@ -36,9 +36,9 @@
     },
     "pe": {
       "embedded": {
-        "value": 0.021,
-        "min": 0.01186,
-        "max": 0.03331,
+        "value": 0.014,
+        "min": 0.007907,
+        "max": 0.02221,
         "warnings": [
           "End of life is not included in the calculation"
         ]
