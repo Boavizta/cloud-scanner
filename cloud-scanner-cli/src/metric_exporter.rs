@@ -17,6 +17,8 @@ use crate::ImpactsSummary;
 pub struct SummaryLabels {
     pub awsregion: String,
     pub country: String,
+    pub cloud_scanner_version: String,
+    pub boaviztapi_version: String,
 }
 #[derive(Clone, Hash, PartialEq, Eq, EncodeLabelSet, Debug)]
 pub struct ResourceLabels {
@@ -26,6 +28,8 @@ pub struct ResourceLabels {
     pub resource_id: String,
     pub resource_tags: String,
     pub resource_state: ResourceState,
+    pub cloud_scanner_version: String,
+    pub boaviztapi_version: String,
 }
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, EncodeLabelValue)]
@@ -42,7 +46,11 @@ pub enum ResourceState {
     Unknown,
 }
 
-fn build_resource_labels(resource: &CloudResourceWithImpacts) -> ResourceLabels {
+fn build_resource_labels(
+    resource: &CloudResourceWithImpacts,
+    cloud_scanner_version: &str,
+    boaviztapi_version: &str,
+) -> ResourceLabels {
     let resource_type = match resource.clone().cloud_resource.resource_details {
         ResourceDetails::Instance { .. } => ResourceType::Instance,
         ResourceDetails::BlockStorage { .. } => ResourceType::BlockStorage,
@@ -66,12 +74,16 @@ fn build_resource_labels(resource: &CloudResourceWithImpacts) -> ResourceLabels 
         resource_id: resource.cloud_resource.id.clone(),
         resource_tags: resource.cloud_resource.tags_as_metric_label_value(),
         resource_state,
+        cloud_scanner_version: cloud_scanner_version.to_owned(),
+        boaviztapi_version: boaviztapi_version.to_owned(),
     }
 }
 
 pub fn register_resource_metrics(
     registry: &mut Registry,
     resources_with_impacts: Vec<CloudResourceWithImpacts>,
+    cloud_scanner_version: &str,
+    boaviztapi_version: &str,
 ) {
     // Register metrics
     let boavizta_resource_duration_of_use_hours =
@@ -140,7 +152,8 @@ pub fn register_resource_metrics(
 
     // Fill up metrics values
     for resource in resources_with_impacts.iter() {
-        let resource_labels = build_resource_labels(resource);
+        let resource_labels =
+            build_resource_labels(resource, cloud_scanner_version, boaviztapi_version);
         let impacts = resource.impacts_values.as_ref();
 
         // the impacts can be missing
@@ -198,9 +211,16 @@ pub fn register_resource_metrics(
 /// - Individual resource metrics are prefixed with: `boavizta_resource_`
 pub fn get_resources_metrics(
     resources_with_impacts: Vec<CloudResourceWithImpacts>,
+    cloud_scanner_version: &str,
+    boaviztapi_version: &str,
 ) -> Result<String> {
     let mut registry = <Registry>::default();
-    register_resource_metrics(&mut registry, resources_with_impacts);
+    register_resource_metrics(
+        &mut registry,
+        resources_with_impacts,
+        cloud_scanner_version,
+        boaviztapi_version,
+    );
     let mut buffer = String::new();
     encode(&mut buffer, &registry).context("Fails to encode resources impacts into metrics")?;
     let metrics = buffer;
@@ -211,9 +231,18 @@ pub fn get_resources_metrics(
 /// Return an ImpactsSummary as metrics in the prometheus format
 ///
 /// - Summary metrics are prefixed with: `boavizta_`
-pub fn get_summary_metrics(summary: &ImpactsSummary) -> Result<String> {
+pub fn get_summary_metrics(
+    summary: &ImpactsSummary,
+    cloud_scanner_version: String,
+    boaviztapi_version: String,
+) -> Result<String> {
     let mut registry = <Registry>::default();
-    register_summary_metrics(&mut registry, summary);
+    register_summary_metrics(
+        &mut registry,
+        summary,
+        cloud_scanner_version,
+        boaviztapi_version,
+    );
     let mut buffer = String::new();
     encode(&mut buffer, &registry).context("Fails to encode impacts summary into metrics")?;
     let metrics = buffer;
@@ -226,11 +255,30 @@ pub fn get_summary_metrics(summary: &ImpactsSummary) -> Result<String> {
 /// - Individual resource metrics are prefixed with: `boavizta_resource_`
 pub fn get_all_metrics(
     summary: &ImpactsSummary,
-    resources_with_impacts: EstimatedInventory,
+    estimated_inventory: EstimatedInventory,
 ) -> Result<String> {
+    let cloud_scanner_version = estimated_inventory
+        .metadata
+        .cloud_scanner_version
+        .unwrap_or("".to_string());
+    let boaviztapi_version = estimated_inventory
+        .metadata
+        .boavizta_api_version
+        .unwrap_or("".to_string());
+
     let mut registry = <Registry>::default();
-    register_summary_metrics(&mut registry, summary);
-    register_resource_metrics(&mut registry, resources_with_impacts.impacting_resources);
+    register_summary_metrics(
+        &mut registry,
+        summary,
+        cloud_scanner_version.clone(),
+        boaviztapi_version.clone(),
+    );
+    register_resource_metrics(
+        &mut registry,
+        estimated_inventory.impacting_resources,
+        &cloud_scanner_version,
+        &boaviztapi_version,
+    );
 
     let mut buffer = String::new();
     encode(&mut buffer, &registry).context("Fails to encode impacts into metrics")?;
@@ -239,7 +287,12 @@ pub fn get_all_metrics(
     Ok(metrics)
 }
 
-fn register_summary_metrics(registry: &mut Registry, summary: &ImpactsSummary) {
+fn register_summary_metrics(
+    registry: &mut Registry,
+    summary: &ImpactsSummary,
+    cloud_scanner_version: String,
+    boaviztapi_version: String,
+) {
     let boavizta_number_of_resources_total = Family::<SummaryLabels, Gauge>::default();
     // Register the metric family with the registry.
     registry.register(
@@ -335,6 +388,8 @@ fn register_summary_metrics(registry: &mut Registry, summary: &ImpactsSummary) {
     let summary_labels: SummaryLabels = SummaryLabels {
         awsregion: summary.aws_region.to_string(),
         country: summary.country.to_string(),
+        cloud_scanner_version,
+        boaviztapi_version,
     };
 
     // Set the values
@@ -401,42 +456,47 @@ mod tests {
             country: "IRL".to_string(),
         };
 
-        let metrics = get_summary_metrics(&summary).unwrap();
+        let cloud_scannner_version = "4.5.6".to_string();
+        let boaviztapi_version = "v1.2.3".to_string();
+
+        let metrics =
+            get_summary_metrics(&summary, cloud_scannner_version, boaviztapi_version).unwrap();
 
         println!("{}", metrics);
 
         let expected = r#"# HELP boavizta_number_of_resources_total Number of resources detected during the inventory.
 # TYPE boavizta_number_of_resources_total gauge
-boavizta_number_of_resources_total{awsregion="eu-west-1",country="IRL"} 5
+boavizta_number_of_resources_total{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 5
 # HELP boavizta_number_of_resources_assessed Number of resources that were considered in the estimation of impacts.
 # TYPE boavizta_number_of_resources_assessed gauge
-boavizta_number_of_resources_assessed{awsregion="eu-west-1",country="IRL"} 2
+boavizta_number_of_resources_assessed{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 2
 # HELP boavizta_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_duration_of_use_hours gauge
-boavizta_duration_of_use_hours{awsregion="eu-west-1",country="IRL"} 1.0
+boavizta_duration_of_use_hours{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1.0
 # HELP boavizta_pe_manufacture_megajoules Energy consumed for manufacture.
 # TYPE boavizta_pe_manufacture_megajoules gauge
-boavizta_pe_manufacture_megajoules{awsregion="eu-west-1",country="IRL"} 0.3
+boavizta_pe_manufacture_megajoules{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.3
 # HELP boavizta_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_pe_use_megajoules gauge
-boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.4
+boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.4
 # HELP boavizta_adp_manufacture_kgsbeq Abiotic resources depletion potential of manufacture.
 # TYPE boavizta_adp_manufacture_kgsbeq gauge
-boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-1",country="IRL"} 0.1
+boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.1
 # HELP boavizta_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_adp_use_kgsbeq gauge
-boavizta_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL"} 0.2
+boavizta_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.2
 # HELP boavizta_gwp_manufacture_kgco2eq Global Warming Potential of manufacture.
 # TYPE boavizta_gwp_manufacture_kgco2eq gauge
-boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.5
+boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.5
 # HELP boavizta_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_gwp_use_kgco2eq gauge
-boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
+boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.6
 # EOF
 "#;
 
         assert_eq!(expected, metrics);
     }
+
     #[tokio::test]
     async fn test_get_all_metrics_for_instance() {
         let tag1 = CloudResourceTag {
@@ -480,7 +540,7 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
             metadata: EstimationMetadata {
                 description: None,
                 boavizta_api_version: Some("v1.2.3".to_owned()),
-                cloud_scanner_version: Some("acb".to_owned()),
+                cloud_scanner_version: Some("4.5.6".to_owned()),
                 estimation_date: None,
                 execution_statistics: None,
             },
@@ -499,55 +559,55 @@ boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.6
 
         let expected = r#"# HELP boavizta_number_of_resources_total Number of resources detected during the inventory.
 # TYPE boavizta_number_of_resources_total gauge
-boavizta_number_of_resources_total{awsregion="eu-west-3",country="FRA"} 1
+boavizta_number_of_resources_total{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1
 # HELP boavizta_number_of_resources_assessed Number of resources that were considered in the estimation of impacts.
 # TYPE boavizta_number_of_resources_assessed gauge
-boavizta_number_of_resources_assessed{awsregion="eu-west-3",country="FRA"} 1
+boavizta_number_of_resources_assessed{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1
 # HELP boavizta_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_duration_of_use_hours gauge
-boavizta_duration_of_use_hours{awsregion="eu-west-3",country="FRA"} 1.0
+boavizta_duration_of_use_hours{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1.0
 # HELP boavizta_pe_manufacture_megajoules Energy consumed for manufacture.
 # TYPE boavizta_pe_manufacture_megajoules gauge
-boavizta_pe_manufacture_megajoules{awsregion="eu-west-3",country="FRA"} 0.3
+boavizta_pe_manufacture_megajoules{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.3
 # HELP boavizta_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_pe_use_megajoules gauge
-boavizta_pe_use_megajoules{awsregion="eu-west-3",country="FRA"} 0.4
+boavizta_pe_use_megajoules{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.4
 # HELP boavizta_adp_manufacture_kgsbeq Abiotic resources depletion potential of manufacture.
 # TYPE boavizta_adp_manufacture_kgsbeq gauge
-boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-3",country="FRA"} 0.1
+boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.1
 # HELP boavizta_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_adp_use_kgsbeq gauge
-boavizta_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA"} 0.2
+boavizta_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.2
 # HELP boavizta_gwp_manufacture_kgco2eq Global Warming Potential of manufacture.
 # TYPE boavizta_gwp_manufacture_kgco2eq gauge
-boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-3",country="FRA"} 0.5
+boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.5
 # HELP boavizta_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_gwp_use_kgco2eq gauge
-boavizta_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA"} 0.6
+boavizta_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.6
 # HELP boavizta_resource_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_resource_duration_of_use_hours gauge
-boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 1.0
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1.0
 # HELP boavizta_resource_pe_embodied_megajoules Energy consumed for manufacture.
 # TYPE boavizta_resource_pe_embodied_megajoules gauge
-boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.3
+boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.3
 # HELP boavizta_resource_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_resource_pe_use_megajoules gauge
-boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.4
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.4
 # HELP boavizta_resource_adp_embodied_kgsbeq Abiotic resources depletion potential of embodied impacts.
 # TYPE boavizta_resource_adp_embodied_kgsbeq gauge
-boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.1
+boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.1
 # HELP boavizta_resource_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_resource_adp_use_kgsbeq gauge
-boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.2
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.2
 # HELP boavizta_resource_gwp_embodied_kgco2eq Global Warming Potential of embodied impacts.
 # TYPE boavizta_resource_gwp_embodied_kgco2eq gauge
-boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.5
+boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.5
 # HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_resource_gwp_use_kgco2eq gauge
-boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 0.6
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.6
 # HELP boavizta_resource_cpu_load CPU load of instance.
 # TYPE boavizta_resource_cpu_load gauge
-boavizta_resource_cpu_load{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running"} 100.0
+boavizta_resource_cpu_load{awsregion="eu-west-3",country="FRA",resource_type="Instance",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Running",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 100.0
 # HELP boavizta_storage_size_gb Storage size in GB.
 # TYPE boavizta_storage_size_gb gauge
 # EOF
@@ -597,7 +657,7 @@ boavizta_resource_cpu_load{awsregion="eu-west-3",country="FRA",resource_type="In
             metadata: EstimationMetadata {
                 description: None,
                 boavizta_api_version: Some("v1.2.3".to_owned()),
-                cloud_scanner_version: Some("acb".to_owned()),
+                cloud_scanner_version: Some("4.5.6".to_owned()),
                 estimation_date: None,
                 execution_statistics: None,
             },
@@ -617,57 +677,57 @@ boavizta_resource_cpu_load{awsregion="eu-west-3",country="FRA",resource_type="In
 
         let expected = r#"# HELP boavizta_number_of_resources_total Number of resources detected during the inventory.
 # TYPE boavizta_number_of_resources_total gauge
-boavizta_number_of_resources_total{awsregion="eu-west-3",country="FRA"} 1
+boavizta_number_of_resources_total{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1
 # HELP boavizta_number_of_resources_assessed Number of resources that were considered in the estimation of impacts.
 # TYPE boavizta_number_of_resources_assessed gauge
-boavizta_number_of_resources_assessed{awsregion="eu-west-3",country="FRA"} 1
+boavizta_number_of_resources_assessed{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1
 # HELP boavizta_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_duration_of_use_hours gauge
-boavizta_duration_of_use_hours{awsregion="eu-west-3",country="FRA"} 1.0
+boavizta_duration_of_use_hours{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1.0
 # HELP boavizta_pe_manufacture_megajoules Energy consumed for manufacture.
 # TYPE boavizta_pe_manufacture_megajoules gauge
-boavizta_pe_manufacture_megajoules{awsregion="eu-west-3",country="FRA"} 0.3
+boavizta_pe_manufacture_megajoules{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.3
 # HELP boavizta_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_pe_use_megajoules gauge
-boavizta_pe_use_megajoules{awsregion="eu-west-3",country="FRA"} 0.4
+boavizta_pe_use_megajoules{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.4
 # HELP boavizta_adp_manufacture_kgsbeq Abiotic resources depletion potential of manufacture.
 # TYPE boavizta_adp_manufacture_kgsbeq gauge
-boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-3",country="FRA"} 0.1
+boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.1
 # HELP boavizta_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_adp_use_kgsbeq gauge
-boavizta_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA"} 0.2
+boavizta_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.2
 # HELP boavizta_gwp_manufacture_kgco2eq Global Warming Potential of manufacture.
 # TYPE boavizta_gwp_manufacture_kgco2eq gauge
-boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-3",country="FRA"} 0.5
+boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.5
 # HELP boavizta_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_gwp_use_kgco2eq gauge
-boavizta_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA"} 0.6
+boavizta_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.6
 # HELP boavizta_resource_duration_of_use_hours Use duration considered to estimate impacts.
 # TYPE boavizta_resource_duration_of_use_hours gauge
-boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 1.0
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 1.0
 # HELP boavizta_resource_pe_embodied_megajoules Energy consumed for manufacture.
 # TYPE boavizta_resource_pe_embodied_megajoules gauge
-boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 0.3
+boavizta_resource_pe_embodied_megajoules{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.3
 # HELP boavizta_resource_pe_use_megajoules Energy consumed during use.
 # TYPE boavizta_resource_pe_use_megajoules gauge
-boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 0.4
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.4
 # HELP boavizta_resource_adp_embodied_kgsbeq Abiotic resources depletion potential of embodied impacts.
 # TYPE boavizta_resource_adp_embodied_kgsbeq gauge
-boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 0.1
+boavizta_resource_adp_embodied_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.1
 # HELP boavizta_resource_adp_use_kgsbeq Abiotic resources depletion potential of use.
 # TYPE boavizta_resource_adp_use_kgsbeq gauge
-boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 0.2
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.2
 # HELP boavizta_resource_gwp_embodied_kgco2eq Global Warming Potential of embodied impacts.
 # TYPE boavizta_resource_gwp_embodied_kgco2eq gauge
-boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 0.5
+boavizta_resource_gwp_embodied_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.5
 # HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.
 # TYPE boavizta_resource_gwp_use_kgco2eq gauge
-boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 0.6
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 0.6
 # HELP boavizta_resource_cpu_load CPU load of instance.
 # TYPE boavizta_resource_cpu_load gauge
 # HELP boavizta_storage_size_gb Storage size in GB.
 # TYPE boavizta_storage_size_gb gauge
-boavizta_storage_size_gb{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown"} 42
+boavizta_storage_size_gb{awsregion="eu-west-3",country="FRA",resource_type="BlockStorage",resource_id="inst-1",resource_tags="tag_key_1:tag_value_1;tag_key_2:tag_value_2;",resource_state="Unknown",cloud_scanner_version="4.5.6",boaviztapi_version="v1.2.3"} 42
 # EOF
 "#;
 
