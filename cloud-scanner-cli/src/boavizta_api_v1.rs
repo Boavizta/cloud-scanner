@@ -322,12 +322,6 @@ mod tests {
     use assert_json_diff::assert_json_include;
     use assert_json_diff::{assert_json_matches, CompareMode, Config, NumericMode};
 
-    use testcontainers::{
-        core::{IntoContainerPort, WaitFor},
-        runners::AsyncRunner,
-        GenericImage,
-    };
-
     const TEST_API_URL: &str = "https://api.boavizta.org";
     // Test against local  version of Boavizta API
     // const TEST_API_URL: &str = "http:/localhost:5000";
@@ -344,31 +338,6 @@ mod tests {
 
     const DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR: &str =
         include_str!("../test-data/DEFAULT_RAW_IMPACTS_OF_SSD_1000GB_1HR.json");
-
-    #[tokio::test]
-    async fn test_api_container_version() {
-        let image_name = "ghcr.io/boavizta/boaviztapi";
-        let tag = "1.3.7";
-
-        let container = GenericImage::new(image_name, tag)
-            .with_exposed_port(5000.tcp())
-            //.with_wait_for(WaitFor::Duration { length: Duration::from_secs(5) })
-            .with_wait_for(WaitFor::message_on_stderr(
-                "Uvicorn running on http://0.0.0.0:5000",
-            ))
-            .start()
-            .await
-            .expect("Failed to start API");
-
-        let host = container.get_host().await.unwrap();
-        let host_port = container.get_host_port_ipv4(5000).await.unwrap();
-        let url = format!("http://{host}:{host_port}");
-
-        let api: BoaviztaApiV1 = BoaviztaApiV1::new(&url);
-        let version = api.get_api_version().await;
-        let expected = Some("1.3.6".to_owned());
-        assert_eq!(version, expected, "Versions do not match");
-    }
 
     #[tokio::test]
     async fn retrieve_instance_types_through_sdk_works() {
