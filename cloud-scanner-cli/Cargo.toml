@@ -1,5 +1,5 @@
 [package]
-authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
+authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>", "Julien Nioche <jnioche@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
 version = "3.2.0-SNAPSHOT"
