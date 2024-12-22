@@ -2,6 +2,10 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>", "Julien Nioche <jnioche@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-cli"
+description = "Boavizta's Cloud-scanner estimates the environmental impacts of your AWS EC2 usage"
+repository = "https://github.com/Boavizta/cloud-scanner"
+keywords = ["boavizta", "cloud-scanner", "cloud", "green-ops"]
+license = "AGPL-3.0-only"
 version = "3.2.0-SNAPSHOT"
 
 [dependencies]
