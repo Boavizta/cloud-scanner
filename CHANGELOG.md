@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
+- [Show API and CloudScanner versions in dasboard](https://github.com/Boavizta/cloud-scanner/pull/649)
 - [Return API and scanner version in the metrics output](https://github.com/Boavizta/cloud-scanner/issues/266)
 - [Upgrade version of BoaviztAPI to 1.3.7 and adjust tests accordingly](https://github.com/Boavizta/cloud-scanner/issues/643)
 - [Return API and scanner version in the json output](https://github.com/Boavizta/cloud-scanner/issues/265)
