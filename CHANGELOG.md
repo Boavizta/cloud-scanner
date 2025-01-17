@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
+- [chore(deps): bump serde_json from 1.0.133 to 1.0.135](https://github.com/Boavizta/cloud-scanner/pull/653)
+- [chore(deps): bump serde from 1.0.216 to 1.0.217](https://github.com/Boavizta/cloud-scanner/pull/652)
+- [chore(deps): bump serverless from 4.4.15 to 4.4.19](https://github.com/Boavizta/cloud-scanner/pull/658)
+- [chore(deps): bump tokio from 1.42.0 to 1.43.0](https://github.com/Boavizta/cloud-scanner/pull/654)
+- [chore(deps): bump lambda_http from 0.13.0 to 0.14.0](https://github.com/Boavizta/cloud-scanner/pull/640)
 - [Show API and CloudScanner versions in dasboard](https://github.com/Boavizta/cloud-scanner/pull/649)
 - [Return API and scanner version in the metrics output](https://github.com/Boavizta/cloud-scanner/issues/266)
 - [Upgrade version of BoaviztAPI to 1.3.7 and adjust tests accordingly](https://github.com/Boavizta/cloud-scanner/issues/643)
