@@ -6,7 +6,7 @@ description = "Boavizta's Cloud-scanner estimates the environmental impacts of y
 repository = "https://github.com/Boavizta/cloud-scanner"
 keywords = ["boavizta", "cloud-scanner", "cloud", "green-ops"]
 license = "AGPL-3.0-only"
-version = "3.3.0-SNAPSHOT"
+version = "3.2.1-SNAPSHOT"
 
 [dependencies]
 chrono = { version = "^0.4", features = ["serde"] }

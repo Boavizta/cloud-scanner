@@ -2,7 +2,7 @@
 authors = ["boavizta.org", "Olivier de Meringo <demeringo@gmail.com>"]
 edition = "2021"
 name = "cloud-scanner-lambda"
-version = "3.3.0-SNAPSHOT"
+version = "3.2.1-SNAPSHOT"
 
 [[bin]]
 name = "bootstrap-scan"
