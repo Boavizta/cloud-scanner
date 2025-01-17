@@ -10,14 +10,9 @@ WORKDIR /app
 COPY . .
 RUN cargo build --release --bin cloud-scanner-cli
 
-FROM alpine AS runtime
-#update libcrypto3 libssl3 to fix security issues
-RUN apk update && apk add --upgrade libcrypto3 libssl3
-
-#RUN addgroup -S myuser && adduser -S myuser -G myuser
+FROM debian:bookworm-slim AS runtime
 
 COPY --from=builder /app/target/release/cloud-scanner-cli /usr/local/bin/
-#USER myuser
 
 EXPOSE 8000
 ENTRYPOINT ["/usr/local/bin/cloud-scanner-cli"]
