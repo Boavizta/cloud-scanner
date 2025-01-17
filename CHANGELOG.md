@@ -5,17 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-_This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
-
-- [Remove * versions of dependencies in CLI](https://github.com/Boavizta/cloud-scanner/pull/661)
-
-
 ## [3.2.0]-2025-01-17
 
 ## What's Changed
-
+- [Release Docker image based on Debian](https://github.com/Boavizta/cloud-scanner/pull/662)
+- [Remove * versions of dependencies in CLI](https://github.com/Boavizta/cloud-scanner/pull/661)
 - [chore(deps): bump serde_json from 1.0.133 to 1.0.135](https://github.com/Boavizta/cloud-scanner/pull/653)
 - [chore(deps): bump serde from 1.0.216 to 1.0.217](https://github.com/Boavizta/cloud-scanner/pull/652)
 - [chore(deps): bump serverless from 4.4.15 to 4.4.19](https://github.com/Boavizta/cloud-scanner/pull/658)
