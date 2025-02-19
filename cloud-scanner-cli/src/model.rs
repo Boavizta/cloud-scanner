@@ -285,11 +285,10 @@ mod tests {
             },
         );
 
-        let mut instance1tags: Vec<CloudResourceTag> = Vec::new();
-        instance1tags.push(CloudResourceTag {
+        let instance1tags: Vec<CloudResourceTag> = vec![CloudResourceTag {
             key: "Name".to_string(),
             value: Some("App1".to_string()),
-        });
+        }];
 
         let instance1: CloudResource = CloudResource {
             provider: CloudProvider::AWS,
@@ -302,8 +301,7 @@ mod tests {
             tags: instance1tags,
         };
 
-        assert_eq!(
-            true,
+        assert!(
             instance1.has_matching_tagmap(&filtertags),
             "Tags should match"
         );
@@ -317,9 +315,8 @@ mod tests {
                 value: Some("OtherApp".to_string()),
             },
         );
-        assert_eq!(
-            false,
-            instance1.has_matching_tagmap(&other_name_tag),
+        assert!(
+            !instance1.has_matching_tagmap(&other_name_tag),
             "Tags should not match"
         );
 
@@ -332,9 +329,8 @@ mod tests {
                 value: Some("PROD".to_string()),
             },
         );
-        assert_eq!(
-            false,
-            instance1.has_matching_tagmap(&more_tags),
+        assert!(
+            !instance1.has_matching_tagmap(&more_tags),
             "Tags should not match"
         );
 
@@ -347,16 +343,14 @@ mod tests {
                 value: None,
             },
         );
-        assert_eq!(
-            false,
-            instance1.has_matching_tagmap(&tag_without_val),
+        assert!(
+            !instance1.has_matching_tagmap(&tag_without_val),
             "Tag without a value should not match"
         );
 
         // Trying an empty filter
         let empty_filter = HashMap::new();
-        assert_eq!(
-            true,
+        assert!(
             instance1.has_matching_tagmap(&empty_filter),
             "Tags should match"
         );
@@ -372,8 +366,7 @@ mod tests {
                 value: Some("whatever".to_string()),
             },
         );
-        assert_eq!(
-            true,
+        assert!(
             instance1.has_matching_tagmap(&empty_filter),
             "Tags should match (i.e. we should ignore this invalid filter"
         );
