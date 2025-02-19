@@ -83,27 +83,24 @@ enum SubCommand {
 }
 
 fn set_region(optional_region: Option<String>) -> String {
-    match optional_region {
-        Some(region_arg) => {
-            info!("Using region: {}", region_arg);
-            region_arg
-        }
-        None => "".to_owned(),
-    }
+    optional_region.map_or_else(String::new, |region_arg| {
+        info!("Using region: {}", region_arg);
+        region_arg
+    })
 }
 
 fn set_api_url(optional_url: Option<String>) -> String {
-    match optional_url {
-        Some(url_arg) => {
+    optional_url.map_or_else(
+        || {
+            let default_url = "https://api.boavizta.org".to_string();
+            warn!("Using default API at:  {default_url}");
+            default_url
+        },
+        |url_arg| {
             info!("Using API at:  {}", url_arg);
             url_arg
-        }
-        None => {
-            let default_url = "https://api.boavizta.org".to_string();
-            warn!("Using default API at:  {}", default_url);
-            default_url
-        }
-    }
+        },
+    )
 }
 
 #[tokio::main]
@@ -126,8 +123,8 @@ async fn main() -> Result<()> {
             output_verbose_json,
             summary_only,
             inventory_file,
-        } => match inventory_file {
-            Some(path) => {
+        } => {
+            if let Some(path) = inventory_file {
                 info!("Providing estimation for inventory file");
                 let i = cloud_scanner_cli::estimate_impacts_of_inventory_file(
                     &use_duration_hours,
@@ -137,8 +134,7 @@ async fn main() -> Result<()> {
                 )
                 .await?;
                 println!("{}", serde_json::to_string(&i)?);
-            }
-            None => {
+            } else {
                 info!("Providing estimation for live inventory");
                 let i: EstimatedInventory = cloud_scanner_cli::estimate_impacts(
                     &use_duration_hours,
@@ -152,9 +148,9 @@ async fn main() -> Result<()> {
                 let result =
                     get_estimated_inventory_as_json(&i, &region, &use_duration_hours, summary_only)
                         .await?;
-                println!("{}", result);
+                println!("{result}");
             }
-        },
+        }
         SubCommand::Metrics {
             use_duration_hours,
             include_block_storage,
@@ -168,7 +164,7 @@ async fn main() -> Result<()> {
                 include_block_storage,
             )
             .await?;
-            println!("{}", metrics);
+            println!("{metrics}");
         }
         SubCommand::Inventory {
             include_block_storage,
