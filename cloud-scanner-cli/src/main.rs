@@ -21,7 +21,7 @@ struct Arguments {
     aws_region: Option<String>,
 
     #[arg(short, long)]
-    /// Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. https://api.boavizta.org)
+    /// Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. <https://api.boavizta.org>)
     boavizta_api_url: Option<String>,
 
     #[arg(short = 't', long)]
@@ -42,7 +42,7 @@ enum SubCommand {
         use_duration_hours: f32,
 
         #[arg(long, short = 'f', action)]
-        /// Retrieve and output the details from BoaviztaAPI (equivalent to the verbose flag when querying Boavizta API)
+        /// Retrieve and output the details from `BoaviztaAPI` (equivalent to the verbose flag when querying Boavizta API)
         output_verbose_json: bool,
 
         #[arg(long, short = 'b', action)]
@@ -57,7 +57,7 @@ enum SubCommand {
         #[arg(short, long)]
         inventory_file: Option<PathBuf>,
     },
-    /// Get estimation of impacts for a given usage duration as OpenMetrics (Prometheus) instead of json
+    /// Get estimation of impacts for a given usage duration as `OpenMetrics` (Prometheus) instead of json
     Metrics {
         #[arg(short = 'u', long)]
         /// The number of hours of use for which we want to estimate the impacts
@@ -78,7 +78,7 @@ enum SubCommand {
         print_json_schema: bool,
     },
     ///  Run as a standalone server.
-    /// Access metrics (e.g. http://localhost:8000/metrics?aws_region=eu-west-3), inventory or impacts (see http://localhost:8000/swagger-ui)
+    /// Access metrics (e.g. <http://localhost:8000/metrics?aws_region=eu-west-3>), inventory or impacts (se<http://localhost:8000/swagger-ui>ui)
     Serve {},
 }
 
