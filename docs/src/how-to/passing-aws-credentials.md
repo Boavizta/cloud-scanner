@@ -10,7 +10,7 @@ The minimal set of permissions to perform inventory of resources (and query CPU 
 
 - ec2:DescribeInstances
 - cloudwatch:GetMetricStatistics
-- cloudwatch:DescribeAlarm
+- cloudwatch:DescribeAlarms
 
 You could also restricts permissions to a specific set of instances or resources.
 

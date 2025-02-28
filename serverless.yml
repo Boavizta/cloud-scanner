@@ -18,7 +18,7 @@ provider:
           Action: "cloudwatch:GetMetricStatistics"
           Resource: "*"
         - Effect: Allow
-          Action: "cloudwatch:DescribeAlarm"
+          Action: "cloudwatch:DescribeAlarms"
           Resource: "*"
   environment:
     BOAVIZTA_API_URL: ${env:BOAVIZTA_API_URL}
