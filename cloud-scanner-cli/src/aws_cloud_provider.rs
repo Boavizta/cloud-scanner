@@ -431,12 +431,12 @@ mod tests {
     async fn get_cpu_usage_metrics_of_running_instance_should_return_right_number_of_data_points() {
         let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await.unwrap();
         let res = aws
-            .get_average_cpu_usage_of_last_10_minutes(&RUNNING_INSTANCE_ID)
+            .get_average_cpu_usage_of_last_10_minutes(RUNNING_INSTANCE_ID)
             .await
             .unwrap();
         let datapoints = res.datapoints.unwrap();
         assert!(
-            0 < datapoints.len() && datapoints.len() < 3,
+            !datapoints.is_empty() && datapoints.len() < 3,
             "Strange number of datapoint returned for instance {}, is it really up ?. I was expecting 1 or 2  but got {} .\n {:#?}",
             &RUNNING_INSTANCE_ID,
             datapoints.len(),
@@ -476,15 +476,15 @@ mod tests {
         // This instance  needs to be running for the test to pass
         let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await.unwrap();
 
-        let avg_cpu_load = aws.get_average_cpu(&RUNNING_INSTANCE_ID).await.unwrap();
+        let avg_cpu_load = aws.get_average_cpu(RUNNING_INSTANCE_ID).await.unwrap();
         assert_ne!(
             0 as f64, avg_cpu_load,
             "CPU load of instance {} is zero, is it really running ?",
             &RUNNING_INSTANCE_ID
         );
         println!("{:#?}", avg_cpu_load);
-        assert!((0 as f64) < avg_cpu_load);
-        assert!((100 as f64) > avg_cpu_load);
+        assert!(0_f64 < avg_cpu_load);
+        assert!(100_f64 > avg_cpu_load);
     }
 
     #[tokio::test]
