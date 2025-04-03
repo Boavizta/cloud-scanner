@@ -357,7 +357,7 @@ mod tests {
     async fn get_api_version() {
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
         let version = api.get_api_version().await;
-        let expected = Some("1.3.8".to_owned());
+        let expected = Some("1.3.10".to_owned());
         assert_eq!(version, expected, "Versions do not match");
     }
 
