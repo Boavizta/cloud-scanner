@@ -1,7 +1,7 @@
 # used for building releases - done once in a while
 # and pretty slow but can handle multi platform
 
-FROM rust:1.82.0 AS builder
+FROM rust:1.86.0 AS builder
 
 RUN apt update && apt install -y musl-tools musl-dev
 RUN update-ca-certificates
