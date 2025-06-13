@@ -57,7 +57,8 @@ impl AwsCloudProvider {
                 }
                 Some(region) => {
                     warn!(
-                        "Initialized AWS client from the default region picked up from environment [{}]", region
+                        "Initialized AWS client from the default region picked up from environment [{}]",
+                        region
                     );
                 }
             }
@@ -87,7 +88,9 @@ impl AwsCloudProvider {
             }
             retained_region.to_string().to_owned()
         } else {
-            error!("Unable to configure AWS client region. You should consider setting a AWS_DEFAULT_REGION as environment variable or pass region as a CLI parameter.... Exiting...");
+            error!(
+                "Unable to configure AWS client region. You should consider setting a AWS_DEFAULT_REGION as environment variable or pass region as a CLI parameter.... Exiting..."
+            );
             panic!();
         }
     }
@@ -247,10 +250,12 @@ impl AwsCloudProvider {
         let cpu_metric_name = String::from("CPUUtilization");
         let ec2_namespace = "AWS/EC2";
 
-        let dimensions = vec![Dimension::builder()
-            .name("InstanceId")
-            .value(instance_id)
-            .build()];
+        let dimensions = vec![
+            Dimension::builder()
+                .name("InstanceId")
+                .value(instance_id)
+                .build(),
+        ];
 
         let end_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
             aws_sdk_cloudwatch::primitives::DateTime::from_secs(now.timestamp());
@@ -338,6 +343,20 @@ impl AwsCloudProvider {
             };
             resources.push(disk);
         }
+
+        Ok(resources)
+    }
+
+    async fn get_s3_buckets_with_usage_data(&self, tags: &[String]) -> Result<Vec<CloudResource>> {
+        let location = UsageLocation::try_from(self.aws_region.as_str())?;
+        let mut resources: Vec<CloudResource> = Vec::new();
+
+        Ok(resources)
+    }
+
+    async fn list_s3_buckets(&self) -> Result<Vec<CloudResource>> {
+        let location = UsageLocation::try_from(self.aws_region.as_str())?;
+        let mut resources: Vec<CloudResource> = Vec::new();
 
         Ok(resources)
     }
@@ -511,6 +530,14 @@ mod tests {
         let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await.unwrap();
         let filtertags: Vec<String> = Vec::new();
         let res = aws.list_volumes(&filtertags).await.unwrap();
+        assert_eq!(6, res.len());
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn list_s3_buckets() {
+        let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await.unwrap();
+        let res = aws.list_s3_buckets().await.unwrap();
         assert_eq!(6, res.len());
     }
 }

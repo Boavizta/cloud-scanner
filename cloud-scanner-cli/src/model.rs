@@ -136,7 +136,10 @@ pub enum ResourceDetails {
         usage: Option<StorageUsage>,
         attached_instances: Option<Vec<StorageAttachment>>,
     },
-    ObjectStorage,
+    ObjectStorage {
+        storage_type: String,
+        usage: Option<StorageUsage>,
+    },
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -396,7 +399,10 @@ mod tests {
                 aws_region: "eu-west-3".to_string(),
                 iso_country_code: "FR".to_string(),
             },
-            resource_details: ResourceDetails::ObjectStorage,
+            resource_details: ResourceDetails::ObjectStorage {
+                     storage_type: "arbitrary-storage-class".to_string(),
+                     usage: None,
+            },
             tags: vec![tag1, tag2],
         };
 

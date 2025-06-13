@@ -54,7 +54,7 @@ fn build_resource_labels(
     let resource_type = match resource.clone().cloud_resource.resource_details {
         ResourceDetails::Instance { .. } => ResourceType::Instance,
         ResourceDetails::BlockStorage { .. } => ResourceType::BlockStorage,
-        ResourceDetails::ObjectStorage => ResourceType::ObjectStorage,
+        ResourceDetails::ObjectStorage { .. }=> ResourceType::ObjectStorage,
     };
     let resource_state = match resource.clone().cloud_resource.resource_details {
         ResourceDetails::Instance {
