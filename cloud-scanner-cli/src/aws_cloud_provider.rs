@@ -366,8 +366,8 @@ impl AwsCloudProvider {
 
         while let Some(Ok(output)) = buckets.next().await {
             for bucket in output.buckets() {
-                println!("{}", bucket.name().unwrap_or_default());
-                println!("{}", bucket.bucket_region().unwrap_or_default());
+                println!("Bucket: {}", bucket.name().unwrap_or_default());
+                println!("Region: {}", bucket.bucket_region().unwrap_or_default());
             }
         }
 
