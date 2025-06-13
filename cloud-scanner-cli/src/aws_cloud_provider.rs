@@ -10,6 +10,7 @@ use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOut
 use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
 use aws_sdk_ec2::types::{Instance, InstanceStateName, Volume};
+use aws_sdk_s3::Client;
 use chrono::{TimeDelta, Utc};
 
 use crate::model::{
@@ -25,6 +26,7 @@ pub struct AwsCloudProvider {
     aws_region: String,
     ec2_client: aws_sdk_ec2::Client,
     cloudwatch_client: aws_sdk_cloudwatch::Client,
+    s3_client: aws_sdk_s3::Client,
 }
 
 impl AwsCloudProvider {
@@ -39,6 +41,7 @@ impl AwsCloudProvider {
             aws_region: retained_region,
             ec2_client: aws_sdk_ec2::Client::new(&shared_config),
             cloudwatch_client: aws_sdk_cloudwatch::Client::new(&shared_config),
+            s3_client: aws_sdk_s3::Client::new(&shared_config),
         })
     }
 
@@ -357,6 +360,16 @@ impl AwsCloudProvider {
     async fn list_s3_buckets(&self) -> Result<Vec<CloudResource>> {
         let location = UsageLocation::try_from(self.aws_region.as_str())?;
         let mut resources: Vec<CloudResource> = Vec::new();
+
+        let client = &self.s3_client;
+        let mut buckets = client.list_buckets().into_paginator().send();
+
+        while let Some(Ok(output)) = buckets.next().await {
+            for bucket in output.buckets() {
+                println!("{}", bucket.name().unwrap_or_default());
+                println!("{}", bucket.bucket_region().unwrap_or_default());
+            }
+        }
 
         Ok(resources)
     }

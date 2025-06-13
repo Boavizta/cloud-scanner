@@ -47,6 +47,10 @@ version = "1"
 features = ["behavior-version-latest", "rustls"]
 version = "1"
 
+[dependencies.aws-sdk-s3]
+features = ["behavior-version-latest", "rustls"]
+version = "1"
+
 [dependencies.aws-smithy-types-convert]
 features = ["convert-chrono"]
 version = "0.60.2"
