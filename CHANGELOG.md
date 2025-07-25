@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
+- [Upgrade version of BoaviztAPI to 1.3.11](https://github.com/Boavizta/cloud-scanner/issues/728)
 - [Update to Rust version 1.86](https://github.com/Boavizta/cloud-scanner/issues/698)
 - [Upgrade version of BoaviztAPI to 1.3.10](https://github.com/Boavizta/cloud-scanner/issues/693)
 - [Upgrade version of BoaviztAPI to 1.3.8](https://github.com/Boavizta/cloud-scanner/issues/681)
