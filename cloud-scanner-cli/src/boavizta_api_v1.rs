@@ -377,7 +377,7 @@ mod tests {
             tags: Vec::new(),
         };
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let one_hour = 1.0 as f32;
+        let one_hour = 1.0_f32;
         let res = api
             .get_raws_impacts(instance1, &one_hour, false)
             .await
@@ -404,7 +404,7 @@ mod tests {
         };
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let one_hour = 1.0 as f32;
+        let one_hour = 1.0_f32;
         let res = api.get_raws_impacts(hdd, &one_hour, true).await.unwrap();
 
         let expected: serde_json::Value = serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_HDD).unwrap();
@@ -429,7 +429,7 @@ mod tests {
         };
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let one_hour = 1.0 as f32;
+        let one_hour = 1.0_f32;
         let res = api.get_raws_impacts(ssd, &one_hour, true).await.unwrap();
 
         let expected: serde_json::Value =
@@ -470,11 +470,9 @@ mod tests {
         };
 
         let api: BoaviztaApiV1 = BoaviztaApiV1::new(TEST_API_URL);
-        let one_hour = 1.0 as f32;
+        let one_hour = 1.0_f32;
 
-        let mut instances: Vec<CloudResource> = Vec::new();
-        instances.push(instance1);
-        instances.push(instance1_1percent);
+        let instances: Vec<CloudResource> = vec![instance1, instance1_1percent];
 
         let inventory = Inventory {
             metadata: InventoryMetadata {
@@ -538,11 +536,8 @@ mod tests {
             tags: Vec::new(),
         };
 
-        let mut instances: Vec<CloudResource> = Vec::new();
-        instances.push(instance1);
-        instances.push(instance2);
-        instances.push(instance3);
-        let one_hour = 1.0 as f32;
+        let instances: Vec<CloudResource> = vec![instance1, instance2, instance3];
+        let one_hour = 1.0_f32;
 
         let inventory = Inventory {
             metadata: InventoryMetadata {
@@ -590,7 +585,7 @@ mod tests {
 
         let raw_impacts =
             Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR).unwrap());
-        let one_hour: f32 = 1 as f32;
+        let one_hour: f32 = 1_f32;
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
         assert!(
@@ -636,7 +631,7 @@ mod tests {
 
         let raw_impacts =
             Some(serde_json::from_str(DEFAULT_RAW_IMPACTS_OF_M6GXLARGE_1HRS_FR_VERBOSE).unwrap());
-        let one_hour: f32 = 1 as f32;
+        let one_hour: f32 = 1_f32;
         let cloud_resource_with_impacts: CloudResourceWithImpacts =
             boa_impacts_to_cloud_resource_with_impacts(&instance1, &raw_impacts, &one_hour);
         assert!(
