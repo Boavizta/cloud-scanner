@@ -136,7 +136,9 @@ pub enum ResourceDetails {
         usage: Option<StorageUsage>,
         attached_instances: Option<Vec<StorageAttachment>>,
     },
-    ObjectStorage,
+    ObjectStorage {
+        storage_by_type: Vec<StorageUsageForType>,
+    },
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -158,6 +160,13 @@ pub enum InstanceState {
 #[serde(rename_all = "snake_case")]
 pub struct StorageUsage {
     pub size_gb: i32,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct StorageUsageForType {
+    pub storage_type: String,
+    pub size_bytes: u64,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -396,7 +405,9 @@ mod tests {
                 aws_region: "eu-west-3".to_string(),
                 iso_country_code: "FR".to_string(),
             },
-            resource_details: ResourceDetails::ObjectStorage,
+            resource_details: ResourceDetails::ObjectStorage {
+                storage_by_type: Vec::new(),
+            },
             tags: vec![tag1, tag2],
         };
 

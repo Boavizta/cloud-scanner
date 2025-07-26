@@ -18,6 +18,9 @@ provider:
           Action: "cloudwatch:GetMetricStatistics"
           Resource: "*"
         - Effect: Allow
+          Action: "cloudwatch:ListMetrics"
+          Resource: "*"
+        - Effect: Allow
           Action: "cloudwatch:DescribeAlarms"
           Resource: "*"
   environment:

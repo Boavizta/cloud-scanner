@@ -9,8 +9,8 @@ use prometheus_client::metrics::family::Family;
 use prometheus_client::metrics::gauge::*;
 use prometheus_client::registry::Registry;
 
-use crate::model::{EstimatedInventory, InstanceState, ResourceDetails};
 use crate::ImpactsSummary;
+use crate::model::{EstimatedInventory, InstanceState, ResourceDetails};
 
 // Define a type representing a metric label set, i.e. a key value pair.
 #[derive(Clone, Hash, PartialEq, Eq, EncodeLabelSet, Debug)]
@@ -54,7 +54,7 @@ fn build_resource_labels(
     let resource_type = match resource.clone().cloud_resource.resource_details {
         ResourceDetails::Instance { .. } => ResourceType::Instance,
         ResourceDetails::BlockStorage { .. } => ResourceType::BlockStorage,
-        ResourceDetails::ObjectStorage => ResourceType::ObjectStorage,
+        ResourceDetails::ObjectStorage { .. } => ResourceType::ObjectStorage,
     };
     let resource_state = match resource.clone().cloud_resource.resource_details {
         ResourceDetails::Instance {
