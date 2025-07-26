@@ -315,25 +315,31 @@ impl AwsCloudProvider {
     /// Fetch all aws S3 buckets `BucketSizeBytes` metrics of the region
     ///
     /// An individual metric resembles the following:
-    /// ```rust
-    /// Metric {
-    ///   metric_name: Some("BucketSizeBytes"),
-    ///   namespace:   Some("AWS/S3"),
-    ///   dimensions:  Some([
-    ///     Dimension {
-    ///       name:  "StorageType",
-    ///       value: "StandardStorage"
-    ///     },
-    ///     Dimension {
-    ///       name:  "StorageType",
-    ///       value: "GlacierStorage"
-    ///     },
-    ///     Dimension {
-    ///       name:  "BucketName",
-    ///       value: "some-bucket-name"
-    ///     }
-    ///   ]),
-    /// }
+    /// ```
+    /// use aws_sdk_cloudwatch::types::{Metric, Dimension};
+    ///
+    /// Metric::builder()
+    ///     .metric_name("BucketSizeBytes")
+    ///     .namespace("AWS/S3")
+    ///     .dimensions(
+    ///         Dimension::builder()
+    ///             .name("StorageType")
+    ///             .value("StandardStorage")
+    ///             .build(),
+    ///     )
+    ///     .dimensions(
+    ///         Dimension::builder()
+    ///             .name("StorageType")
+    ///             .value("GlacierStorage")
+    ///             .build(),
+    ///     )
+    ///     .dimensions(
+    ///         Dimension::builder()
+    ///             .name("BucketName")
+    ///             .value("some-bucket-name")
+    ///             .build(),
+    ///     )
+    ///     .build();
     /// ```
     pub async fn list_bucket_size_metrics(&self, tags: &[String]) -> Result<Vec<Metric>> {
         let mut metrics = Vec::new();
