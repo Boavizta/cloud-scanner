@@ -1,26 +1,23 @@
 [book]
 authors = ["olivier de Meringo", "Boavizta"]
 language = "en"
-multilingual = false
 src = "src"
 title = "Boavizta cloud scanner 📡"
 
 # Deactivate link checker by default
 # cargo install mdbook-linkcheck
-[output.linkcheck]
+# [output.linkcheck]
 
 [output.html]
 #theme = "my-theme"
 default-theme = "light"
 preferred-dark-theme = "navy"
-curly-quotes = true
 mathjax-support = false
-copy-fonts = true
 #additional-css = ["custom.css", "custom2.css"]
 #additional-js = ["custom.js"]
 #no-section-label = false
 git-repository-url = "https://github.com/Boavizta/cloud-scanner"
-git-repository-icon = "fa-github"
+#git-repository-icon = "fa-github"
 edit-url-template = "https://github.com/Boavizta/cloud-scanner/edit/main/docs/{path}"
 additional-js = ["mermaid.min.js", "mermaid-init.js"]
 
