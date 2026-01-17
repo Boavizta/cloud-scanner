@@ -1,4 +1,4 @@
-FROM rust:1.86.0 AS chef
+FROM rust:1.92.0 AS chef
 RUN rustup target add x86_64-unknown-linux-musl
 RUN apt update && apt install -y musl-tools musl-dev
 RUN update-ca-certificates
