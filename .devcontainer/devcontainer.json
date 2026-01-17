@@ -1,0 +1,11 @@
+{
+  "build": { "dockerfile": "Dockerfile" },
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["rust-lang.rust-analyzer"]
+    }
+  },
+  "forwardPorts": [3000], // forward ports as needed
+  "runArgs": ["--name", "CloudScannerDev"]
+}
