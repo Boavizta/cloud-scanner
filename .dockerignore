@@ -1,0 +1,6 @@
+.github
+.serverless
+baovizta-api-sdk/target
+docs
+node_modules
+target

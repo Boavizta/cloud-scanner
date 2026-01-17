@@ -1,0 +1,5 @@
+# some custom aliases and env vars...
+
+export DO_NOT_TRACK=1
+
+export PATH="$PATH:$HOME/.cargo/bin"

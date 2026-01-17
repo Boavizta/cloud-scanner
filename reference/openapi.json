@@ -1,0 +1,650 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "cloud-scanner-cli",
+    "version": "3.2.0-SNAPSHOT"
+  },
+  "paths": {
+    "/metrics": {
+      "get": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Returns Prometheus metrics.",
+        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nResults are estimated for one hour of use by default.\n\nExample query: http://localhost:8000/metrics?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0&include_storage=true",
+        "operationId": "metrics",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "use_duration_hours",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          },
+          {
+            "name": "include_block_storage",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Returns current inventory.",
+        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nExample query: http://localhost:8000/inventory?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value",
+        "operationId": "inventory",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "include_block_storage",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impacts": {
+      "get": {
+        "tags": [
+          "impacts"
+        ],
+        "summary": "Returns the impacts of current inventory.",
+        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nExample query: http://localhost:8000/impacts?aws_region=eu-west-3&filter_tag=Name=boatest&filter_tag=OtherTag=other-value&use_duration_hours=1.0",
+        "operationId": "impacts",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "use_duration_hours",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          },
+          {
+            "name": "verbose_output",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          },
+          {
+            "name": "include_block_storage",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedInventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impacts-from-arbitrary-inventory": {
+      "post": {
+        "tags": [
+          "impacts"
+        ],
+        "summary": "Retrieve the impacts of arbitrary inventory.",
+        "description": "This can be used to evaluate impacts of a not yet implemented architecture.\n\nThe inventory is passed as json data in the request body.",
+        "operationId": "impacts_from_arbitrary_inventory",
+        "parameters": [
+          {
+            "name": "use_duration_hours",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          },
+          {
+            "name": "verbose_output",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Inventory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedInventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Inventory": {
+        "description": "A list of cloud resources and metadata that describes the inventory itself",
+        "type": "object",
+        "required": [
+          "metadata",
+          "resources"
+        ],
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/InventoryMetadata"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResource"
+            }
+          }
+        }
+      },
+      "InventoryMetadata": {
+        "description": "Details about the inventory",
+        "type": "object",
+        "properties": {
+          "inventory_date": {
+            "description": "The date when the inventory was generated",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "description": "A free text description of the inventory",
+            "type": "string",
+            "nullable": true
+          },
+          "cloud_scanner_version": {
+            "description": "The version of the cloud scanner that generated the inventory",
+            "type": "string",
+            "nullable": true
+          },
+          "execution_statistics": {
+            "description": "Statistics about program execution",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionStatistics"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "ExecutionStatistics": {
+        "description": "Statistics about program execution",
+        "type": "object",
+        "required": [
+          "impact_estimation_duration",
+          "inventory_duration",
+          "total_duration"
+        ],
+        "properties": {
+          "inventory_duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "impact_estimation_duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "total_duration": {
+            "$ref": "#/components/schemas/Duration"
+          }
+        }
+      },
+      "Duration": {
+        "type": "object",
+        "required": [
+          "nanos",
+          "secs"
+        ],
+        "properties": {
+          "secs": {
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
+          },
+          "nanos": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
+      "CloudResource": {
+        "description": "A cloud resource (could be an instance, block storage or any other resource)",
+        "type": "object",
+        "required": [
+          "id",
+          "location",
+          "provider",
+          "resource_details",
+          "tags"
+        ],
+        "properties": {
+          "provider": {
+            "$ref": "#/components/schemas/CloudProvider"
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "description": "The location where cloud resources are running.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UsageLocation"
+              }
+            ]
+          },
+          "resource_details": {
+            "$ref": "#/components/schemas/ResourceDetails"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResourceTag"
+            }
+          }
+        }
+      },
+      "CloudProvider": {
+        "type": "string",
+        "enum": [
+          "AWS",
+          "OVH"
+        ]
+      },
+      "UsageLocation": {
+        "description": "The location where cloud resources are running.\n\nTODO! the usage location should be abstracted and vendor specific implementation should be part of the cloud_provider model (region names are tied to a specific cloud provider)",
+        "type": "object",
+        "required": [
+          "aws_region",
+          "iso_country_code"
+        ],
+        "properties": {
+          "aws_region": {
+            "description": "The AWS region (like eu-west-1)",
+            "type": "string"
+          },
+          "iso_country_code": {
+            "description": "The 3-letters ISO country code corresponding to the country of the aws_region",
+            "type": "string"
+          }
+        }
+      },
+      "ResourceDetails": {
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "object_storage"
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "instance"
+            ],
+            "properties": {
+              "instance": {
+                "type": "object",
+                "required": [
+                  "instance_type"
+                ],
+                "properties": {
+                  "instance_type": {
+                    "type": "string"
+                  },
+                  "usage": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/InstanceUsage"
+                      }
+                    ],
+                    "nullable": true
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "block_storage"
+            ],
+            "properties": {
+              "block_storage": {
+                "type": "object",
+                "required": [
+                  "storage_type"
+                ],
+                "properties": {
+                  "storage_type": {
+                    "type": "string"
+                  },
+                  "usage": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/StorageUsage"
+                      }
+                    ],
+                    "nullable": true
+                  },
+                  "attached_instances": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/StorageAttachment"
+                    },
+                    "nullable": true
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "InstanceUsage": {
+        "type": "object",
+        "required": [
+          "average_cpu_load",
+          "state"
+        ],
+        "properties": {
+          "average_cpu_load": {
+            "type": "number",
+            "format": "double"
+          },
+          "state": {
+            "$ref": "#/components/schemas/InstanceState"
+          }
+        }
+      },
+      "InstanceState": {
+        "type": "string",
+        "enum": [
+          "running",
+          "stopped"
+        ]
+      },
+      "StorageUsage": {
+        "type": "object",
+        "required": [
+          "size_gb"
+        ],
+        "properties": {
+          "size_gb": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StorageAttachment": {
+        "type": "object",
+        "required": [
+          "instance_id"
+        ],
+        "properties": {
+          "instance_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CloudResourceTag": {
+        "description": "A tag (just a mandatory key + optional value)",
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "EstimatedInventory": {
+        "description": "An estimated inventory: impacting resources with their estimated impacts",
+        "type": "object",
+        "required": [
+          "impacting_resources",
+          "metadata"
+        ],
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/EstimationMetadata"
+          },
+          "impacting_resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResourceWithImpacts"
+            }
+          }
+        }
+      },
+      "EstimationMetadata": {
+        "description": "Details about the estimation",
+        "type": "object",
+        "properties": {
+          "estimation_date": {
+            "description": "The date when the estimation was generated",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "description": "A free text description of the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "cloud_scanner_version": {
+            "description": "The version of the cloud scanner that provided the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "boavizta_api_version": {
+            "description": "The version of the Boavizta api that provided the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "execution_statistics": {
+            "description": "Statistics about program execution",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionStatistics"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "CloudResourceWithImpacts": {
+        "type": "object",
+        "required": [
+          "cloud_resource",
+          "impacts_duration_hours"
+        ],
+        "properties": {
+          "cloud_resource": {
+            "$ref": "#/components/schemas/CloudResource"
+          },
+          "impacts_values": {
+            "description": "The impacts",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ImpactsValues"
+              }
+            ],
+            "nullable": true
+          },
+          "impacts_duration_hours": {
+            "description": "The duration for which impacts are calculated",
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ImpactsValues": {
+        "description": "Impacts of an individual resource",
+        "type": "object",
+        "required": [
+          "adp_manufacture_kgsbeq",
+          "adp_use_kgsbeq",
+          "gwp_manufacture_kgco2eq",
+          "gwp_use_kgco2eq",
+          "pe_manufacture_megajoules",
+          "pe_use_megajoules"
+        ],
+        "properties": {
+          "adp_manufacture_kgsbeq": {
+            "type": "number",
+            "format": "double"
+          },
+          "adp_use_kgsbeq": {
+            "type": "number",
+            "format": "double"
+          },
+          "pe_manufacture_megajoules": {
+            "type": "number",
+            "format": "double"
+          },
+          "pe_use_megajoules": {
+            "type": "number",
+            "format": "double"
+          },
+          "gwp_manufacture_kgco2eq": {
+            "type": "number",
+            "format": "double"
+          },
+          "gwp_use_kgco2eq": {
+            "type": "number",
+            "format": "double"
+          },
+          "raw_data": {
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}

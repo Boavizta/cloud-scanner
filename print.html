@@ -1,0 +1,2009 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Boavizta cloud scanner 📡</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-f559e7ea.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-be5f87a2.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Boavizta cloud scanner 📡</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Boavizta/cloud-scanner" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <p><img src="images/cloudscanner_color_logo.svg" alt="Cloud scanner logo"></p>
+<h1 id="about-cloud-scanner"><a class="header" href="#about-cloud-scanner">About cloud-scanner</a></h1>
+<p><a href="https://github.com/Boavizta/cloud-scanner">Boavizta Cloud-scanner</a> returns environmental impacts of your AWS Instances (EC2) and Storage usage.</p>
+<pre class="mermaid">  graph LR;
+      inventory[ Account inventory] 
+      api[Impacts from BoaviztaAPI]
+      metrics[Prometheus metrics]
+      json[JSON output]
+      inventory --&gt; api
+      api --&gt; metrics
+      api --&gt; json
+</pre>
+
+<p>It combines real time <em>inventory</em> and <em>usage</em> data from your AWS account with <a href="https://github.com/Boavizta/boaviztapi/">Boavizta API</a> to offer a  view of your impacts on a given region.</p>
+<ul>
+<li>multi criteria: Primary Energy consumption (PE), Abiotic resource depletion potential (ADP), and Global Warming Potential (GWP)</li>
+<li>multi stage: separate impacts of ressources Usage and Manufacture</li>
+</ul>
+<p>Estimations can be filtered by tags. It eases attribution to a specific server, environment, application or service.</p>
+<p>Cloud-scanner can be used:</p>
+<ul>
+<li>from command line, to get an immediate view of your impacts 💻</li>
+<li>as a metric server . You can use it to monitor and display real time impacts in a dashboard 📊</li>
+</ul>
+<p><img src="images/cloud-scanner-dashboard-clear.png" title="A example dashboard rendering cloud scanner metrics" alt="A example dashboard rendering cloud scanner metrics"></p>
+<p>Cloud-scanner is an Open Source application maintained here: <a href="https://github.com/Boavizta/cloud-scanner">https://github.com/Boavizta/cloud-scanner</a>.</p>
+<h2 id="how-it-works"><a class="header" href="#how-it-works">How it works</a></h2>
+<p><img src="images/cloud-scanner-system-in-context.png" title="System in context diagram of cloud scanner" alt="System in context diagram of cloud scanner"></p>
+<p>Cloud scanner relies on cloud providers APIs to perform an inventory of your cloud resources.  It collects information about usage (instance types, tags, CPU load or volume size).</p>
+<p>This inventory is used to query Boavizta API which returns impact data.</p>
+<p>Results are exposed as JSON or metrics.</p>
+<h2 id="contributing"><a class="header" href="#contributing">Contributing</a></h2>
+<p>Cloud scanner is stable, but with limited functionality.</p>
+<p>Development versions may already provide new functionalities that have not yet be included to a release. So have a look at the <a href="https://github.com/Boavizta/cloud-scanner/blob/main/CHANGELOG.md">changelog</a> and <a href="https://github.com/Boavizta/cloud-scanner/issues">Issues</a> on this repository.</p>
+<p>And most importantly, do not hesitate to ask questions or share your feedback by opening an <a href="https://github.com/Boavizta/cloud-scanner/issues">Issue</a> or <a href="https://github.com/Boavizta/cloud-scanner/discussions">discussion</a> on GitHub.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="quick-start-run-cli-using-docker-"><a class="header" href="#quick-start-run-cli-using-docker-">Quick start run CLI using docker 🐳</a></h1>
+<p>No installation needed, you will run a public docker image of cloud-scanner CLI.</p>
+<h2 id="pre-requisites"><a class="header" href="#pre-requisites">Pre-requisites</a></h2>
+<ul>
+<li>Docker.</li>
+<li>A working AWS account (and your AWS CLI profile already configured)</li>
+</ul>
+<h2 id="run-cloud-scanner-cli"><a class="header" href="#run-cloud-scanner-cli">Run cloud-scanner cli</a></h2>
+<pre><code class="language-sh">docker pull ghcr.io/boavizta/cloud-scanner-cli:latest
+docker run -it ghcr.io/boavizta/cloud-scanner-cli:latest --help
+
+# Ensure you have a working AWS profile setup locally (like you would do for AWS CLI)
+# Note
+# - we map local credentials on the container (-v)
+# - we force a using 'myprofile' profile by setting the AWS_PROFILE environment variable with -e flag
+# - the -it flag is optional, only purpose is to get colored output if any
+
+# Just list instances
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest inventory
+
+# List instances and standard impacts (for 10 hours of use)
+docker run -it -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e AWS_PROFILE='myprofile' ghcr.io/boavizta/cloud-scanner-cli:latest estimate --use-duration-hours 10
+
+# Serve metrics
+# /!\ Note that we need to provide CA certificates and bind listen address to 0.0.0.0.
+docker run -it -p 8000:8000 -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt -v $HOME/.aws/credentials:/root/.aws/credentials:ro -e ROCKET_ADDRESS=0.0.0.0 -e ROCKET_PORT=8000 -e AWS_PROFILE='myprofile'  ghcr.io/boavizta/cloud-scanner-cli:latest serve
+</code></pre>
+<p>⚠ This method of passing credentials is not secure nor very practical. In a production setup on AWS, you should rather rely on the <strong>role of the instance</strong> that execute the container to manage authentication of the cli.</p>
+<p>⚠ Running metric server in container require setting  extra variables:</p>
+<ul>
+<li>to map AWS credentials</li>
+<li>to map SSL ca certificates</li>
+<li>and more importantly to configure Rocket to listen to 0.0.0.0 instead of default 127.0.0.1 (which is internal to the container. This is done with the extra variable: <code>ROCKET_ADDRESS=0.0.0.0</code></li>
+</ul>
+<p>Alternatively you may build and use a local docker image, See <a href="#build-a-local-docker-image">build a local docker image</a></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="quick-start--display-dashboard-using-docker-compose-"><a class="header" href="#quick-start--display-dashboard-using-docker-compose-">Quick start : display dashboard using docker-compose 🐳</a></h1>
+<p>Visualize the live impacts of you account in a dashboard.</p>
+<p>No installation needed, you will run a public docker image of cloud-scanner CLI, Boavizta API, Prometheus and Grafana to get access to a demo dashboard..</p>
+<p>All data remain  local to your environment (this docker-compose stack uses a <em>private instance</em> of Boavizta API).</p>
+<h2 id="pre-requisites-1"><a class="header" href="#pre-requisites-1">Pre-requisites</a></h2>
+<ul>
+<li>Docker and docker-compose</li>
+<li>A working AWS account (and your AWS CLI profile already configured)</li>
+</ul>
+<p><img src="images/cloud-scanner-metrics-compose.excalidraw.png" alt="components of monitoring stack in docker compose"></p>
+<h2 id="run-the-demo-dashboard"><a class="header" href="#run-the-demo-dashboard">Run the demo dashboard</a></h2>
+<pre><code class="language-sh"># Map your AWS credentials
+export AWS_PROFILE=name-of-your-profile
+# Start the stack (from the root of the repository)
+docker-compose up
+</code></pre>
+<ul>
+<li>Demo dashboard is exposed on http://localhost:3001</li>
+<li>Log in with user admin/admin</li>
+<li>Select the dashboard in the left menu.</li>
+</ul>
+<p><img src="images/cloud-scanner-dashboard-clear.png" title="A example dashboard rendering cloud scanner metrics" alt="Demo dashboard exposing cloud scanner metrics"></p>
+<p>⚠ The demo docker-compose is preconfigured to generate metrics only for the following regions:</p>
+<ul>
+<li>eu-west-1</li>
+<li>eu-west-3</li>
+<li>eu-central-1</li>
+<li>us-east-1</li>
+</ul>
+<p>Refer to  <a href="#generating-metrics-for-additional-regions">Generating metrics for additional regions</a> to retrieve metrics for additional regions.</p>
+<h2 id="additional-info"><a class="header" href="#additional-info">Additional info</a></h2>
+<ul>
+<li>⚠ This docker-compose example is <strong>not</strong> intended  for production deployment, but rather for quick testing.
+<ul>
+<li>ports of all services are exposed.</li>
+<li>Grafana is served on http with default login.</li>
+</ul>
+</li>
+<li>You may have to update the line mapping your AWS profile (Replace <code>AWS_PROFILE=${AWS_PROFILE}</code> by <code>AWS_PROFILE=the-real-name-of-your-profile</code>) when using Podman. It seems that Podman compose does not map the variables of the environment to the containers.</li>
+<li>In corporate environments, you may need to provide your certificates authorities certificates (<code>ca-certificates</code>) to the cloud-scanner container (uncomment the mapping line in the docker-compose file).</li>
+<li>For the demo, we deliberately set a short metrics scrapping interval (30 seconds). In a production environment, you may want to increase this metric scraping interval to reduce the API calls and volume of data. This scrapping period is set in the Prometheus configuration file.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="quick-start---run-cli-using-cargo-"><a class="header" href="#quick-start---run-cli-using-cargo-">Quick start - Run CLI using Cargo 🦀</a></h1>
+<p>This quick start will show the impacts of your EC2 instances for 10 hours of use, by building a local version of the cloud-scanner CLI from source.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<ul>
+<li>a Rust toolchain installed locally <a href="https://rustup.rs/">rustup.rs - The Rust toolchain installer</a></li>
+<li>A working AWS account (and you AWS CLI profile already configured)</li>
+<li>optional: <a href="https://stedolan.github.io/jq/">jq</a> to format json results</li>
+</ul>
+<h2 id="compile-an-run-cli-"><a class="header" href="#compile-an-run-cli-">Compile an run CLI 💻</a></h2>
+<ol>
+<li>Clone the cloud-scanner repository</li>
+<li>build and run CLI</li>
+</ol>
+<pre><code class="language-sh"># Ensure you have a working AWS profile setup locally (like you would do for AWS CLI)
+export AWS_PROFILE='&lt;YOUR_PROFILE_NAME&gt;'
+
+# Get impacts of 10 hours of use (on your default account region)
+cargo run estimate --use-duration-hours 10 | jq
+
+# Get impacts of 10 hours of use, for a explicit region. Results as JSON 
+cargo run -- --aws-region eu-west-1 estimate --use-duration-hours 10 | jq
+
+# Get impacts of 10 hours of use, for a explicit region. Results as Prometheus metrics 
+cargo run -- --aws-region eu-west-1 metrics --use-duration-hours 10
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="use-cloud-scanner-as-a-serverless--application"><a class="header" href="#use-cloud-scanner-as-a-serverless--application">Use cloud-scanner as a serverless  application⚡</a></h1>
+<p>This will deploy the cloud-scanner <em>inside</em> your AWS account. You can use it to:</p>
+<ul>
+<li>scan the account to get json impacts (as you would do with the CLI)</li>
+<li>or</li>
+<li>get metrics (that you can scrape with prometheus or the monitoring system of your choice)</li>
+</ul>
+<p>The application is build and deployed using the serverless framework (see <a href="#serverless-design">serverless-design</a>).</p>
+<h2 id="prerequisites-1"><a class="header" href="#prerequisites-1">Prerequisites</a></h2>
+<p>The deployment creates an aws role configured to get sufficient permission to scan your resources without requesting end-user authentication.</p>
+<ol>
+<li>Nodejs installed locally</li>
+<li>An AWS account/profile with sufficient permissions to deploy lambda, configure API gateway, and create a role.</li>
+</ol>
+<p>⚠ The deployment process was only tested on Linux.</p>
+<h2 id="deploy-the-application-"><a class="header" href="#deploy-the-application-">Deploy the application ⚡</a></h2>
+<pre><code class="language-sh"># Install node the serverless framework and it's dependencies
+npm i
+export aws_profile = &lt;my profile&gt;
+# Deploy the application to your AWS account
+serverless deploy
+</code></pre>
+<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
+<h3 id="scan-the-account--region-"><a class="header" href="#scan-the-account--region-">Scan the account / region 💻</a></h3>
+<p>This returns results in json format (see below, same as CLI)</p>
+<p>https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&amp;aws_region=eu-west-1</p>
+<p>Use <code>hours_use_time</code> and <code>aws_region</code> parameters in the query to pass the values to the lambda.</p>
+<h3 id="get-metrics-"><a class="header" href="#get-metrics-">Get Metrics 📊</a></h3>
+<p>https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1</p>
+<p>Returns metrics for <strong>1 hour of use</strong> in prometheus format.</p>
+<p>The metrics represent the costs / impacts of one hour of use of the resources present in your account at the time of the query.</p>
+<p>Use <code>aws_region</code> parameters in the query.</p>
+<pre><code class="language-plaintext"># HELP boavizta_number_of_instances_total Number of instances detected during the scan.
+# TYPE boavizta_number_of_instances_total gauge
+boavizta_number_of_instances_total{awsregion="eu-central-1",country="DEU"} 7
+# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
+# TYPE boavizta_number_of_instances_assessed gauge
+boavizta_number_of_instances_assessed{awsregion="eu-central-1",country="DEU"} 5
+# HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
+# TYPE boavizta_duration_of_use_hours gauge
+boavizta_duration_of_use_hours{awsregion="eu-central-1",country="DEU"} 1.0
+# HELP boavizta_pe_manufacture_megajoules Power consumed for manufacture.
+# TYPE boavizta_pe_manufacture_megajoules gauge
+boavizta_pe_manufacture_megajoules{awsregion="eu-central-1",country="DEU"} 1760.0
+# HELP boavizta_pe_use_megajoules Power consumed during usage.
+# TYPE boavizta_pe_use_megajoules gauge
+boavizta_pe_use_megajoules{awsregion="eu-central-1",country="DEU"} 0.86
+# EOF
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="methodology-and-source-of-data"><a class="header" href="#methodology-and-source-of-data">Methodology and source of data</a></h1>
+<p>Cloud scanner relies on the Boavizta methodology and data to estimate the impacts of cloud resources.</p>
+<p>It performs an inventory of the resources used in a cloud account. It then returns impacts of the <em>use</em> phase but also impacts related to the <em>manufacture</em> of the identified resources (<em>embodied</em> impacts).</p>
+<h2 id="the-source-of-impact-data"><a class="header" href="#the-source-of-impact-data">The source of impact data</a></h2>
+<p>Impact data is retrieved from <a href="https://github.com/Boavizta/boaviztapi/">BOAVIZTA reference data API</a> v1.3.x.</p>
+<h2 id="general-approach-and-limits"><a class="header" href="#general-approach-and-limits">General approach and limits</a></h2>
+<p>Cloud scanner estimates impacts according to the duration of use of cloud resources. It also considers the “intensity” of use (like the type of instance and CPU load for a VM or size of a disk for storage). The region of use is also considered to take into account the electricity mix of the region (carbon intensity).</p>
+<blockquote>
+<p>Thibault Simon, David Ekchajzer, Adrien Berthelot, Eric Fourboul, Samuel Rince, et al.. BoaviztAPI: a bottom-up model to assess the environmental impacts of cloud services. HotCarbon’24. Workshop on Sustainable Computer Systems, Jul 2024, Santa Cruz, United States. <a href="https://hal.science/hal-04621947v1">⟨hal-04621947v1⟩</a></p>
+</blockquote>
+<p>The general approach is to map cloud vendor specific ressources, either to Boavizta <em>cloud resources</em> (like for VM instances) or to more generic components (Block storage volumes are approximated as Boavizta HDD or SSD).</p>
+<p>But this approach means that <strong>a large portion</strong> of the cloud provider infrastructure <strong>is excluded from the estimation</strong>.</p>
+<p>⚠ Cloud scanner <strong>underestimates the impacts of a cloud account</strong>. Because it only considers the <em>instances</em> and <em>block storage</em>, many additional sources of impacts (network, potential redundancy, cloud control plan, buildings…) are not included in the estimation.</p>
+<p><img src="images/cloud-scanner-perimeter-aws.excalidraw.png" alt="A diagram that show that only VM’s and Block storage are considered"></p>
+<p>See also <a href="#limitations-and-perimeter">other limits</a>.</p>
+<h2 id="methodology"><a class="header" href="#methodology">Methodology</a></h2>
+<p>The Boavizta methodology is described in <a href="https://boavizta.org/en/blog/empreinte-de-la-fabrication-d-un-serveur">Digital &amp; environment : How to evaluate server manufacturing footprint, beyond greenhouse gas emissions? | Boavizta</a></p>
+<p>The impacts (use and embedded) are attributed according to the principles described in <a href="https://doc.api.boavizta.org/Explanations/services/cloud/">Cloud instances - Boavizta API documentation</a>.</p>
+<p>The results of cloud scanner are similar to what you can visualize in <a href="http://datavizta.boavizta.org/cloudimpact">Datavizta</a>, but with automated inventory.</p>
+<ul>
+<li>Boavizta website: <a href="https://www.boavizta.org/en">https://www.boavizta.org/en</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="how-we-estimate-instance-workload"><a class="header" href="#how-we-estimate-instance-workload">How we estimate instance workload</a></h1>
+<p>Workload (or intensity of use) of instances is estimated using CPU load level as a proxy.</p>
+<h2 id="estimating-instances-workload-for-aws"><a class="header" href="#estimating-instances-workload-for-aws">Estimating instances workload for AWS</a></h2>
+<p>The CPU load of AWS instances is retrieved using <em>AWS Cloudwatch CPU metrics summary</em>.</p>
+<p>Cloud scanner uses a sampling period of 15 minutes, but impacts metrics are returned as impacts equivalent to one hour of use.</p>
+<p>This means that instance impacts metrics data returned can be understood as: <code>impact for one hour of use (considering  the CPU workload of 15 last minutes)</code>.</p>
+<p>Why this default sampling period of 15 minutes ?</p>
+<ul>
+<li>It is sufficient for our current monitoring needs (but maybe we may make this setting configurable in the future).</li>
+<li>It is hard to go below 10 minutes. Default (and free) period of AWS instance metrics is 5 minutes. You need to activate <code>detailed monitoring</code> (extra feature) for 1 minute granularity: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html#ec2-cloudwatch-metrics">List the available CloudWatch metrics for your instances - Amazon Elastic Compute Cloud</a>).</li>
+</ul>
+<h2 id="estimating-instances-workload-for-azure"><a class="header" href="#estimating-instances-workload-for-azure">Estimating instances workload for Azure</a></h2>
+<p>Not implemented.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="estimating-impacts-of-block-storage"><a class="header" href="#estimating-impacts-of-block-storage">Estimating impacts of block storage</a></h1>
+<p>Block storage volumes are approximated either as SSD or HDD depending on cloud provider specific storage type.</p>
+<p>This is a basic estimation. It takes into account the size of the block storage volume.</p>
+<p>⚠ Only the <strong>manufacture</strong> impacts of the Block storage are returned. The impacts of the <strong>use</strong> phase are returned as zero (mainly because we lack the related data in current version of Boavizta API).</p>
+<h2 id="block-storage-ebs-estimation-aws"><a class="header" href="#block-storage-ebs-estimation-aws">Block storage (EBS) estimation (AWS)</a></h2>
+<h3 id="what-is-considered-in-estimation"><a class="header" href="#what-is-considered-in-estimation">What is considered in estimation:</a></h3>
+<ul>
+<li>storage type (HDD vs SSD)</li>
+<li>storage size</li>
+<li>duration of use</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">AWS EBS volume type</th><th style="text-align: left">Boavizta storage used for estimation</th><th style="text-align: left">comments</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left">st1</td><td style="text-align: left">HDD</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left">sc1</td><td style="text-align: left">HDD</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left">magnetic (standard)</td><td style="text-align: left">HDD</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left">gp2</td><td style="text-align: left">SSD</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left">gp3</td><td style="text-align: left">SSD</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left">io1</td><td style="text-align: left">SSD</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left">io2</td><td style="text-align: left">SSD</td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left">unknown type</td><td style="text-align: left">SSD</td><td style="text-align: left">If it cannot identify the type of storage (like when a new type is introduced, cloud scanner uses SSD as an approximation)</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="what-is-not-considered-for-the-estimation"><a class="header" href="#what-is-not-considered-for-the-estimation">What is not considered for the estimation</a></h3>
+<ul>
+<li>If the storage offers provisioned IOPS or not.</li>
+<li>Implicit redundancy related to storage type.</li>
+<li>Any other infrastructure (network, backup, supervision or redundancy) that may allow the cloud provider to offer EBS service.</li>
+</ul>
+<h2 id="block-storage-estimations-azure"><a class="header" href="#block-storage-estimations-azure">Block storage estimations (Azure)</a></h2>
+<p>Not yet implemented.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="get-impacts-of-an-existing-inventory-file"><a class="header" href="#get-impacts-of-an-existing-inventory-file">Get impacts of an existing inventory file</a></h1>
+<p>You can use cloud scanner to take a snapshot of an existing inventory and run estimation of impacts later.</p>
+<h2 id="get-an-inventory-file"><a class="header" href="#get-an-inventory-file">Get an inventory file</a></h2>
+<h3 id="from-command-line"><a class="header" href="#from-command-line">From command line</a></h3>
+<pre><code class="language-shell"># Save an inventory to file
+cloud-scanner inventory &gt; my_inventory.json
+</code></pre>
+<h3 id="using-http-server--api-mode"><a class="header" href="#using-http-server--api-mode">Using http server / API mode</a></h3>
+<pre><code class="language-shell"># start server
+cloud-scanner serve
+# get the inventory
+curl -X 'GET' \
+  'http://localhost:8000/inventory?aws_region=eu-west-3&amp;include_block_storage=true' \
+  -H 'accept: application/json' &gt; my_inventory.json
+</code></pre>
+<h2 id="get-estimate-for-a-existing-inventory"><a class="header" href="#get-estimate-for-a-existing-inventory">Get estimate for a existing inventory</a></h2>
+<h3 id="from-command-line-1"><a class="header" href="#from-command-line-1">From command line</a></h3>
+<p><em>You have to explicitly pass the duration of use for which you would like to retrieve the estimation.</em></p>
+<pre><code class="language-sh"># Get impacts of an existing inventory 
+cloud-scanner estimate --use-duration-hours 1 --inventory-file my_inventory.json
+</code></pre>
+<h3 id="using-http-server--api-mode-1"><a class="header" href="#using-http-server--api-mode-1">Using http server / API mode</a></h3>
+<p><em>You have to explicitly pass the duration of use for which you would like to retrieve the estimation.</em></p>
+<pre><code class="language-shell"># start server
+cloud-scanner serve
+# Post the previously saved inventory (my_inventory.json) for estimate
+curl -X POST -H "Content-Type: application/json" -d @my_inventory.json http://localhost:8000/impacts-from-arbitrary-inventory\?use_duration_hours\=10\&amp;verbose_output\=false
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="get-impacts-of-an-arbitrary-inventory"><a class="header" href="#get-impacts-of-an-arbitrary-inventory">Get impacts of an arbitrary inventory</a></h1>
+<p>This is useful to simulate the impacts of a non-existing infrastructure or a variant of existing infrastructure.</p>
+<p>This involves building an inventory file and passing it to cloud scanner for evaluation.</p>
+<ol>
+<li>describe an arbitrary inventory (the to-be infrastructure) as a json file.</li>
+<li>request cloud scanner to estimate impacts of this inventory.</li>
+</ol>
+<p>💡 It may be easier to adapt an existing inventory file, rather than creating it from scratch. See <a href="#get-impacts-of-an-existing-inventory-file">Estimate the impacts of an existing inventory</a>.</p>
+<p>The JSON schema of the inventory file is in the git repository: <a href="https://github.com/Boavizta/cloud-scanner/blob/main/cloud-scanner-cli/test-data/INVENTORY_JSON_SCHEMA.json">cloud-scanner/cloud-scanner-cli/test-data/INVENTORY_JSON_SCHEMA.json</a>. This schema can also be retrieved with the command <code>cargo run inventory --print-json-schema</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="building-cloud-scanner-cli-with-cargo-"><a class="header" href="#building-cloud-scanner-cli-with-cargo-">Building cloud-scanner CLI with Cargo 🦀</a></h1>
+<p>Cloud scanner is mostly implemented in Rust. You need to install Rust on your system to build the project from scratch.</p>
+<h2 id="using-a-devcontainer"><a class="header" href="#using-a-devcontainer">Using a devcontainer</a></h2>
+<p>You can build cloud scanner without installing Rust toolchain by using the provided <a href="https://containers.dev/">devcontainer</a>. It is a docker container that already contains the necessary build tools.</p>
+<p>In VS code:</p>
+<ul>
+<li>install the devcontainer extension (`ms-vscode-remote.remote-containers)</li>
+<li>from the command palete, select <code>Dev Container:Reopen in container</code></li>
+</ul>
+<p>VS code will build the container if needed, run it and attach it’s current session to this container. You can then develop in VS code without directly as if you had the build toolchain installed on your system.</p>
+<h2 id="on-linux"><a class="header" href="#on-linux">On Linux</a></h2>
+<p>Install Rust and linux-musl dependencies.</p>
+<pre><code class="language-sh"># Install rust (see https://www.rust-lang.org/tools/install), validate when prompted
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source "$HOME/.cargo/env"
+# Add Linux musl target (needed for cross compilation for aws lambda)
+rustup target add x86_64-unknown-linux-musl
+
+sudo apt update &amp;&amp; sudo apt install -y musl-tools musl-dev
+
+# Build cloud-scanner
+cargo build
+
+# Build a release
+cargo build --release
+
+# [Optional] To work on documentation
+# Install globally mdBook and some preprocessors(to work on documentation)
+cargo install mdbook mdbook-mermaid mdbook-linkcheck
+# Serve documentation
+cd docs
+mdbook serve
+</code></pre>
+<h2 id="on-windows-with-wsl2"><a class="header" href="#on-windows-with-wsl2">On Windows with WSL2</a></h2>
+<p>Tested method to build Rust on Windows is to use <em>Windows Subsystem For Linux</em> (WSL2)</p>
+<ol>
+<li>Prerequisite: install WSL2 and the latest Ubuntu LTS image (22.04).
+<em>If you are not familiar with WSL, you may inspire from <a href="https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl">Set up Node.js on WSL 2</a>.</em></li>
+<li>After WSL is setup, follow Linux instructions above inside the Linux VM.</li>
+</ol>
+<h2 id="using-docker"><a class="header" href="#using-docker">Using docker</a></h2>
+<p>See <a href="#build-a-local-docker-image">Build a local docker image</a></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="usage-with-docker-"><a class="header" href="#usage-with-docker-">Usage with Docker 🐳</a></h1>
+<h2 id="build-a-local-docker-image"><a class="header" href="#build-a-local-docker-image">Build a local docker image</a></h2>
+<pre><code class="language-sh"># Local build of docker image
+docker build . --tag cloud-scanner-cli
+# Test run
+docker run -it cloud-scanner-cli --help
+</code></pre>
+<h2 id="run-cloud-scanner-as-a-docker-image"><a class="header" href="#run-cloud-scanner-as-a-docker-image">Run cloud-scanner as a docker image</a></h2>
+<p>See <a href="#quick-start-run-cli-using-docker-">Quickstart using docker</a></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="deploy-cloud-scanner-as-a-serverless-application"><a class="header" href="#deploy-cloud-scanner-as-a-serverless-application">Deploy cloud scanner as a serverless application</a></h1>
+<p>You can deploy cloud scanner as a serverless application (AWS lambda).</p>
+<p>The application is build and deployed using the serverless framework (see <a href="#serverless-design">serverless-design</a>).</p>
+<h2 id="using-linux"><a class="header" href="#using-linux">Using Linux</a></h2>
+<ol>
+<li>Install Rust</li>
+<li>Install nvm, nodejs</li>
+<li>test serverless package</li>
+</ol>
+<p>First, don’t forget to clone the repo using</p>
+<pre><code class="language-sh">git clone https://github.com/Boavizta/cloud-scanner.git
+cd cloud-scanner
+</code></pre>
+<h3 id="install-rust"><a class="header" href="#install-rust">Install Rust</a></h3>
+<pre><code class="language-sh"># Install rust (see https://www.rust-lang.org/tools/install), validate when prompted
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source "$HOME/.cargo/env"
+# Add Linux musl target (needed for cross compilation for lambda)
+rustup target add x86_64-unknown-linux-musl
+
+sudo apt update &amp;&amp; sudo apt install -y musl-tools musl-dev
+</code></pre>
+<h3 id="install-node-for-serverless-deployment"><a class="header" href="#install-node-for-serverless-deployment">Install node (for serverless deployment)</a></h3>
+<p>nvm, node.js and npm</p>
+<p>See https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl</p>
+<pre><code class="language-sh">sudo apt-get install curl
+
+# Install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+# Install node
+nvm install --lts
+</code></pre>
+<h3 id="install-serverless-framework-and-deps"><a class="header" href="#install-serverless-framework-and-deps">Install serverless framework and deps</a></h3>
+<pre><code class="language-sh">npm install -g serverless
+npm i
+</code></pre>
+<h3 id="configure-environment"><a class="header" href="#configure-environment">Configure environment</a></h3>
+<p>Everything you need should now be installed, but there is a last step you have to do before deploying. Since the serverless framework automatically deploys the lambda onto your AWS instance without you having to upload a zip file or anything, you have to give it access to it by giving it an access key (see <a href="https://www.serverless.com/framework/docs/providers/aws/guide/credentials">this guide</a> for more informations on how to generate an access keys).</p>
+<pre><code class="language-sh">serverless config credentials \
+  --provider aws \
+  --key YOURACCESSKEY \
+  --secret YOURSECRETKEY
+</code></pre>
+<p>Optionally, you can config a private instance of Boaviztapi by setting the environment variable <code>BOAVIZTA_API_URL</code> so :</p>
+<pre><code class="language-sh">export BOAVIZTA_API_URL="boaviztapi.example.com"
+</code></pre>
+<p>If the environment variable is not set, cloud scanner will use the public instance (https://api.boavizta.org) by default.</p>
+<h3 id="deploy"><a class="header" href="#deploy">Deploy</a></h3>
+<p>You should be good to go by now, simply run</p>
+<pre><code class="language-sh">serverless package
+serverless deploy
+</code></pre>
+<p>and wait for it to be done. You should by now see two lamda functions appear on your AWS instance, Congratulations !</p>
+<p>If any error happen, redo those steps carefully and make sure you didn’t miss anything before posting a GitHub Issue.</p>
+<h2 id="using-windows"><a class="header" href="#using-windows">Using Windows</a></h2>
+<p>Tested method to deploy this serverless app from on windows is to use Windows Subsystem For Linux (WSL2).</p>
+<ol>
+<li>Prerequisite: install WSL2 and  the latest Ubuntu LTS image (22.04).
+<em>If you do not have it yet, you may inspire from <a href="https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl">Set up Node.js on WSL 2</a>.</em></li>
+<li>After WSL is setup, follow Linux instructions above inside the Linux VM.</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="aws-authentication"><a class="header" href="#aws-authentication">AWS authentication</a></h1>
+<p>Cloud scanner uses AWS Rust SDK to query AWS account. By default Rust SDK picks up AWS credentials from environment variables.</p>
+<h2 id="aws-permissions-required-by-cloud-scanner"><a class="header" href="#aws-permissions-required-by-cloud-scanner">AWS permissions required by Cloud Scanner</a></h2>
+<p>🔥 An Important pre-requisite is to have a <em>user</em> with sufficient permissions to list resources of the account (or an instance profile / role pre-configured when running cloud-scanner from EC2).</p>
+<p>The minimal set of permissions to perform inventory of resources (and query CPU load of instances) is:</p>
+<ul>
+<li>ec2:DescribeInstances</li>
+<li>cloudwatch:GetMetricStatistics</li>
+<li>cloudwatch:DescribeAlarms</li>
+</ul>
+<p>You could also restricts permissions to a specific set of instances or resources.</p>
+<h2 id="pass-credentials-as-environment-variables"><a class="header" href="#pass-credentials-as-environment-variables">Pass credentials as environment variables</a></h2>
+<h3 id="option-1-use-aws_access_key_id-and-aws_secret_access_key"><a class="header" href="#option-1-use-aws_access_key_id-and-aws_secret_access_key">Option 1: Use AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY</a></h3>
+<p>Set environment variables with your account detail.</p>
+<pre><code class="language-sh"># Example for Linux / macOS
+export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+export AWS_DEFAULT_REGION=eu-west-1
+</code></pre>
+<p><em>See <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html">https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html</a> for equivalent Windows command prompt or Powershell syntax example.</em></p>
+<h3 id="option-2--use-a-an-existing-aws_profile"><a class="header" href="#option-2--use-a-an-existing-aws_profile">Option 2:  Use a an existing AWS_PROFILE</a></h3>
+<p>If you have configured an AWS CLI profile, the easiest way to pass aws credential to cloud scanner  is use an environment variable that points to this profile.</p>
+<p>Pre-requisite to use a profile:</p>
+<ol>
+<li>AWS CLI <em>installed</em>: <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">Installing or updating the latest version of the AWS CLI - AWS Command Line Interface</a></li>
+<li>AWS CLI <em>configured</em>: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html">Configure the AWS CLI - AWS Command Line Interface</a>.</li>
+</ol>
+<pre><code class="language-sh"># Example for Linux / macOS
+# cloud-scanner can use the AWS_PROFILE set as en environment variable.
+# You have to reference one of the profiles previously configured in ~/.aws/credentials
+export AWS_PROFILE=YOUR_PROFILE_NAME_EXAMPLE
+export AWS_DEFAULT_REGION=eu-west-3
+</code></pre>
+<p><em>See <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html">https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html</a> for equivalent Windows command prompt or Powershell syntax example.</em></p>
+<h2 id="reference"><a class="header" href="#reference">Reference</a></h2>
+<p>See <a href="https://docs.aws.amazon.com/sdk-for-rust/latest/dg/credentials.html">Specify your credentials and default Region - AWS SDK for Rust</a> for more options to pass credentials to the SDK.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="integrate-metrics-to-a-monitoring-dashboard"><a class="header" href="#integrate-metrics-to-a-monitoring-dashboard">Integrate metrics to a monitoring dashboard</a></h1>
+<p>Cloud-scanner can be used to export metrics related to the impact of your cloud account.</p>
+<p>The metrics are exposed in Prometheus/OpenMetrics format. You can use it to feed a monitoring dashboard and keep an eye on the evolution of impacts of your usage.</p>
+<p><img src="images/cloud-scanner-dashboard-clear.png" alt="cloud-scanner-metrics-dashboard"></p>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<ol>
+<li>Start cloud-scanner in metrics mode (using the  <code>--serve</code>  option or by deploying it as a serverless application).</li>
+<li>Setup Prometheus to scrape the metrics. Metrics are generated separately for each region.</li>
+<li>Configure a dashboard to display the results.</li>
+</ol>
+<p><img src="images/cloud-scanner-metrics-compose.excalidraw.png" alt="components of monitoring stack in docker compose"></p>
+<h2 id="detailed-steps"><a class="header" href="#detailed-steps">Detailed steps</a></h2>
+<h3 id="demo-for-some-eu-regions"><a class="header" href="#demo-for-some-eu-regions">Demo for some EU regions.</a></h3>
+<p>You can refer to  the provided <a href="#quick-start--display-dashboard-using-docker-compose-">docker compose example </a> for a quick start.</p>
+<p>It comes preconfigured to generate metrics for the following regions:</p>
+<ul>
+<li>eu-west-1</li>
+<li>eu-west-3</li>
+<li>eu-central-1</li>
+<li>us-east-1</li>
+</ul>
+<h3 id="generating-metrics-for-additional-regions"><a class="header" href="#generating-metrics-for-additional-regions">Generating metrics for additional regions.</a></h3>
+<p>Examples of Prometheus and Grafana configuration files are located in the <a href="https://github.com/Boavizta/cloud-scanner/tree/main/dashboard-config">dashboard-config</a> directories.</p>
+<p>To generate (and display) metrics for an additional region:</p>
+<ol>
+<li>Edit the prometheus configuration (<code>prometheus.yml</code>)</li>
+<li>Add a new job  and set its region parameter like <code>aws_region: ['us-east-2']</code>.</li>
+<li>Restart Prometheus container and verify that metrics are now collected for this region.</li>
+</ol>
+<p>In the exemple compose stack, prometheus admin GUI is exposed.  You can check status of the scrape targets at:  <a href="http://localhost:9090/targets">http://localhost:9090/targets</a>.</p>
+<pre><code class="language-yml"># Extract from prometheus.yml
+# Example extra job configuration to cover us-east-2
+  - job_name: 'cloud-scanner-metrics-us-east-2'
+    scheme: http
+    static_configs:
+      - targets: ['cloud_scanner_boa:8000']
+        labels:
+          group: 'production'
+    metrics_path: '/metrics'
+    params:
+      aws_region: ['us-east-2']
+      include_block_storage: ['true']
+</code></pre>
+<h3 id="adapting-configuration-for-production-use"><a class="header" href="#adapting-configuration-for-production-use">Adapting configuration for production use:</a></h3>
+<p>In production environment, you may want to increase the  metrics scraping interval.</p>
+<p>This It is set to 30 seconds in the sample prometheus configuration. In production you shoud increase this intervall (e.g. 10 minutes).</p>
+<pre><code class="language-yml"># Prometheus scrapping interval / extract from prometheus.yml configuration
+global:
+  scrape_interval:     30s # By default, scrape targets every 30 seconds.
+  evaluation_interval: 30s # Evaluate rules every 30 seconds.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="filter-by-tags"><a class="header" href="#filter-by-tags">Filter by tags</a></h1>
+<p>You can limit cloud-scanner results (metriccs or json) to the cloud resources that match specific tags.</p>
+<p>You can use multiple tags.</p>
+<p>Works with inventory or estimates.</p>
+<h2 id="filter-in-cli"><a class="header" href="#filter-in-cli">Filter in cli</a></h2>
+<pre><code class="language-sh"># Retrieve only resources with the following tags:
+#  CustomTagNameForDebug=olivierdemeringoadm
+#     and 
+#  Name=test-boavizta
+cargo run -- -t Name=test-boavizta-2 -t CreatorName=olivierdemeringoadm  inventory| jq
+</code></pre>
+<h2 id="filter-with-serverlesslambda"><a class="header" href="#filter-with-serverlesslambda">Filter (with serverless/lambda)</a></h2>
+<p>Use one (or multiple) <code>filter_tag</code> parameter in the query string to restrict results.</p>
+<pre><code class="language-sh"># Retrieve only resources with the following tags:
+#  CustomTagNameForDebug=olivierdemeringoadm
+#     and 
+#  Name=test-boavizta
+https://&lt;EDITED&gt;.execute-api.eu-west-1.amazonaws.com/dev/scan?use_duration_hours=5&amp;aws_region=eu-west-1&amp;filter_tag=CustomTagNameForDebug=olivierdemeringoadm&amp;filter_tag=Name=test-boavizta
+</code></pre>
+<h2 id="filter-metrics"><a class="header" href="#filter-metrics">Filter metrics</a></h2>
+<p>Use the <code>filter_tag</code> query parameter in the URL.</p>
+<p>It can be used multiple time (only instances matching <em>all</em> tags will be returned).</p>
+<p>Example queries</p>
+<ul>
+<li><a href="http://localhost:8000/metrics?aws_region=eu-west-3&amp;filter_tag=Name=boatest&amp;filter_tag=OtherTag=other-value">http://localhost:8000/metrics?aws_region=eu-west-3&amp;filter_tag=Name=boatest&amp;filter_tag=OtherTag=other-value</a></li>
+<li><a href="http://localhost:8000/metrics?aws_region=eu-west-3&amp;filter_tag=Name=boatest">http://localhost:8000/metrics?aws_region=eu-west-3&amp;filter_tag=Name=boatest</a></li>
+<li><a href="http://localhost:8000/metrics?aws_region=eu-west-1&amp;filter_tag=Name=test-boavizta">http://localhost:8000/metrics?aws_region=eu-west-1&amp;filter_tag=Name=test-boavizta</a></li>
+</ul>
+<h2 id="important-limitation"><a class="header" href="#important-limitation">Important limitation</a></h2>
+<p>Suppose the following instances (and tags)</p>
+<ul>
+<li>
+<p>instance1 (</p>
+<ul>
+<li>ENV=prod</li>
+<li>PURPOSE=CI</li>
+</ul>
+</li>
+<li>
+<p>instance2</p>
+<ul>
+<li>ENV=prod</li>
+<li>PURPOSE=service</li>
+</ul>
+</li>
+<li>
+<p>Filtering on “ENV=prod” will return instance1 and instance2</p>
+</li>
+<li>
+<p>Filtering on “ENV=prod” and PURPOSE=CI will return only instance2</p>
+</li>
+<li>
+<p>No filter will return <em>all</em> instances</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="using-a-private-instance-of-boavizta-api"><a class="header" href="#using-a-private-instance-of-boavizta-api">Using a private instance of Boavizta API</a></h1>
+<p>To avoid that the scanner shares your inventory data to the public version of Boavizta API,  It is recommended to deploy your own instance of Boavizta API.</p>
+<p>This is also useful if you want to stick to a specific version of the API.</p>
+<p>The Boavizta API can be deployed in several ways (docker, lambda a.s.o.). Refer to the API documentation: <a href="https://doc.api.boavizta.org/deploy/">Deploy - Boavizta API documentation</a> or refer to the provided <a href="#quick-start--display-dashboard-using-docker-compose-">docker compose example</a> for an example of integration cloud-scanner and a private instance of the API.</p>
+<p>Once you have deployed your instance of API, use either the command line flags (CLI) or environment variable (docker, lambda) to configure the scanner to use <em>your</em> API instance.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="frequently-asked-questions"><a class="header" href="#frequently-asked-questions">Frequently Asked Questions</a></h1>
+<h2 id="what-are-differences-between-datavizta-and-cloud-scanner-"><a class="header" href="#what-are-differences-between-datavizta-and-cloud-scanner-">What are differences between Datavizta and Cloud scanner ?</a></h2>
+<p>Both tools rely on the same source of impact data (i.e. the <a href="https://api.boavizta.org/">BoaviztAPI</a>. The API is used to estimation the impacts of aws instances.</p>
+<ul>
+<li>
+<p><a href="https://dataviz.boavizta.org/cloudimpact">Datavizta</a> is positioned as a <em>pedagogical</em> front end to the API. It helps users understand which kind of data the API, quickly test hypothesis. It offers visualizations of impacts of multiple indicators for different lifecycle steps (use vs manufacture).</p>
+</li>
+<li>
+<p>Cloud scanner is more <strong>production oriented</strong>. It returns same data as Datavizta but <em>in different form and with different inputs</em>.
+The main objective of cloud scanner is to help quickly retrieve the impacts of an entire AWS account by <strong>automating the inventory</strong> of resource used and the retrieval of associated impacts.</p>
+</li>
+</ul>
+<p>In addition cloud scanner <strong>can be used as a monitoring system</strong> that runs regularly. In this later case, it generates <strong>results as metrics</strong> (in standard <em>Prometheus / Open metrics</em> format). Theses metrics can be consumed by external systems, to ease further analysis (e.g. breakdown by service / tags or countries) or use custom visualizations (like an external dashboard).</p>
+<h2 id="which-cloud-provider-or-service-is-supported-"><a class="header" href="#which-cloud-provider-or-service-is-supported-">Which cloud provider or service is supported ?</a></h2>
+<p>AWS (instances and block storage).</p>
+<ul>
+<li>Only AWS is supported for the time being.  The reason is that historically BoaviztAPI could only provide reference data for AWS instances.</li>
+<li>Azure instances are on the roadmap. After data becomes available in Boavizta API, cloud scanner will be adapted to support Azure https://github.com/Boavizta/cloud-scanner/issues/15.</li>
+<li>In addition BoaviztAPI is working on providing impacts of Storage as a service. It will be integrated to cloud scanner once available. https://github.com/Boavizta/boaviztapi/issues/143</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="common-issues"><a class="header" href="#common-issues">Common issues</a></h1>
+<h2 id="the-demo-dashboard-does-not-show-any-metric"><a class="header" href="#the-demo-dashboard-does-not-show-any-metric">The demo dashboard does not show any metric…</a></h2>
+<p>Several reasons may explain why metrics do not appear in the dashboard.</p>
+<ol>
+<li>Verify in the docker-compose logs that there is no error related to AWS authentication.</li>
+<li>Check that prometheus is configured to retrieve metrics for the region you use.</li>
+</ol>
+<p>⚠ The demo docker-compose is preconfigured to generate metrics only for the following regions:</p>
+<ul>
+<li>eu-west-1</li>
+<li>eu-west-3</li>
+<li>eu-central-1</li>
+<li>us-east-1</li>
+</ul>
+<p>Refer to  <a href="#generating-metrics-for-additional-regions">Generating metrics for additional regions</a> to retrieve metrics for additional regions.</p>
+<h2 id="the-docker-compose-demo-may-not-display-the-latest-version-of-the-grafana-dashboard"><a class="header" href="#the-docker-compose-demo-may-not-display-the-latest-version-of-the-grafana-dashboard">The docker compose demo may not display the latest version of the Grafana dashboard</a></h2>
+<p>/!\ The existing Grafana volume is preserved even after deploying a newer version of the docker-compose demo stack.</p>
+<p>As a consequence the Grafana provisioning does not occur. Any update of the demo dashboard provided with the new stack is not reflected in the instance, even if Grafana container itself is recreated.</p>
+<h3 id="workaround"><a class="header" href="#workaround">Workaround</a></h3>
+<p>We have 2 possibilities, depending if we want to preserve the existing Grafana configuration (volume) or not.</p>
+<ul>
+<li><em>Preserve</em> the existing volume if it was previously customized to contain additional Grafana configuration (outside cloud scanner) or if you add custom dashboards.</li>
+<li>Delete the volume if you use a vanilla instance of cloud-scanner demo.</li>
+</ul>
+<h4 id="updating-the-dashboard-while-keeping-existing-volume"><a class="header" href="#updating-the-dashboard-while-keeping-existing-volume">Updating the dashboard while keeping existing volume</a></h4>
+<p>Wee need to <strong>upload the new dashboard</strong> definition manually <strong>using  the Grafana web UI.</strong></p>
+<ul>
+<li>The dashboard definition can be found under <code>dashboard-config/provisioning/dashboards/</code>: <a href="https://github.com/Boavizta/cloud-scanner/blob/main/dashboard-config/provisioning/dashboards/grafana-dashboard-cloud-impacts.template.json">grafana-dashboard-cloud-impacts.template.json</a></li>
+<li>By default Grafana UI is exposed at <code>http://&lt;host-ip&gt;:3001</code></li>
+</ul>
+<h4 id="updating-the-dashboard-by-recreating-grafana-configuration-from-scratch"><a class="header" href="#updating-the-dashboard-by-recreating-grafana-configuration-from-scratch">Updating the dashboard by recreating Grafana configuration from scratch</a></h4>
+<p>/!\ Use this method only if Grafana was <strong>not</strong> customized after deployment of the demo or you are ok to loose these changes.</p>
+<p>The easiest is to delete the Grafana volume and Grafana container. They will be recreated, and Grafana provisioned with latest dashboard, when we restart the docker compose stack.</p>
+<pre><code class="language-sh"># stop docker compose stack
+docker compose down
+# delete Grafana container (necessary because it may be using the volume even if stopped)
+docker rm grafana_boa
+# now delete volume
+docker volume rm cloud-scanner_grafana-data
+# Recreate compose stack
+docker compose up
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="cli-options"><a class="header" href="#cli-options">CLI options</a></h1>
+<pre><code class="language-sh">List aws instances and their environmental impact (from Boavizta API)
+
+Usage: cloud-scanner-cli [OPTIONS] &lt;COMMAND&gt;
+
+Commands:
+  estimate   Get estimation of impacts for a given usage duration as json
+  metrics    Get estimation of impacts for a given usage duration as OpenMetrics (Prometheus) instead of json
+  inventory  List resources (and instances average cpu load for the last 5 minutes) without returning impacts
+  serve      Run as a standalone server. Access metrics (e.g. http://localhost:8000/metrics?aws_region=eu-west-3), inventory or impacts (see http://localhost:8000/swagger-ui)
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+  -a, --aws-region &lt;AWS_REGION&gt;
+          AWS region (The default aws profile region is used if not provided)
+  -b, --boavizta-api-url &lt;BOAVIZTA_API_URL&gt;
+          Optional Boavizta API URL if you want to use your own instance (URL without the trailing slash, e.g. https://api.boavizta.org)
+  -t, --filter-tags &lt;FILTER_TAGS&gt;
+          Filter instances on tags (like tag-key-1=val_1 tag-key_2=val2)
+  -v, --verbosity...
+          Enable logging and show execution duration, use multiple `v`s to increase logging level warning to debug
+  -h, --help
+          Print help
+  -V, --version
+          Print version
+</code></pre>
+<h2 id="experimental-feature-estimate-block-storage"><a class="header" href="#experimental-feature-estimate-block-storage">Experimental feature: estimate block storage</a></h2>
+<p>Use the <code>--include-block-storage</code> command line flag or parameter to consider block storage (either in inventory or when requesting an estimation of impacts.). This parameter defaults to <code>false</code> . This means that by default block storage (volumes) are not counted in the inventory nor in the results.</p>
+<p>⚠ In any case, for storage, the impacts of the <em>use</em> phase are <em>not</em> counted. Boavizta API returns only the impacts of the <em>manufacturing</em> phase for HDD and SSD. Furthermore the impacts of storage are likely <em>are likely overestimated</em>. They are calculated by taking into account the size of the logical volume. In reality, a volume that is not full may not claim the full space on a physical device, which would result in smaller impacts.</p>
+<pre><code class="language-sh"># Experimental: get impacts of instances and attached storage
+cargo run estimate --use-duration-hours 1 --include-block-storage --output-verbose-json
+</code></pre>
+<h2 id="print-the-json-schema-of-the-inventory-file"><a class="header" href="#print-the-json-schema-of-the-inventory-file">Print the JSON schema of the inventory file</a></h2>
+<pre><code class="language-sh"># Print the JSON schema of an inventory file (without producing the inventory)
+cargo run inventory --print-json-schema
+</code></pre>
+<h2 id="display-statistics"><a class="header" href="#display-statistics">Display statistics</a></h2>
+<p>Use <code>-v</code> will display statistics on std error.</p>
+<ul>
+<li>First output line shows the time spend specifically gathering CPU load of instances.</li>
+<li>Second line shows global statistics:
+<ul>
+<li>total inventory duration: total time taken to retrieve resource lists and CPU statistics from AWS.</li>
+<li>impact estimation duration: time taken to query Boavizta API</li>
+<li>total execution duration.</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-sh">cloud-scanner-cli -v estimate -u 1
+# use -- -v with cargo
+# cargo  run -- -v estimate -u 1
+[...]
+cloud_scanner_cli::aws_inventory: Total time spend querying CPU load of instances: 372.153481ms
+cloud_scanner_cli: ExecutionStatistics { inventory_duration: 911.526773ms, impact_duration: 398.993816ms, total_duration: 1.310520822s }
+[...]
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="environment-variables"><a class="header" href="#environment-variables">Environment variables</a></h1>
+<p>Cloud scanner uses environment variables to configure connection to your cloud account. See <a href="#aws-authentication">AWS authentication</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="format-of-results-in-server-mode"><a class="header" href="#format-of-results-in-server-mode">Format of results in server mode</a></h1>
+<p>When run in server mode (<code>cloud-scanner-cli serve</code>), Cloud-scanner exposes 3 endpoints:</p>
+<ul>
+<li><code>/metrics</code>: returns Prometheus metrics (plain text)</li>
+<li><code>/inventory</code>: returns an inventory  (json format, see schema below)</li>
+<li><code>/impacts</code>: returns impacts (json format, see schema below)</li>
+</ul>
+<h2 id="open-api-specification-swagger"><a class="header" href="#open-api-specification-swagger">Open API specification (Swagger)</a></h2>
+<p>To access the OpenAPI specification:</p>
+<ol>
+<li>start a server (<code>cloud-scanner-cli serve</code>)</li>
+<li>access the OpenAPI specification at <a href="http://127.0.0.1:8000/openapi.json">http://127.0.0.1:8000/openapi.json</a> and a swagger-ui at
+<a href="http://127.0.0.1:8000/swagger-ui/">http://127.0.0.1:8000/swagger-ui/</a></li>
+</ol>
+<p>The latest (up-to-date) version of OpenAPI specification is exposed under  <code>&lt;BaseURL&gt;/openapi.json</code> path and displayed using swagger-ui at <code>&lt;BaseURL&gt;/swagger-ui/index.html</code>.</p>
+<pre><code class="language-json">{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "cloud-scanner-cli",
+    "version": "3.2.0-SNAPSHOT"
+  },
+  "paths": {
+    "/metrics": {
+      "get": {
+        "tags": [
+          "metrics"
+        ],
+        "summary": "Returns Prometheus metrics.",
+        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nResults are estimated for one hour of use by default.\n\nExample query: http://localhost:8000/metrics?aws_region=eu-west-3&amp;filter_tag=Name=boatest&amp;filter_tag=OtherTag=other-value&amp;use_duration_hours=1.0&amp;include_storage=true",
+        "operationId": "metrics",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "use_duration_hours",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          },
+          {
+            "name": "include_block_storage",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/inventory": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Returns current inventory.",
+        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nExample query: http://localhost:8000/inventory?aws_region=eu-west-3&amp;filter_tag=Name=boatest&amp;filter_tag=OtherTag=other-value",
+        "operationId": "inventory",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "include_block_storage",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impacts": {
+      "get": {
+        "tags": [
+          "impacts"
+        ],
+        "summary": "Returns the impacts of current inventory.",
+        "description": "Region is mandatory. Filter_tags (if any) should be written as string containing tag_name=tag_value\n\nExample query: http://localhost:8000/impacts?aws_region=eu-west-3&amp;filter_tag=Name=boatest&amp;filter_tag=OtherTag=other-value&amp;use_duration_hours=1.0",
+        "operationId": "impacts",
+        "parameters": [
+          {
+            "name": "aws_region",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter_tags",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true
+            }
+          },
+          {
+            "name": "use_duration_hours",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          },
+          {
+            "name": "verbose_output",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          },
+          {
+            "name": "include_block_storage",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedInventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/impacts-from-arbitrary-inventory": {
+      "post": {
+        "tags": [
+          "impacts"
+        ],
+        "summary": "Retrieve the impacts of arbitrary inventory.",
+        "description": "This can be used to evaluate impacts of a not yet implemented architecture.\n\nThe inventory is passed as json data in the request body.",
+        "operationId": "impacts_from_arbitrary_inventory",
+        "parameters": [
+          {
+            "name": "use_duration_hours",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          },
+          {
+            "name": "verbose_output",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Inventory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimatedInventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Inventory": {
+        "description": "A list of cloud resources and metadata that describes the inventory itself",
+        "type": "object",
+        "required": [
+          "metadata",
+          "resources"
+        ],
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/InventoryMetadata"
+          },
+          "resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResource"
+            }
+          }
+        }
+      },
+      "InventoryMetadata": {
+        "description": "Details about the inventory",
+        "type": "object",
+        "properties": {
+          "inventory_date": {
+            "description": "The date when the inventory was generated",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "description": "A free text description of the inventory",
+            "type": "string",
+            "nullable": true
+          },
+          "cloud_scanner_version": {
+            "description": "The version of the cloud scanner that generated the inventory",
+            "type": "string",
+            "nullable": true
+          },
+          "execution_statistics": {
+            "description": "Statistics about program execution",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionStatistics"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "ExecutionStatistics": {
+        "description": "Statistics about program execution",
+        "type": "object",
+        "required": [
+          "impact_estimation_duration",
+          "inventory_duration",
+          "total_duration"
+        ],
+        "properties": {
+          "inventory_duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "impact_estimation_duration": {
+            "$ref": "#/components/schemas/Duration"
+          },
+          "total_duration": {
+            "$ref": "#/components/schemas/Duration"
+          }
+        }
+      },
+      "Duration": {
+        "type": "object",
+        "required": [
+          "nanos",
+          "secs"
+        ],
+        "properties": {
+          "secs": {
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
+          },
+          "nanos": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
+      "CloudResource": {
+        "description": "A cloud resource (could be an instance, block storage or any other resource)",
+        "type": "object",
+        "required": [
+          "id",
+          "location",
+          "provider",
+          "resource_details",
+          "tags"
+        ],
+        "properties": {
+          "provider": {
+            "$ref": "#/components/schemas/CloudProvider"
+          },
+          "id": {
+            "type": "string"
+          },
+          "location": {
+            "description": "The location where cloud resources are running.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UsageLocation"
+              }
+            ]
+          },
+          "resource_details": {
+            "$ref": "#/components/schemas/ResourceDetails"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResourceTag"
+            }
+          }
+        }
+      },
+      "CloudProvider": {
+        "type": "string",
+        "enum": [
+          "AWS",
+          "OVH"
+        ]
+      },
+      "UsageLocation": {
+        "description": "The location where cloud resources are running.\n\nTODO! the usage location should be abstracted and vendor specific implementation should be part of the cloud_provider model (region names are tied to a specific cloud provider)",
+        "type": "object",
+        "required": [
+          "aws_region",
+          "iso_country_code"
+        ],
+        "properties": {
+          "aws_region": {
+            "description": "The AWS region (like eu-west-1)",
+            "type": "string"
+          },
+          "iso_country_code": {
+            "description": "The 3-letters ISO country code corresponding to the country of the aws_region",
+            "type": "string"
+          }
+        }
+      },
+      "ResourceDetails": {
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "object_storage"
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "instance"
+            ],
+            "properties": {
+              "instance": {
+                "type": "object",
+                "required": [
+                  "instance_type"
+                ],
+                "properties": {
+                  "instance_type": {
+                    "type": "string"
+                  },
+                  "usage": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/InstanceUsage"
+                      }
+                    ],
+                    "nullable": true
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "block_storage"
+            ],
+            "properties": {
+              "block_storage": {
+                "type": "object",
+                "required": [
+                  "storage_type"
+                ],
+                "properties": {
+                  "storage_type": {
+                    "type": "string"
+                  },
+                  "usage": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/StorageUsage"
+                      }
+                    ],
+                    "nullable": true
+                  },
+                  "attached_instances": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/StorageAttachment"
+                    },
+                    "nullable": true
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "InstanceUsage": {
+        "type": "object",
+        "required": [
+          "average_cpu_load",
+          "state"
+        ],
+        "properties": {
+          "average_cpu_load": {
+            "type": "number",
+            "format": "double"
+          },
+          "state": {
+            "$ref": "#/components/schemas/InstanceState"
+          }
+        }
+      },
+      "InstanceState": {
+        "type": "string",
+        "enum": [
+          "running",
+          "stopped"
+        ]
+      },
+      "StorageUsage": {
+        "type": "object",
+        "required": [
+          "size_gb"
+        ],
+        "properties": {
+          "size_gb": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StorageAttachment": {
+        "type": "object",
+        "required": [
+          "instance_id"
+        ],
+        "properties": {
+          "instance_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CloudResourceTag": {
+        "description": "A tag (just a mandatory key + optional value)",
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "EstimatedInventory": {
+        "description": "An estimated inventory: impacting resources with their estimated impacts",
+        "type": "object",
+        "required": [
+          "impacting_resources",
+          "metadata"
+        ],
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/EstimationMetadata"
+          },
+          "impacting_resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CloudResourceWithImpacts"
+            }
+          }
+        }
+      },
+      "EstimationMetadata": {
+        "description": "Details about the estimation",
+        "type": "object",
+        "properties": {
+          "estimation_date": {
+            "description": "The date when the estimation was generated",
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "description": {
+            "description": "A free text description of the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "cloud_scanner_version": {
+            "description": "The version of the cloud scanner that provided the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "boavizta_api_version": {
+            "description": "The version of the Boavizta api that provided the estimation",
+            "type": "string",
+            "nullable": true
+          },
+          "execution_statistics": {
+            "description": "Statistics about program execution",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionStatistics"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "CloudResourceWithImpacts": {
+        "type": "object",
+        "required": [
+          "cloud_resource",
+          "impacts_duration_hours"
+        ],
+        "properties": {
+          "cloud_resource": {
+            "$ref": "#/components/schemas/CloudResource"
+          },
+          "impacts_values": {
+            "description": "The impacts",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ImpactsValues"
+              }
+            ],
+            "nullable": true
+          },
+          "impacts_duration_hours": {
+            "description": "The duration for which impacts are calculated",
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ImpactsValues": {
+        "description": "Impacts of an individual resource",
+        "type": "object",
+        "required": [
+          "adp_manufacture_kgsbeq",
+          "adp_use_kgsbeq",
+          "gwp_manufacture_kgco2eq",
+          "gwp_use_kgco2eq",
+          "pe_manufacture_megajoules",
+          "pe_use_megajoules"
+        ],
+        "properties": {
+          "adp_manufacture_kgsbeq": {
+            "type": "number",
+            "format": "double"
+          },
+          "adp_use_kgsbeq": {
+            "type": "number",
+            "format": "double"
+          },
+          "pe_manufacture_megajoules": {
+            "type": "number",
+            "format": "double"
+          },
+          "pe_use_megajoules": {
+            "type": "number",
+            "format": "double"
+          },
+          "gwp_manufacture_kgco2eq": {
+            "type": "number",
+            "format": "double"
+          },
+          "gwp_use_kgco2eq": {
+            "type": "number",
+            "format": "double"
+          },
+          "raw_data": {
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="output-data"><a class="header" href="#output-data">Output data</a></h1>
+<p>The <em>inventory</em> is always returned as JSON.</p>
+<p>The <em>estimated inventory</em> (i.e. inventory with impacts data ) is either returned as <em>json</em> or as a set of <em>Open Metrics</em> (Prometheus).</p>
+<h2 id="format-of-the-estimated-inventory-as-json"><a class="header" href="#format-of-the-estimated-inventory-as-json">Format of the estimated inventory as JSON</a></h2>
+<p>Cloud scanner returns a json array of <em>impacting_resources</em>. Each resource contains <code>resource_details</code> as well as <code>impact_values</code>.</p>
+<p>⚠  Cloud scanner returns <em>empty</em> impacts_values when the <em>instance type</em> is not known in Boavizta database</p>
+<pre><code class="language-json">{
+  "impacting_resources": [
+    {
+      "cloud_resource": {
+        "provider": "AWS",
+        "id": "instance-F",
+        "location": {
+          "aws_region": "eu-west-1",
+          "iso_country_code": "IRL"
+        },
+        "resource_details": {
+          "instance": {
+            "instance_type": "FICTIVE-INSTANCE-TYPE",
+            "usage": {
+              "average_cpu_load": 100,
+              "state": "running"
+            }
+          }
+        },
+        "tags": []
+      },
+      "impacts_values": null,
+      "impacts_duration_hours": 5
+    },
+    {
+      "cloud_resource": {
+        "provider": "AWS",
+        "id": "instance-1",
+        "location": {
+          "aws_region": "eu-west-1",
+          "iso_country_code": "IRL"
+        },
+        "resource_details": {
+          "instance": {
+            "instance_type": "a1.medium",
+            "usage": {
+              "average_cpu_load": 0.3,
+              "state": "running"
+            }
+          }
+        },
+        "tags": []
+      },
+      "impacts_values": {
+        "adp_manufacture_kgsbeq": 8.8e-07,
+        "adp_use_kgsbeq": 1.29e-10,
+        "pe_manufacture_megajoules": 0.057,
+        "pe_use_megajoules": 0.063,
+        "gwp_manufacture_kgco2eq": 0.0041,
+        "gwp_use_kgco2eq": 0.00226,
+        "raw_data": {
+          "impacts": {
+            "adp": {
+              "description": "Use of minerals and fossil ressources",
+              "embedded": {
+                "max": 1.261e-06,
+                "min": 5.808e-07,
+                "value": 8.8e-07,
+                "warnings": [
+                  "End of life is not included in the calculation"
+                ]
+              },
+              "unit": "kgSbeq",
+              "use": {
+                "max": 1.552e-10,
+                "min": 1.164e-10,
+                "value": 1.29e-10
+              }
+            },
+            "gwp": {
+              "description": "Total climate change",
+              "embedded": {
+                "max": 0.005669,
+                "min": 0.002324,
+                "value": 0.0041,
+                "warnings": [
+                  "End of life is not included in the calculation"
+                ]
+              },
+              "unit": "kgCO2eq",
+              "use": {
+                "max": 0.002718,
+                "min": 0.002038,
+                "value": 0.00226
+              }
+            },
+            "pe": {
+              "description": "Consumption of primary energy",
+              "embedded": {
+                "max": 0.07877,
+                "min": 0.03178,
+                "value": 0.057,
+                "warnings": [
+                  "End of life is not included in the calculation"
+                ]
+              },
+              "unit": "MJ",
+              "use": {
+                "max": 0.07577,
+                "min": 0.05683,
+                "value": 0.063
+              }
+            }
+          }
+        }
+      },
+      "impacts_duration_hours": 5
+    }
+  ]
+}
+</code></pre>
+<h2 id="schema-of-the-json-output"><a class="header" href="#schema-of-the-json-output">Schema of the json output</a></h2>
+<p>A schema describe the format of the JSON estimated inventory  (as part of theOpenAPI specification).</p>
+<p>To access it:</p>
+<ol>
+<li>start a server (<code>cloud-scanner-cli serve</code>)</li>
+<li>access the OpenAPI specification at <a href="http://127.0.0.1:8000/openapi.json">http://127.0.0.1:8000/openapi.json</a> and a swagger-ui at
+<a href="http://127.0.0.1:8000/swagger-ui/">http://127.0.0.1:8000/swagger-ui/</a></li>
+</ol>
+<p>See  <a href="#format-of-results-in-server-mode">OpenAPI specification in server mode</a></p>
+<h2 id="openmetricsprometheus-output"><a class="header" href="#openmetricsprometheus-output">OpenMetrics/Prometheus output</a></h2>
+<p>As CLI application, when using the  <code>metrics</code> or  <code>serve</code> command, cloud-scanner returns consolidated results as OpenMetric/Prometheus format instead of json.
+This is also the default format of the serverless application <code>metrics</code> route.</p>
+<p>When using the metric output format, you get 2 sets of metrics</p>
+<ul>
+<li>Metrics named <em>boavizta_xxxxx</em> are <em>summary</em> metrics (total number of resources, summed impacts, a.s.o)</li>
+<li>Metrics named <em>boavizta_resource_yyy</em> are specific to <em>individual resources</em>. The metric labels can be filtered to identify resource.</li>
+</ul>
+<pre><code class="language-sh">cargo run metrics -u 1
+</code></pre>
+<p>Returns:</p>
+<pre><code class="language-sh"># HELP boavizta_number_of_resources_total Number of resources detected during the inventory.
+# TYPE boavizta_number_of_resources_total gauge
+boavizta_number_of_resources_total{awsregion="eu-west-1",country="IRL"} 4
+# HELP boavizta_number_of_resources_assessed Number of resources that were considered in the estimation of impacts.
+# TYPE boavizta_number_of_resources_assessed gauge
+boavizta_number_of_resources_assessed{awsregion="eu-west-1",country="IRL"} 4
+# HELP boavizta_duration_of_use_hours Use duration considered to estimate impacts.
+# TYPE boavizta_duration_of_use_hours gauge
+boavizta_duration_of_use_hours{awsregion="eu-west-1",country="IRL"} 1.0
+# HELP boavizta_pe_manufacture_megajoules Energy consumed for manufacture.
+# TYPE boavizta_pe_manufacture_megajoules gauge
+boavizta_pe_manufacture_megajoules{awsregion="eu-west-1",country="IRL"} 0.0704
+# HELP boavizta_pe_use_megajoules Energy consumed during use.
+# TYPE boavizta_pe_use_megajoules gauge
+boavizta_pe_use_megajoules{awsregion="eu-west-1",country="IRL"} 0.2636
+# HELP boavizta_adp_manufacture_kgsbeq Abiotic resources depletion potential of manufacture.
+# TYPE boavizta_adp_manufacture_kgsbeq gauge
+boavizta_adp_manufacture_kgsbeq{awsregion="eu-west-1",country="IRL"} 8.3e-7
+# HELP boavizta_adp_use_kgsbeq Abiotic resources depletion potential of use.
+# TYPE boavizta_adp_use_kgsbeq gauge
+boavizta_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL"} 5.387e-10
+# HELP boavizta_gwp_manufacture_kgco2eq Global Warming Potential of manufacture.
+# TYPE boavizta_gwp_manufacture_kgco2eq gauge
+boavizta_gwp_manufacture_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.00532
+# HELP boavizta_gwp_use_kgco2eq Global Warming Potential of use.
+# TYPE boavizta_gwp_use_kgco2eq gauge
+boavizta_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL"} 0.009430000000000001
+# HELP boavizta_resource_duration_of_use_hours Use duration considered to estimate impacts.
+# TYPE boavizta_resource_duration_of_use_hours gauge
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-033df52f12f30ca66",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boavizta") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }]",resource_state="Stopped"} 1.0
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-0a3e6b8cdb50c49b8",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "appname", value: Some("app1") }, CloudResourceTag { key: "created_by", value: Some("demeringo") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("boavizta-c5n.xlarge") }]",resource_state="Stopped"} 1.0
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-03c8f84a6318a8186",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boapi") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }]",resource_state="Running"} 1.0
+boavizta_resource_duration_of_use_hours{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-003ea8da7bb9bfff9",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("test-boavizta-2") }]",resource_state="Running"} 1.0
+# HELP boavizta_resource_pe_embedded_megajoules Energy consumed for manufacture.
+# TYPE boavizta_resource_pe_embedded_megajoules gauge
+boavizta_resource_pe_embedded_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-003ea8da7bb9bfff9",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("test-boavizta-2") }]",resource_state="Running"} 0.021
+boavizta_resource_pe_embedded_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-0a3e6b8cdb50c49b8",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "appname", value: Some("app1") }, CloudResourceTag { key: "created_by", value: Some("demeringo") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("boavizta-c5n.xlarge") }]",resource_state="Stopped"} 0.017
+boavizta_resource_pe_embedded_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-03c8f84a6318a8186",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boapi") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }]",resource_state="Running"} 0.0114
+boavizta_resource_pe_embedded_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-033df52f12f30ca66",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boavizta") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }]",resource_state="Stopped"} 0.021
+# HELP boavizta_resource_pe_use_megajoules Energy consumed during use.
+# TYPE boavizta_resource_pe_use_megajoules gauge
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-003ea8da7bb9bfff9",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("test-boavizta-2") }]",resource_state="Running"} 0.082
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-03c8f84a6318a8186",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boapi") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }]",resource_state="Running"} 0.0126
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-033df52f12f30ca66",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boavizta") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }]",resource_state="Stopped"} 0.081
+boavizta_resource_pe_use_megajoules{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-0a3e6b8cdb50c49b8",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "appname", value: Some("app1") }, CloudResourceTag { key: "created_by", value: Some("demeringo") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("boavizta-c5n.xlarge") }]",resource_state="Stopped"} 0.088
+# HELP boavizta_resource_adp_embedded_kgsbeq Abiotic resources depletion potential of embedded impacts.
+# TYPE boavizta_resource_adp_embedded_kgsbeq gauge
+boavizta_resource_adp_embedded_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-033df52f12f30ca66",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boavizta") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }]",resource_state="Stopped"} 2.1e-7
+boavizta_resource_adp_embedded_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-003ea8da7bb9bfff9",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("test-boavizta-2") }]",resource_state="Running"} 2.1e-7
+boavizta_resource_adp_embedded_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-03c8f84a6318a8186",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boapi") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }]",resource_state="Running"} 1.8e-7
+boavizta_resource_adp_embedded_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-0a3e6b8cdb50c49b8",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "appname", value: Some("app1") }, CloudResourceTag { key: "created_by", value: Some("demeringo") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("boavizta-c5n.xlarge") }]",resource_state="Stopped"} 2.3e-7
+# HELP boavizta_resource_adp_use_kgsbeq Abiotic resources depletion potential of use.
+# TYPE boavizta_resource_adp_use_kgsbeq gauge
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-0a3e6b8cdb50c49b8",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "appname", value: Some("app1") }, CloudResourceTag { key: "created_by", value: Some("demeringo") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("boavizta-c5n.xlarge") }]",resource_state="Stopped"} 1.81e-10
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-033df52f12f30ca66",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boavizta") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }]",resource_state="Stopped"} 1.65e-10
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-03c8f84a6318a8186",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boapi") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }]",resource_state="Running"} 2.57e-11
+boavizta_resource_adp_use_kgsbeq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-003ea8da7bb9bfff9",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("test-boavizta-2") }]",resource_state="Running"} 1.67e-10
+# HELP boavizta_resource_gwp_embedded_kgco2eq Global Warming Potential of embedded impacts.
+# TYPE boavizta_resource_gwp_embedded_kgco2eq gauge
+boavizta_resource_gwp_embedded_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-003ea8da7bb9bfff9",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("test-boavizta-2") }]",resource_state="Running"} 0.0016
+boavizta_resource_gwp_embedded_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-033df52f12f30ca66",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boavizta") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }]",resource_state="Stopped"} 0.0016
+boavizta_resource_gwp_embedded_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-0a3e6b8cdb50c49b8",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "appname", value: Some("app1") }, CloudResourceTag { key: "created_by", value: Some("demeringo") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("boavizta-c5n.xlarge") }]",resource_state="Stopped"} 0.0013
+boavizta_resource_gwp_embedded_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-03c8f84a6318a8186",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boapi") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }]",resource_state="Running"} 0.00082
+# HELP boavizta_resource_gwp_use_kgco2eq Global Warming Potential of use.
+# TYPE boavizta_resource_gwp_use_kgco2eq gauge
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-033df52f12f30ca66",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boavizta") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }]",resource_state="Stopped"} 0.00289
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-0a3e6b8cdb50c49b8",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "appname", value: Some("app1") }, CloudResourceTag { key: "created_by", value: Some("demeringo") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("boavizta-c5n.xlarge") }]",resource_state="Stopped"} 0.00317
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-03c8f84a6318a8186",resource_tags="[CloudResourceTag { key: "Name", value: Some("test-boapi") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }]",resource_state="Running"} 0.00045
+boavizta_resource_gwp_use_kgco2eq{awsregion="eu-west-1",country="IRL",resource_type="Instance",resource_id="i-003ea8da7bb9bfff9",resource_tags="[CloudResourceTag { key: "CustomTagNameForDebug", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "CreatorName", value: Some("olivierdemeringoadm") }, CloudResourceTag { key: "Name", value: Some("test-boavizta-2") }]",resource_state="Running"} 0.00292
+# EOF
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="serverless-design"><a class="header" href="#serverless-design">Serverless design</a></h1>
+<p>We use the <a href="https://www.serverless.com/">serverless framework</a> and the <a href="https://github.com/softprops/serverless-rust">softprops/serverless-rust</a> plugin to ease packaging and deployment as lambda.</p>
+<p>The cloud-scanner-cli is wrapped into a set of lambdas functions exposed behind an AWS API gateway.</p>
+<p><em>This is certainly not the only way to deploy the application. If you want more control, you could compile, package and deploy the application with Terraform or CDK, but this is not documented yet.</em></p>
+<h2 id="serverless-deployment"><a class="header" href="#serverless-deployment">Serverless deployment</a></h2>
+<p>When deploying as serverless, <strong>you</strong> have to provide and configure Grafana and Prometheus seprately. This repository <em>only</em> wrapps the cloud-scanner in a lambda.</p>
+<p>The recommended serveless deployment is the following.</p>
+<p><img src="images/cloud-scanner-lambda-deployment.excalidraw.png" alt="Where to deploy the scanner as lambda"></p>
+<p>The scanner is deployed as a lambda inside a first region of your account. It performs inventory of other regions.</p>
+<ul>
+<li>You may restrict to specifc regions by tuning the role of the lambda defined in <code>serverless.yml</code></li>
+<li>You can (and should) also deploy Boaviztapi as a lambda or other in your account. This allow to perform scans and evaluate impacts without any inventory data leaking outside your account. Once you have deployed your own instance of BoaviztAPI, tune the <code>BOAVIZTA_API_URL</code> in the <code>serverless.yml</code> file to ensure that cloud-scanner points to your private instance of API. See  <a href="#using-a-private-instance-of-boavizta-api">using private Boavizta API</a>.</li>
+</ul>
+<p>⚠ Open issue prevents Boavizta API deployment as Lambda (https://github.com/Boavizta/boaviztapi/issues/153). As a workaround we recommend deploying Boavizta API as a docker container  (for example using AWS ECS) . You can still use cloud-scanner itself as serverless application deployed with Lambda.</p>
+<h2 id="serverless-routes"><a class="header" href="#serverless-routes">Serverless routes</a></h2>
+<h3 id="instance-impacts-as-json"><a class="header" href="#instance-impacts-as-json">Instance impacts as JSON</a></h3>
+<p>The <code>scan</code> route returns individual instances metrics in json format (see below, same as CLI)</p>
+<p>Use <code>hours_use_time</code> and <code>aws_region</code> parameters in the query</p>
+<p>E.g.: <code>https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/scan?hours_use_time=5&amp;aws_region=eu-west-1</code></p>
+<pre><code class="language-json">[
+  {
+    "instance_id": "i-03c8f84a6318a8186",
+    "instance_type": "a1.medium",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0063,
+        "unit": "kgSbeq",
+        "use": 8e-12
+      },
+      "gwp": {
+        "manufacture": 31,
+        "unit": "kgCO2eq",
+        "use": 0.0001
+      },
+      "pe": {
+        "manufacture": 430,
+        "unit": "MJ",
+        "use": 0.004
+      }
+    }
+  },
+  {
+    "instance_id": "i-033df52f12f30ca66",
+    "instance_type": "m6g.xlarge",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0083,
+        "unit": "kgSbeq",
+        "use": 8e-10
+      },
+      "gwp": {
+        "manufacture": 83,
+        "unit": "kgCO2eq",
+        "use": 0.01
+      },
+      "pe": {
+        "manufacture": 1100,
+        "unit": "MJ",
+        "use": 0.4
+      }
+    }
+  },
+  {
+    "instance_id": "i-0a3e6b8cdb50c49b8",
+    "instance_type": "c5n.xlarge",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0086,
+        "unit": "kgSbeq",
+        "use": 1e-9
+      },
+      "gwp": {
+        "manufacture": 64,
+        "unit": "kgCO2eq",
+        "use": 0.02
+      },
+      "pe": {
+        "manufacture": 840,
+        "unit": "MJ",
+        "use": 0.5
+      }
+    }
+  },
+  {
+    "instance_id": "i-003ea8da7bb9bfff9",
+    "instance_type": "m6g.xlarge",
+    "usage_data": {
+      "hours_use_time": 5,
+      "time_workload": 0,
+      "usage_location": "IRL"
+    },
+    "impacts": {
+      "adp": {
+        "manufacture": 0.0083,
+        "unit": "kgSbeq",
+        "use": 8e-10
+      },
+      "gwp": {
+        "manufacture": 83,
+        "unit": "kgCO2eq",
+        "use": 0.01
+      },
+      "pe": {
+        "manufacture": 1100,
+        "unit": "MJ",
+        "use": 0.4
+      }
+    }
+  }
+]
+</code></pre>
+<h3 id="account-impacts-as-metrics"><a class="header" href="#account-impacts-as-metrics">Account impacts as metrics</a></h3>
+<p>The <code>metrics</code> route returns aggregated account metrics <em>for one hour of use</em> in Prometheus format.</p>
+<p>Use <code>aws_region</code> parameters in the query.</p>
+<p>E.g.: <code>https://xxxxx.execute-api.eu-west-1.amazonaws.com/dev/metrics?aws_region=eu-central-1</code></p>
+<pre><code class="language-text"># HELP boavizta_number_of_instances_total Number of instances detected during the scan.
+# TYPE boavizta_number_of_instances_total gauge
+boavizta_number_of_instances_total{awsregion="eu-central-1",country="DEU"} 7
+# HELP boavizta_number_of_instances_assessed Number of instances that were considered in the measure.
+# TYPE boavizta_number_of_instances_assessed gauge
+boavizta_number_of_instances_assessed{awsregion="eu-central-1",country="DEU"} 5
+# HELP boavizta_duration_of_use_hours Number of instances detected during the scan.
+# TYPE boavizta_duration_of_use_hours gauge
+boavizta_duration_of_use_hours{awsregion="eu-central-1",country="DEU"} 1.0
+# HELP boavizta_pe_manufacture_megajoules Power consumed for manufacture.
+# TYPE boavizta_pe_manufacture_megajoules gauge
+boavizta_pe_manufacture_megajoules{awsregion="eu-central-1",country="DEU"} 1760.0
+# HELP boavizta_pe_use_megajoules Power consumed during usage.
+# TYPE boavizta_pe_use_megajoules gauge
+boavizta_pe_use_megajoules{awsregion="eu-central-1",country="DEU"} 0.86
+# EOF
+</code></pre>
+<p>See also <a href="#integrate-metrics-to-a-monitoring-dashboard">Set up monitoring dashboard</a> for an example of scrapping and displaying these metrics.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="limitations-and-perimeter"><a class="header" href="#limitations-and-perimeter">Limitations and perimeter</a></h1>
+<p>We do our best to offer accurate estimations of impacts.
+But these figures should  still be considered with a grain of salt.</p>
+<blockquote>
+<p>All models are wrong, but some are useful.</p>
+</blockquote>
+<p>The Boavizta impact data result from a modelling effort. It is important to consider:</p>
+<ol>
+<li>the limited Perimeter of the resources that cloud-scanner takes into account.</li>
+<li>the limits of estimations methodology.</li>
+</ol>
+<h2 id="perimeter--scope"><a class="header" href="#perimeter--scope">Perimeter / scope</a></h2>
+<p>Cloud scanner <em>only</em> estimates the impacts of your AWS EC2  instances, and optionally block storage.</p>
+<p>Several significant aspects of the global impacts of cloud usage are <strong>excluded</strong>:</p>
+<ul>
+<li>It only estimate impacts of <em>compute</em> instances (EC2 Virtual Machines) and optionally block storage (HDD, SSD volumes).</li>
+<li>Cloud scanner does not take into account the PUE of the data center. See <a href="https://github.com/Boavizta/cloud-scanner/issues/422">Add an option to override PUE in the queries or cli option · Issue #422 · Boavizta/cloud-scanner</a></li>
+<li>Cloud scanner does not take into account the surrounding cloud infrastructure (network, control plan).</li>
+<li>For <strong>storage</strong> (experimental feature), <strong>only</strong> the impacts of <strong>manufacture</strong> are counted. The impacts of the <em>use</em> phase are <em>not</em> counted. At the moment, Boavizta API returns only the impacts of the <em>manufacturing</em> phase for HDD and SSD. Furthermore the impacts of storage <em>are likely overestimated</em>. They are calculated by taking into account the size of the logical volume. In reality, a volume that is not full may not claim the full space on a physical device, which would result in smaller impacts.</li>
+<li>do not take into account the <em>over-commit</em> (mutualization) or <em>over-provisioning</em>(redundancy) that cloud provider may apply to provide the service.</li>
+<li>do not account managed services (like DB as a service or Containers as a service).</li>
+<li>do not account serverless (lambda) compute.</li>
+<li>unsupported instance types returns zero for their impacts.</li>
+<li>Cloud scanner does not provide error margins <a href="https://github.com/Boavizta/boaviztapi/issues/147">https://github.com/Boavizta/boaviztapi/issues/147</a>.</li>
+</ul>
+<h2 id="other-limits"><a class="header" href="#other-limits">Other limits</a></h2>
+<h3 id="instances-supported"><a class="header" href="#instances-supported">Instances supported</a></h3>
+<p>Cloud scanner supports all instances types of Boavizta API. But when a specific instance type cannot be matched with the Boavizta data set, Cloud-scanner returns empty impacts (i.e. zeroed impact values).</p>
+<h3 id="carbon-intensity-of-electricity-is-not-real-time"><a class="header" href="#carbon-intensity-of-electricity-is-not-real-time">Carbon intensity of electricity is not real time</a></h3>
+<p>Carbon intensity of electricity is not real time. It uses and yearly average corresponding to the country where the data center is located. This is more related to the API itself, see <a href="https://github.com/Boavizta/boaviztapi/issues/117">https://github.com/Boavizta/boaviztapi/issues/117</a> and general Boavizta API methodology.</p>
+<h3 id="we-do-not-provide-margins-of-error"><a class="header" href="#we-do-not-provide-margins-of-error">We do not provide margins of error</a></h3>
+<p>Cloud scanner is not yet able to provide error margin related to it’s estimation. Note that there is ongoing work on Boavizta API to provide more details about the error margins: <a href="https://github.com/Boavizta/boaviztapi/issues/147">https://github.com/Boavizta/boaviztapi/issues/147</a></p>
+<h3 id="open-issues--bugs"><a class="header" href="#open-issues--bugs">Open issues / bugs</a></h3>
+<p>There may be additional identified issues or bugs, see <a href="https://github.com/Boavizta/cloud-scanner/issues">Issues</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="testing"><a class="header" href="#testing">Testing</a></h1>
+<h2 id="unit-tests"><a class="header" href="#unit-tests">Unit tests</a></h2>
+<p>Unit tests are launched with  <code>cargo test</code> command.</p>
+<h2 id="end-to-end-tests"><a class="header" href="#end-to-end-tests">End to end tests</a></h2>
+<p>When launched with <code>cargo test -- --include-ignored</code> additional integration tests need:</p>
+<ul>
+<li>specific instance to be running</li>
+<li>aws credentials to be setup</li>
+</ul>
+<blockquote>
+<p>These integration tests require specific instances to be up and running to pass. This means they are tied to a specific cloud account.</p>
+</blockquote>
+<p>Memo: commands to start or stop instances:</p>
+<pre><code class="language-sh"># List instance state
+aws ec2 describe-instance-status --include-all-instances --filters Name=instance-state-name,Values='*' --query 'InstanceStatuses[*].{InstanceId: InstanceId, State: InstanceState.Name}' --ouptut table
+
+# start instance 
+aws ec2 start-instances --instance-id i-03c8f84a6318a8186
+
+# stop instance
+aws ec2 stop-instances --instance-id i-03c8f84a6318a8186
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid-69e1d02a.min.js"></script>
+        <script src="mermaid-init-4533fb11.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
