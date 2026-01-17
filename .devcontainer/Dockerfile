@@ -52,6 +52,11 @@ RUN npm config set ignore-scripts true
 
 # setup Rust
 RUN rustup default stable
+RUN rustup target add x86_64-unknown-linux-musl
+
+# Install mdbook
+RUN cargo install mdbook mdbook-mermaid mdbook-linkcheck
+
 
 # setup git
 RUN git config --global push.autoSetupRemote true
