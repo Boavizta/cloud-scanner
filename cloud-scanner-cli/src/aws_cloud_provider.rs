@@ -3,11 +3,12 @@ use std::time::Instant;
 
 use crate::cloud_provider::Inventoriable;
 use crate::get_version;
+use crate::model::StorageUsageForType;
 use crate::usage_location::*;
 
-use anyhow::{Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use aws_sdk_cloudwatch::operation::get_metric_statistics::GetMetricStatisticsOutput;
-use aws_sdk_cloudwatch::types::{Dimension, StandardUnit, Statistic};
+use aws_sdk_cloudwatch::types::{Dimension, DimensionFilter, Metric, StandardUnit, Statistic};
 use aws_sdk_ec2::config::Region;
 use aws_sdk_ec2::types::{Instance, InstanceStateName, Volume};
 use chrono::{TimeDelta, Utc};
@@ -57,7 +58,7 @@ impl AwsCloudProvider {
                 }
                 Some(region) => {
                     warn!(
-                        "Initialized AWS client from the default region picked up from environment [{}]", region
+                        "Initialized AWS client from the default region picked up from environment [{region}]"
                     );
                 }
             }
@@ -87,7 +88,9 @@ impl AwsCloudProvider {
             }
             retained_region.to_string().to_owned()
         } else {
-            error!("Unable to configure AWS client region. You should consider setting a AWS_DEFAULT_REGION as environment variable or pass region as a CLI parameter.... Exiting...");
+            error!(
+                "Unable to configure AWS client region. You should consider setting a AWS_DEFAULT_REGION as environment variable or pass region as a CLI parameter.... Exiting..."
+            );
             panic!();
         }
     }
@@ -203,7 +206,6 @@ impl AwsCloudProvider {
     }
 
     /// Returns average CPU load of a given instance.
-    ///
     async fn get_average_cpu(self, instance_id: &str) -> Result<f64> {
         let res = self
             .get_average_cpu_usage_of_last_10_minutes(instance_id)
@@ -238,34 +240,29 @@ impl AwsCloudProvider {
         instance_id: &str,
     ) -> Result<GetMetricStatisticsOutput, Error> {
         // We want statistics about the last 10 minutes using  5min  sample
-        let measure_duration: chrono::TimeDelta =
-            TimeDelta::try_minutes(10).context("Unsupported duration")?;
+        let measure_duration: chrono::TimeDelta = TimeDelta::minutes(10);
+        let (start_time, end_time) = Self::get_cloudwatch_start_and_end_time(measure_duration);
         let sample_period_seconds = 300; // 5*60 (the default granularity of cloudwatch standard CPU metrics)
-        let now: chrono::DateTime<Utc> = Utc::now();
-        let start_time: chrono::DateTime<Utc> = now - measure_duration;
 
         let cpu_metric_name = String::from("CPUUtilization");
         let ec2_namespace = "AWS/EC2";
 
-        let dimensions = vec![Dimension::builder()
-            .name("InstanceId")
-            .value(instance_id)
-            .build()];
-
-        let end_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
-            aws_sdk_cloudwatch::primitives::DateTime::from_secs(now.timestamp());
-        let start_time_aws: aws_sdk_cloudwatch::primitives::DateTime =
-            aws_sdk_cloudwatch::primitives::DateTime::from_secs(start_time.timestamp());
+        let dimensions = vec![
+            Dimension::builder()
+                .name("InstanceId")
+                .value(instance_id)
+                .build(),
+        ];
 
         let resp: GetMetricStatisticsOutput = self
             .cloudwatch_client
             .get_metric_statistics()
-            .end_time(end_time_aws)
+            .end_time(end_time)
             .metric_name(cpu_metric_name)
             .namespace(ec2_namespace)
             .period(sample_period_seconds)
             .set_dimensions(Some(dimensions))
-            .start_time(start_time_aws)
+            .start_time(start_time)
             .statistics(Statistic::Average)
             .unit(StandardUnit::Percent)
             .send()
@@ -273,6 +270,23 @@ impl AwsCloudProvider {
             .context("Trying to get cloudwatch statistics")?;
 
         Ok(resp)
+    }
+
+    /// Return `(start_time, end_time)` to be used when calling `cloudwatch_client.get_metric_statistics()`
+    /// With `start_time = now - measure_duration` and `end_time = now`
+    fn get_cloudwatch_start_and_end_time(
+        measure_duration: chrono::TimeDelta,
+    ) -> (
+        aws_sdk_cloudwatch::primitives::DateTime,
+        aws_sdk_cloudwatch::primitives::DateTime,
+    ) {
+        let now: chrono::DateTime<Utc> = Utc::now();
+        let start_time: chrono::DateTime<Utc> = now - measure_duration;
+
+        let start_time_aws =
+            aws_sdk_cloudwatch::primitives::DateTime::from_secs(start_time.timestamp());
+        let end_time_aws = aws_sdk_cloudwatch::primitives::DateTime::from_secs(now.timestamp());
+        (start_time_aws, end_time_aws)
     }
 
     /// List all Volumes of current account.
@@ -296,6 +310,192 @@ impl AwsCloudProvider {
             volumes.push(v.clone());
         }
         Ok(volumes)
+    }
+
+    /// Fetch all aws S3 buckets `BucketSizeBytes` metrics of the region
+    ///
+    /// An individual metric resembles the following:
+    /// ```
+    /// use aws_sdk_cloudwatch::types::{Metric, Dimension};
+    ///
+    /// Metric::builder()
+    ///     .metric_name("BucketSizeBytes")
+    ///     .namespace("AWS/S3")
+    ///     .dimensions(
+    ///         Dimension::builder()
+    ///             .name("StorageType")
+    ///             .value("StandardStorage")
+    ///             .build(),
+    ///     )
+    ///     .dimensions(
+    ///         Dimension::builder()
+    ///             .name("StorageType")
+    ///             .value("GlacierStorage")
+    ///             .build(),
+    ///     )
+    ///     .dimensions(
+    ///         Dimension::builder()
+    ///             .name("BucketName")
+    ///             .value("some-bucket-name")
+    ///             .build(),
+    ///     )
+    ///     .build();
+    /// ```
+    pub async fn list_bucket_size_metrics(&self, tags: &[String]) -> Result<Vec<Metric>> {
+        let mut metrics = Vec::new();
+        let mut next_token = None;
+
+        // Filter by tags, if any
+        // TODO ensure this work as expected (can't be check on the same day as tag creation)
+        let dimensions: Vec<DimensionFilter> = tags
+            .iter()
+            .map(|tag| {
+                DimensionFilter::builder()
+                    .name("FilterId")
+                    .value(String::from(tag))
+                    .build()
+            })
+            .collect();
+        let dimensions = if dimensions.is_empty() {
+            None
+        } else {
+            Some(dimensions)
+        };
+
+        // We loop until we've processed everything.
+        loop {
+            // Input for CloudWatch API
+            let output = self
+                .cloudwatch_client
+                .list_metrics()
+                .namespace("AWS/S3")
+                .metric_name("BucketSizeBytes")
+                .set_dimensions(dimensions.clone())
+                .set_next_token(next_token)
+                .send()
+                .await?;
+
+            // If we get any metrics, append them to our vec
+            let metric = output.metrics();
+            metrics.append(&mut metric.to_vec());
+
+            // If there was a next token, use it, otherwise the loop is done.
+            match output.next_token() {
+                Some(t) => next_token = Some(t.to_string()),
+                None => break,
+            };
+        }
+
+        Ok(metrics)
+    }
+
+    // Return the most recent size in bytes for this bucket and soraged type
+    // based on the most recent sample of bucket size in the last two days
+    pub async fn get_most_recent_bucket_size(
+        &self,
+        bucket_name: &str,
+        storage_type: &str,
+    ) -> Result<u64> {
+        const ONE_DAY_IN_SECS: i32 = 86_400;
+        // `BucketSizeBytes` is sampled once a day by aws this methode should ensure we get at least one average size
+        let (start_time, end_time) = Self::get_cloudwatch_start_and_end_time(TimeDelta::days(2));
+
+        let dimensions = vec![
+            Dimension::builder()
+                .name("BucketName")
+                .value(bucket_name)
+                .build(),
+            Dimension::builder()
+                .name("StorageType")
+                .value(storage_type)
+                .build(),
+        ];
+
+        let stats = self
+            .cloudwatch_client
+            .get_metric_statistics()
+            .start_time(start_time)
+            .end_time(end_time)
+            .metric_name("BucketSizeBytes")
+            .namespace("AWS/S3")
+            .period(ONE_DAY_IN_SECS)
+            .set_dimensions(Some(dimensions))
+            .statistics(Statistic::Average)
+            .unit(StandardUnit::Bytes)
+            .send()
+            .await?;
+
+        let average = stats
+            .datapoints()
+            .iter()
+            // In case we get multiple averages we take the most recent
+            .max_by_key(|datapoint| datapoint.timestamp)
+            .and_then(|datapoint| datapoint.average)
+            .ok_or_else(|| anyhow!("Failed to fetch any CloudWatch datapoints for average BucketSizeBytes \
+                 (this stats is only sampled once a day by aws, if you just created the bucket you migth need to wait tomorrow)."))?;
+
+        // Do a bit of rounding here to get an integer value before
+        // converting to u64.
+        Ok(average.round() as u64)
+    }
+
+    /// Perform inventory of all aws S3 buckets with `BucketSizeBytes` metrics of the region
+    async fn get_buckets_with_usage_data(&self, tags: &[String]) -> Result<Vec<CloudResource>> {
+        let location = UsageLocation::try_from(self.aws_region.as_str())?;
+        // The metrics are fitered by tags, so they should have those tags
+        // (if it is usefull it should be possible to get the actual, per bucket, tags using aws-sdk-s3)
+        let cloud_resource_tags: Vec<CloudResourceTag> = tags
+            .iter()
+            .map(|tag| CloudResourceTag {
+                key: tag.to_string(),
+                value: None,
+            })
+            .collect();
+
+        let metrics: Vec<Metric> = self.list_bucket_size_metrics(tags).await?;
+        let mut resources: Vec<CloudResource> = Vec::new();
+
+        for bucket in metrics {
+            let dimensions = bucket.dimensions();
+
+            if dimensions.is_empty() {
+                continue;
+            };
+
+            let bucket_name = dimensions
+                .iter()
+                .find(|d| d.name().is_some_and(|n| n == "BucketName"))
+                .and_then(|d| d.value())
+                .unwrap_or_default()
+                .to_owned();
+
+            let storage_types: Vec<String> = dimensions
+                .iter()
+                .filter(|d| d.name().is_some_and(|n| n == "StorageType"))
+                .filter_map(|d| d.value())
+                .map(|e| e.to_owned())
+                .collect();
+
+            let mut storage_by_type: Vec<StorageUsageForType> = Vec::new();
+            for storage_type in storage_types {
+                storage_by_type.push(StorageUsageForType {
+                    storage_type: String::from(&storage_type),
+                    size_bytes: self
+                        .get_most_recent_bucket_size(&bucket_name, &storage_type)
+                        .await?,
+                });
+            }
+
+            resources.push(CloudResource {
+                provider: CloudProvider::AWS,
+                id: bucket_name,
+                location: location.clone(),
+                resource_details: ResourceDetails::ObjectStorage { storage_by_type },
+                tags: cloud_resource_tags.clone(),
+            });
+        }
+
+        Ok(resources)
     }
 
     /// Perform inventory of all aws volumes of the region
@@ -361,6 +561,10 @@ impl Inventoriable for AwsCloudProvider {
             let mut volumes = self.clone().get_volumes_with_usage_data(tags).await?;
             resources.append(&mut volumes);
         }
+
+        let mut buckets = self.clone().get_buckets_with_usage_data(tags).await?;
+        resources.append(&mut buckets);
+
         let stats = ExecutionStatistics {
             inventory_duration: start.elapsed(),
             impact_estimation_duration: std::time::Duration::from_millis(0),
@@ -431,7 +635,7 @@ mod tests {
     async fn get_cpu_usage_metrics_of_running_instance_should_return_right_number_of_data_points() {
         let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await.unwrap();
         let res = aws
-            .get_average_cpu_usage_of_last_10_minutes(&RUNNING_INSTANCE_ID)
+            .get_average_cpu_usage_of_last_10_minutes(RUNNING_INSTANCE_ID)
             .await
             .unwrap();
         let datapoints = res.datapoints.unwrap();
@@ -476,7 +680,7 @@ mod tests {
         // This instance  needs to be running for the test to pass
         let aws: AwsCloudProvider = AwsCloudProvider::new("eu-west-1").await.unwrap();
 
-        let avg_cpu_load = aws.get_average_cpu(&RUNNING_INSTANCE_ID).await.unwrap();
+        let avg_cpu_load = aws.get_average_cpu(RUNNING_INSTANCE_ID).await.unwrap();
         assert_ne!(
             0 as f64, avg_cpu_load,
             "CPU load of instance {} is zero, is it really running ?",

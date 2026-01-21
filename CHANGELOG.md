@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 _This paragraph may describe WIP/unreleased features. They are merged to main branch but not tagged._
+- [Add inventory of S3 buckets](https://github.com/Boavizta/cloud-scanner/issues/420)
 - [Upgrade version of BoaviztAPI to 1.3.11](https://github.com/Boavizta/cloud-scanner/issues/728)
 - [Update to Rust version 1.86](https://github.com/Boavizta/cloud-scanner/issues/698)
 - [Upgrade version of BoaviztAPI to 1.3.10](https://github.com/Boavizta/cloud-scanner/issues/693)

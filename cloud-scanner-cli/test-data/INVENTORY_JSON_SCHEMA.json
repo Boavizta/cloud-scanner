@@ -161,12 +161,6 @@
     "ResourceDetails": {
       "oneOf": [
         {
-          "type": "string",
-          "enum": [
-            "object_storage"
-          ]
-        },
-        {
           "type": "object",
           "required": [
             "instance"
@@ -234,6 +228,29 @@
             }
           },
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "object_storage"
+          ],
+          "properties": {
+            "object_storage": {
+              "type": "object",
+              "required": [
+                "storage_by_type"
+              ],
+              "properties": {
+                "storage_by_type": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/StorageUsageForType"
+                  }
+                }
+              }
+            }
+          },
+          "additionalProperties": false
         }
       ]
     },
@@ -280,6 +297,23 @@
       "properties": {
         "instance_id": {
           "type": "string"
+        }
+      }
+    },
+    "StorageUsageForType": {
+      "type": "object",
+      "required": [
+        "size_bytes",
+        "storage_type"
+      ],
+      "properties": {
+        "storage_type": {
+          "type": "string"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
         }
       }
     },
