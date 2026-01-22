@@ -2,7 +2,7 @@ use lambda_http::{http::StatusCode, IntoResponse, Request, RequestExt, Response}
 /*use lambda_http::*;*/
 
 use lambda_runtime::Error;
-use pkg_version::*;
+use pkg_version::{pkg_version_major, pkg_version_minor, pkg_version_patch};
 use serde_json::json;
 
 extern crate log;
@@ -23,7 +23,7 @@ async fn main() -> Result<(), Error> {
 async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
     let config = match envy::from_env::<Config>() {
         Ok(config) => config,
-        Err(error) => panic!("{:#?}", error),
+        Err(error) => panic!("{error:#?}"),
     };
 
     println!(
@@ -31,8 +31,8 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         get_version(),
         cloud_scanner_cli::get_version()
     );
-    println!("Using config {:#?}", config);
-    println!("Scan account invoked with event : {:?}", event);
+    println!("Using config {config:#?}");
+    println!("Scan account invoked with event : {event:?}");
 
     let query_string_parameters = event.query_string_parameters();
 
@@ -47,41 +47,41 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
         }
     };
 
-    let aws_region = match query_string_parameters.first("aws_region") {
-        Some(aws_region) => aws_region,
-        None => {
-            println!("No 'aws_region' parameter in path, will fallback to default");
-            ""
-        }
-    };
+    let aws_region = query_string_parameters
+        .first("aws_region")
+        .unwrap_or_default();
+    if aws_region.is_empty() {
+        println!("No 'aws_region' parameter in path, will fallback to default");
+    }
 
-    let filter_tags = match query_string_parameters.all("filter_tag") {
-        Some(filter_tags) => filter_tags.iter().map(|t| t.to_string()).collect(),
-        None => {
-            let filter_tags: Vec<String> = Vec::new();
-            println!("No 'filter_tag' parameter in path, will fallback to default");
-            filter_tags
-        }
-    };
+    let filter_tags: Vec<String> = query_string_parameters
+        .all("filter_tag")
+        .unwrap_or_default()
+        .iter()
+        .map(ToString::to_string)
+        .collect();
+    if filter_tags.is_empty() {
+        println!("No 'filter_tag' parameter in path, will fallback to default");
+    }
 
-    let verbose_output: bool = match query_string_parameters.first("verbose_output") {
-        Some(verbose_string) => verbose_string.parse().unwrap_or(false),
-        None => false,
-    };
+    let verbose_output: bool = query_string_parameters
+        .first("verbose_output")
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(false);
 
-    let include_block_storage: bool = match query_string_parameters.first("include_block_storage") {
-        Some(include_block_storage_string) => include_block_storage_string.parse().unwrap_or(false),
-        None => false,
-    };
+    let include_block_storage: bool = query_string_parameters
+        .first("include_block_storage")
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(false);
 
-    let summary_only: bool = match query_string_parameters.first("summary_only") {
-        Some(summary_only_string) => summary_only_string.parse().unwrap_or(false),
-        None => false,
-    };
+    let summary_only: bool = query_string_parameters
+        .first("summary_only")
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(false);
 
-    println!("Using use time of {}", use_duration_hours);
-    println!("Using aws_region {}", aws_region);
-    println!("Using tag filers {:?}", filter_tags);
+    println!("Using use time of {use_duration_hours}");
+    println!("Using aws_region {aws_region}");
+    println!("Using tag filers {filter_tags:?}");
 
     let estimated_inventory = cloud_scanner_cli::estimate_impacts(
         &use_duration_hours,
@@ -95,7 +95,7 @@ async fn scan(event: Request) -> Result<impl IntoResponse, Error> {
     let json_impacts =
         cloud_scanner_cli::estimated_inventory_exporter::get_estimated_inventory_as_json(
             &estimated_inventory,
-            &aws_region,
+            aws_region,
             &use_duration_hours,
             summary_only,
         )
